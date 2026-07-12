@@ -1,0 +1,11 @@
+{
+  "name": "14.3_city_not_found",
+  "description": "Invalid city name triggers helpful error",
+  "messages": [
+    {
+      "send": "Hotels in Xyzzyville, {{today+30:natural}} to {{today+33:natural}}, 1 adult",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["not found", "couldn't find", "could not find", "check spelling", "spell", "try again", "valid", "recognize", "unable", "sorry"]
+    }
+  ]
+}

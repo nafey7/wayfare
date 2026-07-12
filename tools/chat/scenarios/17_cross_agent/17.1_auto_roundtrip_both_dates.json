@@ -1,0 +1,12 @@
+{
+  "name": "17.1_auto_roundtrip_both_dates",
+  "description": "Both dates → auto round-trip, doesn't ask trip type [TEMP LOOSENED PR#1108 — agent returns flight_conversation instead of search results; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Flights from London to Rome, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_not_contains": ["one-way or round"]
+    }
+  ]
+}

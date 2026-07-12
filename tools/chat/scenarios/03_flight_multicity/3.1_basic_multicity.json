@@ -1,0 +1,12 @@
+{
+  "name": "3.1_basic_multicity",
+  "description": "Multi-city with 3 legs + passengers — returns multi-city results",
+  "messages": [
+    {
+      "send": "London to Paris {{today+30:natural}}, Paris to Rome {{today+37:natural}}, Rome to London {{today+44:natural}}, 2 adults",
+      "expect_type_in": ["multicity_flight_search_results", "flight_search_results", "flight_conversation"],
+      "max_time_ms": 120000,
+      "expect_contains_any": ["London", "Paris", "Rome", "leg", "multi", "cheapest", "fastest", "value", "$", "stop", "segment"]
+    }
+  ]
+}

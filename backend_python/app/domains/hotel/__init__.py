@@ -1,0 +1,143 @@
+"""Hotel domain module.
+
+This module provides hotel search, booking, and management functionality,
+following domain-driven design patterns consistent with other domains.
+"""
+
+from typing import TYPE_CHECKING
+
+from .cache import HotelSessionCache
+from .constants import (
+    DEFAULT_CURRENCY,
+    HOTEL_BOOKINGS_COLLECTION,
+    HOTEL_SESSION_EXPIRY_DELTA,
+    HOTEL_SESSION_EXPIRY_MINUTES,
+    HOTEL_SESSIONS_COLLECTION,
+    MAX_ADULTS_PER_ROOM,
+    MAX_CHILDREN_PER_ROOM,
+    MAX_NIGHTS,
+    MAX_ROOMS,
+    MIN_ADULTS_PER_ROOM,
+    MIN_MAX_RESULT,
+    MIN_NIGHTS,
+    MIN_ROOMS,
+)
+from .enums import (
+    BookingStatus,
+    CancellationPolicy,
+    DistanceUnit,
+    HotelFareType,
+    MealPlan,
+    PropertyType,
+    RoomType,
+)
+from .events import HotelEventHandler
+from .exceptions import (
+    HotelBookingError,
+    HotelDomainError,
+    HotelNotFoundError,
+    HotelRateError,
+    HotelSearchError,
+    HotelSessionError,
+    HotelValidationError,
+)
+from .logger import HotelLogger
+from .schemas import (
+    GuestInfo,
+    HotelBookingDetailsRequest,
+    HotelBookingDetailsResponse,
+    HotelBookingRequest,
+    HotelBookingResponse,
+    HotelCancelRequest,
+    HotelCancelResponse,
+    HotelMoreResultsRequest,
+    HotelMyBookingListItem,
+    HotelRateRulesRequest,
+    HotelRateRulesResponse,
+    HotelRoomRatesRequest,
+    HotelRoomRatesResponse,
+    HotelSearchRequest,
+    HotelSearchResponse,
+    HotelSearchResult,
+    HotelTripDetailsRequest,
+    HotelTripDetailsResponse,
+    NearbyLocation,
+    OccupancyRoom,
+    PerNightPrice,
+    RoomOption,
+)
+from .validators import (
+    validate_currency_code,
+    validate_occupancy,
+    validate_search_dates,
+    validate_search_request,
+    validate_session_id,
+    validate_token_id,
+)
+
+__all__ = [
+    "DEFAULT_CURRENCY",
+    "HOTEL_BOOKINGS_COLLECTION",
+    "HOTEL_SESSIONS_COLLECTION",
+    "HOTEL_SESSION_EXPIRY_DELTA",
+    "HOTEL_SESSION_EXPIRY_MINUTES",
+    "MAX_ADULTS_PER_ROOM",
+    "MAX_CHILDREN_PER_ROOM",
+    "MAX_NIGHTS",
+    "MAX_ROOMS",
+    "MIN_ADULTS_PER_ROOM",
+    "MIN_MAX_RESULT",
+    "MIN_NIGHTS",
+    "MIN_ROOMS",
+    "BookingStatus",
+    "CancellationPolicy",
+    "DistanceUnit",
+    "GuestInfo",
+    "HotelBookingDetailsRequest",
+    "HotelBookingDetailsResponse",
+    "HotelBookingError",
+    "HotelBookingRequest",
+    "HotelBookingResponse",
+    "HotelCancelRequest",
+    "HotelCancelResponse",
+    "HotelDomainError",
+    "HotelEventHandler",
+    "HotelFareType",
+    "HotelLogger",
+    "HotelMoreResultsRequest",
+    "HotelMyBookingListItem",
+    "HotelNotFoundError",
+    "HotelRateError",
+    "HotelRateRulesRequest",
+    "HotelRateRulesResponse",
+    "HotelRoomRatesRequest",
+    "HotelRoomRatesResponse",
+    "HotelSearchError",
+    "HotelSearchRequest",
+    "HotelSearchResponse",
+    "HotelSearchResult",
+    "HotelService",
+    "HotelSessionCache",
+    "HotelSessionError",
+    "HotelTripDetailsRequest",
+    "HotelTripDetailsResponse",
+    "HotelValidationError",
+    "MealPlan",
+    "NearbyLocation",
+    "OccupancyRoom",
+    "PerNightPrice",
+    "PropertyType",
+    "RoomOption",
+    "RoomType",
+    "get_hotel_service",
+    "validate_currency_code",
+    "validate_occupancy",
+    "validate_search_dates",
+    "validate_search_request",
+    "validate_session_id",
+    "validate_token_id",
+]
+
+# Lazy import service after __all__ to avoid circular dependency
+# Service is used via dependency injection (app.api.hotels imports directly)
+from .service import HotelService, get_hotel_service  # noqa: E402, F401

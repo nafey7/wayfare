@@ -1,0 +1,12 @@
+{
+  "name": "R1_cold_paris_5day",
+  "description": "REGRESSION (#1053 Phase 0): cold-turn 5-day Paris trip. NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. Pins baseline behavior on the canonical cold-turn shape so Phase 2 prompt softening can be a known delta against this baseline.",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to Paris from {{today+30:natural}} to {{today+34:natural}}",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    }
+  ]
+}

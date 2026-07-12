@@ -1,0 +1,12 @@
+{
+  "name": "4.3_month_only_asks_specific",
+  "description": "Month only → agent asks for specific dates [TEMP LOOSENED PR#1108 — agent no longer asks for specific dates; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Flights from London to Tokyo in {{month+3}}, round trip, 1 adult",
+      "expect_intent": "flight_conversation",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["specific", "which date", "what date", "exact", "travel dates", "departure date", "departure", "return date", "date", "when", "Tokyo", "London", "flight"]
+    }
+  ]
+}

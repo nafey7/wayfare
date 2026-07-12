@@ -1,0 +1,12 @@
+{
+  "name": "3.2_multicity_codes",
+  "description": "Multi-city with IATA codes — LHR to CDG to FCO",
+  "messages": [
+    {
+      "send": "LHR to CDG {{today+30:natural}}, CDG to FCO {{today+37:natural}}, 1 adult",
+      "expect_type_in": ["multicity_flight_search_results", "flight_search_results", "flight_conversation"],
+      "max_time_ms": 120000,
+      "expect_contains_any": ["London", "Paris", "Rome", "leg", "multi", "cheapest", "fastest", "value", "$", "stop", "segment", "LHR", "CDG", "FCO"]
+    }
+  ]
+}

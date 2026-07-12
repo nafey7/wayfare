@@ -1,0 +1,12 @@
+{
+  "name": "R10_partial_no_origin",
+  "description": "REGRESSION (#1053 Phase 0): partial input — no origin. NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. Pins CURRENT behavior when flight side-search is skipped (no origin → no _FLIGHT_REQUIRED match). Phase 1 plumbing wins should not silently change this.",
+  "messages": [
+    {
+      "send": "Plan 4 days in Madrid for 1 adult from {{today+30:natural}} to {{today+33:natural}}",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    }
+  ]
+}

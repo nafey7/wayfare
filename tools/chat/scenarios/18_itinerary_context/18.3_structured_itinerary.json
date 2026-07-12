@@ -1,0 +1,13 @@
+{
+  "name": "18.3_structured_itinerary",
+  "description": "Generated itinerary includes structured_itinerary in response data",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to Barcelona, {{today+30:natural}} to {{today+34:natural}}, 1 adult",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_has_data": true
+    }
+  ]
+}

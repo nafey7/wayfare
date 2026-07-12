@@ -1,0 +1,24 @@
+{
+  "name": "31.7_negative_short_followup",
+  "description": "AI-CHAT-013 over-refusal guard: short sticky-intent follow-ups MUST NOT trigger the limitation check. 'yes' alone should pass through to normal supervisor routing.",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Tokyo next week for 2 adults",
+      "expect_type_in": [
+        "itinerary_results",
+        "message"
+      ],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "yes",
+      "expect_type_in": [
+        "itinerary_results",
+        "message",
+        "flight_search_results"
+      ],
+      "max_time_ms": 90000,
+      "expect_not_contains": "I can search one city at a time"
+    }
+  ]
+}

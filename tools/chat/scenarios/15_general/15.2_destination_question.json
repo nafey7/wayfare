@@ -1,0 +1,12 @@
+{
+  "name": "15.2_destination_question",
+  "description": "Destination question → answered by general agent",
+  "messages": [
+    {
+      "send": "What's the best time to visit Japan?",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["spring", "autumn", "season", "japan", "cherry", "blossom"]
+    }
+  ]
+}

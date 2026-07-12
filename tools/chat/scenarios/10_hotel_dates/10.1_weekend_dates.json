@@ -1,0 +1,11 @@
+{
+  "name": "10.1_weekend_dates",
+  "description": "Hotel search with 'next weekend' relative date",
+  "messages": [
+    {
+      "send": "Hotels in Tokyo next weekend, 1 adult",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000
+    }
+  ]
+}

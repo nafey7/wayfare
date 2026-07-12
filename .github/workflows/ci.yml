@@ -1,0 +1,368 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    # Skip pure-doc pushes — same rationale as the PR filter below.
+    paths-ignore:
+      - '**.md'
+      - '**.mdx'
+      - 'docs/**'
+      - '**/docs/**'
+      - 'CLAUDE.md'
+      - '**/CLAUDE.md'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches: [main, develop]
+    # Skip pure-doc PRs (no .ts/.tsx/.py/yml/lockfile diff). Refs #921.
+    # If a PR mixes docs + code, the code paths win and CI runs as normal.
+    paths-ignore:
+      - '**.md'
+      - '**.mdx'
+      - 'docs/**'
+      - '**/docs/**'
+      - 'CLAUDE.md'
+      - '**/CLAUDE.md'
+      - '.gitignore'
+      - 'LICENSE'
+
+env:
+  PYTHON_VERSION: "3.12"
+  WORKING_DIR: backend_python
+  NODE_VERSION: "20"
+
+jobs:
+  frontend:
+    name: Frontend Lint, Typecheck, Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend-v2/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend-v2
+        run: npm ci
+
+      - name: ESLint
+        working-directory: frontend-v2
+        run: npx eslint src --ext .ts,.tsx --quiet
+
+      - name: TypeScript
+        working-directory: frontend-v2
+        run: npm run type-check
+
+      - name: Production build
+        working-directory: frontend-v2
+        run: npm run build
+
+      - name: Unit tests with coverage
+        working-directory: frontend-v2
+        run: npx vitest run --project unit --coverage
+
+      - name: Upload frontend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend-v2/coverage/coverage-summary.json
+          retention-days: 5
+
+  frontend-storybook-tests:
+    name: Frontend Storybook Story Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend-v2/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend-v2
+        run: npm ci
+
+      # The `storybook` vitest project mounts every story in headless Chromium
+      # via @vitest/browser-playwright. This catches render-time errors (missing
+      # providers, unresolved hooks, throwing components) that type-check and
+      # the Storybook production build both miss — e.g. `useChatContext must be
+      # used within a ChatProvider` when a component transitively pulls in a
+      # context consumer and the story doesn't supply that context.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('frontend-v2/package-lock.json') }}
+          restore-keys: |
+            playwright-chromium-${{ runner.os }}-
+
+      - name: Install Playwright Chromium
+        working-directory: frontend-v2
+        run: npx playwright install --with-deps chromium
+
+      - name: Storybook story smoke tests
+        working-directory: frontend-v2
+        run: npx vitest run --project storybook
+
+  backend-lint:
+    name: Backend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: ${{ env.WORKING_DIR }}/requirements.txt
+
+      - name: Install Ruff
+        run: pip install ruff==0.13.2
+
+      - name: Run Ruff Linting
+        working-directory: ${{ env.WORKING_DIR }}
+        run: ruff check . --output-format=github
+
+      - name: Run Ruff Formatting Check
+        working-directory: ${{ env.WORKING_DIR }}
+        run: ruff format --check .
+
+  backend-type-check:
+    name: Backend Type Check
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Non-blocking while we fix 360+ errors
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: ${{ env.WORKING_DIR }}/requirements.txt
+
+      - name: Cache MyPy
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.WORKING_DIR }}/.mypy_cache
+          key: mypy-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-${{ hashFiles('backend_python/requirements.txt', 'backend_python/pyproject.toml') }}
+          restore-keys: |
+            mypy-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-
+
+      - name: Install System Dependencies
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config
+
+      - name: Install Dependencies
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install mypy>=1.18.2
+
+      - name: Run MyPy (Non-blocking)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          echo "::warning::MyPy check is currently non-blocking while we resolve 360+ existing type errors"
+          mypy app/ --cache-dir=.mypy_cache || echo "::notice::MyPy found type errors (non-blocking)"
+
+  backend-security:
+    name: Backend Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Bandit
+        run: pip install bandit[toml]>=1.8.0
+
+      - name: Run Bandit
+        working-directory: ${{ env.WORKING_DIR }}
+        run: bandit -r app/ -ll -c pyproject.toml
+
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: ${{ env.WORKING_DIR }}/requirements.txt
+
+      - name: Install System Dependencies
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config
+
+      - name: Install Dependencies
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Tests with Coverage
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          pytest tests/unit_tests/ --cov=app --cov-report=xml --cov-report=json --cov-report=term-missing -v
+
+      - name: Upload backend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: ${{ env.WORKING_DIR }}/coverage.json
+          retention-days: 5
+
+  coverage-placeholder:
+    name: Coverage Placeholder
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Post placeholder comment
+        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728  # v2.9.1
+        with:
+          header: coverage-report
+          message: |
+            ## Code Coverage Report
+
+            :hourglass_flowing_sand: Running tests... coverage will appear here when complete.
+
+  coverage-report:
+    name: Coverage Report
+    if: always() && github.event_name == 'pull_request'
+    needs: [frontend, backend-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: frontend-coverage
+          path: coverage/frontend
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: backend-coverage
+          path: coverage/backend
+
+      - name: Generate coverage comment
+        id: coverage
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Get changed files per stack
+          FE_CHANGED=$(git diff --name-only "$BASE_SHA"..."$HEAD_SHA" -- 'frontend-v2/src/**/*.ts' 'frontend-v2/src/**/*.tsx' | sed 's|^frontend-v2/||' || true)
+          BE_CHANGED=$(git diff --name-only "$BASE_SHA"..."$HEAD_SHA" -- 'backend_python/app/**/*.py' || true)
+
+          # --- Frontend overall ---
+          if [ -f coverage/frontend/coverage-summary.json ]; then
+            FE_LINES="$(jq '.total.lines.pct' coverage/frontend/coverage-summary.json)%"
+            FE_STMTS="$(jq '.total.statements.pct' coverage/frontend/coverage-summary.json)%"
+            FE_FUNCS="$(jq '.total.functions.pct' coverage/frontend/coverage-summary.json)%"
+            FE_BRANCHES="$(jq '.total.branches.pct' coverage/frontend/coverage-summary.json)%"
+
+            # Frontend changed files coverage
+            if [ -n "$FE_CHANGED" ]; then
+              # Build jq filter for changed files (match by suffix since keys are absolute paths)
+              FE_FILTER=$(echo "$FE_CHANGED" | while read -r f; do echo "\"$f\""; done | paste -sd, -)
+              FE_DIFF_LINES=$(jq --argjson files "[$FE_FILTER]" '
+                [to_entries[] | select(.key != "total") |
+                  select(.key as $k | any($files[]; . as $f | $k | endswith($f))) |
+                  .value.lines] |
+                if length == 0 then null
+                else { covered: (map(.covered) | add), total: (map(.total) | add) } |
+                  if .total == 0 then null else (.covered / .total * 100 * 100 | round / 100) end
+                end
+              ' coverage/frontend/coverage-summary.json)
+              if [ "$FE_DIFF_LINES" != "null" ] && [ -n "$FE_DIFF_LINES" ]; then
+                FE_DIFF="${FE_DIFF_LINES}%"
+              else
+                FE_DIFF="N/A"
+              fi
+              FE_DIFF_COUNT=$(echo "$FE_CHANGED" | wc -l | tr -d ' ')
+            else
+              FE_DIFF="-"
+              FE_DIFF_COUNT="0"
+            fi
+          else
+            FE_LINES="N/A"; FE_STMTS="N/A"; FE_FUNCS="N/A"; FE_BRANCHES="N/A"
+            FE_DIFF="N/A"; FE_DIFF_COUNT="0"
+          fi
+
+          # --- Backend overall ---
+          if [ -f coverage/backend/coverage.json ]; then
+            BE_PCT="$(jq '.totals.percent_covered | . * 100 | round / 100' coverage/backend/coverage.json)%"
+
+            # Backend changed files coverage
+            if [ -n "$BE_CHANGED" ]; then
+              BE_FILTER=$(echo "$BE_CHANGED" | sed 's|^backend_python/||' | while read -r f; do echo "\"$f\""; done | paste -sd, -)
+              BE_DIFF_LINES=$(jq --argjson files "[$BE_FILTER]" '
+                [.files | to_entries[] | select(.key as $k | any($files[]; . == $k)) | .value.summary] |
+                if length == 0 then null
+                else { covered: (map(.covered_lines) | add), total: (map(.num_statements) | add) } |
+                  if .total == 0 then null else (.covered / .total * 100 * 100 | round / 100) end
+                end
+              ' coverage/backend/coverage.json)
+              if [ "$BE_DIFF_LINES" != "null" ] && [ -n "$BE_DIFF_LINES" ]; then
+                BE_DIFF="${BE_DIFF_LINES}%"
+              else
+                BE_DIFF="N/A"
+              fi
+              BE_DIFF_COUNT=$(echo "$BE_CHANGED" | wc -l | tr -d ' ')
+            else
+              BE_DIFF="-"
+              BE_DIFF_COUNT="0"
+            fi
+          else
+            BE_PCT="N/A"; BE_DIFF="N/A"; BE_DIFF_COUNT="0"
+          fi
+
+          # Build comment body
+          SHORT_SHA="${HEAD_SHA:0:8}"
+          cat > coverage-comment.md << EOF
+          ## Code Coverage Report
+
+          **Overall**
+
+          | | Lines | Statements | Functions | Branches |
+          |---|---|---|---|---|
+          | **Frontend** | ${FE_LINES} | ${FE_STMTS} | ${FE_FUNCS} | ${FE_BRANCHES} |
+          | **Backend** | ${BE_PCT} | ${BE_PCT} | - | - |
+
+          **Changed files in this PR**
+
+          | | Lines | Files changed |
+          |---|---|---|
+          | **Frontend** | ${FE_DIFF} | ${FE_DIFF_COUNT} |
+          | **Backend** | ${BE_DIFF} | ${BE_DIFF_COUNT} |
+
+          > Commit: \`${SHORT_SHA}\` | Threshold: 80% minimum for new code
+          EOF
+
+      - name: Post coverage comment
+        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728  # v2.9.1
+        with:
+          header: coverage-report
+          path: coverage-comment.md

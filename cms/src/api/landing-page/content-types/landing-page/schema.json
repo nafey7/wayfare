@@ -1,0 +1,156 @@
+{
+  "kind": "collectionType",
+  "collectionName": "landing_pages",
+  "info": {
+    "singularName": "landing-page",
+    "pluralName": "landing-pages",
+    "displayName": "Landing Page",
+    "description": "Home page — hero copy, trip rails, and editorial card managed by marketing. Multiple entries supported; mark one as isDefault to serve it on the home page. Write chatPrompt without an origin city — the frontend appends a random popular city automatically."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "internalName": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "slug": {
+      "type": "uid",
+      "required": true,
+      "targetField": "internalName"
+    },
+    "isDefault": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "heroHeadline": {
+      "type": "string",
+      "default": "Your next trip, planned in minutes."
+    },
+    "heroSubheadline": {
+      "type": "text",
+      "default": "Describe your ideal trip — Voya plans every detail. Flights, hotels, itinerary, your way. Fast and personal, on call 24/7."
+    },
+    "heroCalloutText": {
+      "type": "string",
+      "default": "Your personal travel AI, available 24/7"
+    },
+    "heroCalloutTextMobile": {
+      "type": "string",
+      "default": "Your personal travel AI"
+    },
+    "heroAvatarImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "heroFlightOrigin": {
+      "type": "string",
+      "default": "DUB"
+    },
+    "heroFlightDestination": {
+      "type": "string",
+      "default": "LON"
+    },
+    "heroFlightDetails": {
+      "type": "string",
+      "default": "6:55 AM • Direct"
+    },
+    "heroHotelName": {
+      "type": "string",
+      "default": "The Ritz London"
+    },
+    "heroHotelDetails": {
+      "type": "string",
+      "default": "Checked in • 2 Guests"
+    },
+    "heroCtaLabel": {
+      "type": "string",
+      "default": "Plan My Trip"
+    },
+    "weekendRailTitle": {
+      "type": "string",
+      "default": "Trips for this weekend"
+    },
+    "weekendRailSubtitle": {
+      "type": "string"
+    },
+    "weekendTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "fromCityRailTitle": {
+      "type": "string",
+      "default": "From London"
+    },
+    "fromCityRailSubtitle": {
+      "type": "string"
+    },
+    "fromCityTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "adventureTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "beachTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "natureTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "foodTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "cultureTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "hiddenTrips": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing.inspiration-trip-card"
+    },
+    "voyaPicksEyebrow": {
+      "type": "string",
+      "default": "Voya picks · this week"
+    },
+    "voyaPicksTitle": {
+      "type": "string"
+    },
+    "voyaPicksBody": {
+      "type": "text"
+    },
+    "voyaPicksChatPrompt": {
+      "type": "text"
+    },
+    "voyaPicksMeta": {
+      "type": "string",
+      "description": "Pipe-separated (|) list of chip labels, e.g. '⚡ Built in 53s | $3,290 · 7 nights | ★ 4.9 guests'"
+    },
+    "voyaPicksCtaLabel": {
+      "type": "string",
+      "default": "See the trip"
+    },
+    "voyaPicksImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

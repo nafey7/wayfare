@@ -1,0 +1,12 @@
+{
+  "name": "5.8_country_as_destination",
+  "description": "Country name as destination — agent asks which city or suggests airports",
+  "messages": [
+    {
+      "send": "Flights from London to Spain, {{today+30:natural}}, one way, 1 adult",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 60000,
+      "expect_contains_any": ["Madrid", "Barcelona", "Malaga", "Seville", "city", "which city", "which", "airport", "Spain"]
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'  # Matches v2026.1.1, v2026.1.1.p1, etc.
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: myvoya-production-fastapi-react
+  ECS_CLUSTER: production-cluster
+  ECS_SERVICE: production-fastapi-react-service
+  CONTAINER_NAME: fastapi-react-container
+
+jobs:
+  # Build and push Docker image
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    outputs:
+      image_tag: ${{ steps.image_info.outputs.image_tag }}
+      image_uri: ${{ steps.image_info.outputs.image_uri }}
+      version: ${{ steps.image_info.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git describe
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::155304839180:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Determine Image Tag
+        id: image_info
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          # Get git tag (e.g., v2026.1.8)
+          GIT_TAG=${GITHUB_REF#refs/tags/}
+          # Strip 'v' prefix for Docker tag (v2026.1.8 -> 2026.1.8)
+          VERSION="${GIT_TAG#v}"
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "image_tag=$VERSION" >> $GITHUB_OUTPUT
+          echo "image_uri=$ECR_REGISTRY/$ECR_REPOSITORY:$VERSION" >> $GITHUB_OUTPUT
+          echo "Deploying version: $VERSION (from tag: $GIT_TAG)"
+
+      - name: Build, tag, and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          VERSION: ${{ steps.image_info.outputs.version }}
+        run: |
+          # Get git describe version for health endpoint (strips 'v' prefix)
+          GIT_VERSION=$(git describe --tags --always | sed 's/^v//')
+
+          docker build \
+            --build-arg COMMIT_HASH=$GITHUB_SHA \
+            --build-arg GIT_VERSION=$GIT_VERSION \
+            --build-arg VITE_ENV=production \
+            --build-arg VITE_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID_PROD }} \
+            --build-arg VITE_GOOGLE_MAPS_API_KEY=${{ secrets.VITE_GOOGLE_MAPS_API_KEY_PROD }} \
+            --build-arg VITE_GOOGLE_MAPS_MAP_ID=${{ secrets.VITE_GOOGLE_MAPS_MAP_ID_PROD }} \
+            --build-arg VITE_STRAPI_URL=${{ secrets.VITE_STRAPI_URL_PROD }} \
+            --build-arg VITE_STRAPI_API_TOKEN=${{ secrets.VITE_STRAPI_API_TOKEN_PROD }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            .
+
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          echo "Pushed image: $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION"
+          echo "Also tagged as: latest"
+
+  # Run migrations (one-off ECS task with new image)
+  migrate:
+    name: Run Migrations
+    uses: ./.github/workflows/run-migrations.yml
+    needs: build-and-push
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      image_uri: ${{ needs.build-and-push.outputs.image_uri }}
+      task_definition_name: production-fastapi-react
+      migrate_family: production-migrate
+      ecs_cluster: production-cluster
+      ecs_service: production-fastapi-react-service
+      aws_region: us-east-1
+      container_name: fastapi-react-container
+
+  # Deploy to ECS
+  deploy:
+    name: Deploy to ECS Production
+    needs: [build-and-push, migrate]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::155304839180:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download Current Task Definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition production-fastapi-react \
+            --query taskDefinition > task-definition.json
+
+          echo "Downloaded current task definition"
+
+      - name: Update Task Definition with New Image
+        env:
+          IMAGE_URI: ${{ needs.build-and-push.outputs.image_uri }}
+          CONTAINER: ${{ env.CONTAINER_NAME }}
+        run: |
+          # Update image in task definition (use named lookup to support sidecars)
+          cat task-definition.json | \
+            jq --arg IMAGE "$IMAGE_URI" --arg CONTAINER "$CONTAINER" \
+              '.containerDefinitions |= map(if .name == $CONTAINER then . + {image: $IMAGE} else . end)' | \
+            jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            > new-task-definition.json
+
+          echo "Updated task definition with image: $IMAGE_URI"
+
+      - name: Register New Task Definition
+        id: register-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-definition.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          echo "task_definition_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+          echo "Registered new task definition: $TASK_DEF_ARN"
+
+      - name: Update ECS Service
+        env:
+          TASK_DEF_ARN: ${{ steps.register-task-def.outputs.task_definition_arn }}
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition $TASK_DEF_ARN \
+            --force-new-deployment
+
+          echo "Service update initiated"
+
+      - name: Wait for Service Stability
+        run: |
+          echo "Waiting for service to stabilize (max 10 minutes)..."
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }}
+
+          echo "Service stable. Verifying old tasks are drained..."
+
+          # Wait until only one deployment exists (old tasks fully drained)
+          for i in {1..30}; do
+            DEPLOYMENT_COUNT=$(aws ecs describe-services \
+              --cluster ${{ env.ECS_CLUSTER }} \
+              --services ${{ env.ECS_SERVICE }} \
+              --query 'length(services[0].deployments)' \
+              --output text)
+
+            if [ "$DEPLOYMENT_COUNT" -eq 1 ]; then
+              echo "Old tasks drained. Only primary deployment remains."
+              break
+            fi
+
+            echo "Waiting for old tasks to drain... ($DEPLOYMENT_COUNT deployments, attempt $i/30)"
+            sleep 10
+          done
+
+          echo "Deployment completed successfully!"
+
+      - name: Get Service Status
+        if: always()
+        run: |
+          aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }} \
+            --query 'services[0].{Status:status,RunningCount:runningCount,DesiredCount:desiredCount}'
+
+  # Purge CloudFlare cache
+  purge-cache:
+    name: Purge CloudFlare Cache
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge CloudFlare Cache
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          echo "Purging CloudFlare cache for prod.myvoya.ai, app.myvoya.ai, and www.myvoya.ai..."
+          RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"hosts":["prod.myvoya.ai","app.myvoya.ai","www.myvoya.ai"]}')
+
+          SUCCESS=$(echo $RESPONSE | jq -r '.success')
+          if [ "$SUCCESS" = "true" ]; then
+            echo "CloudFlare cache purged successfully"
+          else
+            echo "Warning: Cache purge may have failed"
+            echo $RESPONSE | jq '.'
+          fi
+
+  # Deployment summary
+  notify:
+    name: Deployment Summary
+    needs: [build-and-push, deploy, purge-cache]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deployment Summary
+        env:
+          VERSION: ${{ needs.build-and-push.outputs.version }}
+          IMAGE_URI: ${{ needs.build-and-push.outputs.image_uri }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          CACHE_RESULT: ${{ needs.purge-cache.result }}
+        run: |
+          echo "## Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${GITHUB_SHA::8}" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** $IMAGE_URI" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deploy:** $DEPLOY_RESULT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Cache Purge:** $CACHE_RESULT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Production:** https://prod.myvoya.ai" >> $GITHUB_STEP_SUMMARY
+          echo "- **Health:** https://prod.myvoya.ai/health" >> $GITHUB_STEP_SUMMARY

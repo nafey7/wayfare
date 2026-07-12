@@ -1,0 +1,18 @@
+{
+  "name": "15.8_handback_to_flight",
+  "description": "Greeting then explicit flight request — hands back to flight agent",
+  "messages": [
+    {
+      "send": "Hey there!",
+      "expect_intent": "general_query",
+      "max_time_ms": 15000,
+      "expect_contains_any": ["welcome", "help", "travel", "Voya", "flight", "hotel", "trip", "Hi", "Hey", "Hello"]
+    },
+    {
+      "send": "Book a flight to Paris",
+      "expect_intent": "flight_conversation",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["Paris", "flight", "from", "depart", "origin", "when", "date", "passenger", "one-way", "round"]
+    }
+  ]
+}

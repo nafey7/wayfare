@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Ticket</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 1cm;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 7pt;
+        color: #333;
+        line-height: 1.2;
+      }
+
+      .header {
+        text-align: center;
+        border-bottom: 2px solid #333;
+        padding-bottom: 5px;
+        margin-bottom: 2px;
+      }
+
+      .logo {
+        font-size: 24pt;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .doc-title {
+        font-size: 9pt;
+        color: #666;
+      }
+
+      .status-badge {
+        background-color: #333;
+        color: white;
+        padding: 3px 12px;
+        display: inline-block;
+        font-weight: bold;
+        margin: 8px 0;
+        font-size: 7pt;
+      }
+
+      .section {
+        margin-bottom: 2px;
+        page-break-inside: avoid;
+      }
+
+      .section-title {
+        font-size: 7pt;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 2px;
+        margin-bottom: 3px;
+      }
+
+      .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2px;
+      }
+
+      .info-table td {
+        padding: 2px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 7pt;
+      }
+
+      .info-table td:first-child {
+        font-weight: bold;
+        width: 40%;
+        color: #666;
+      }
+
+      .ticket-number {
+        font-family: "Courier New", monospace;
+        font-size: 7pt;
+        background-color: #f5f5f5;
+        padding: 2px 4px;
+        border: 1px solid #333;
+        display: inline-block;
+      }
+
+      .passenger-list {
+        margin: 3px 0;
+      }
+
+      .passenger-item {
+        padding: 3px;
+        background-color: #f9f9f9;
+        border-left: 2px solid #333;
+        margin-bottom: 3px;
+        font-size: 7pt;
+      }
+
+      .flight-segment {
+        background-color: #f5f5f5;
+        padding: 4px;
+        margin-bottom: 2px;
+        border: 1px solid #ccc;
+      }
+
+      .route {
+        font-size: 9pt;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 2px;
+      }
+
+      .info-box {
+        background-color: #f5f5f5;
+        border-left: 2px solid #333;
+        padding: 4px;
+        margin: 6px 0;
+        font-size: 7pt;
+      }
+
+      .checkin-box {
+        background-color: #f5f5f5;
+        border-left: 2px solid #333;
+        padding: 4px;
+        margin: 6px 0;
+        font-size: 7pt;
+      }
+
+      .footer {
+        margin-top: 6px;
+        padding-top: 4px;
+        border-top: 1px solid #ccc;
+        text-align: center;
+        font-size: 7pt;
+        color: #666;
+      }
+
+      ul {
+        margin: 3px 0;
+        padding-left: 15px;
+      }
+
+      li {
+        margin: 1px 0;
+        font-size: 7pt;
+      }
+
+      .ticket-box {
+        background-color: #fff;
+        border: 1px solid #333;
+        padding: 4px;
+        margin: 4px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">VOYA</div>
+      <div class="doc-title">ELECTRONIC TICKET (E-TICKET)</div>
+      <div style="margin-top: 5px; color: #999; font-size: 7pt">
+        Generated: {{ generated_date }}
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div style="text-align: center">
+      <div class="status-badge">✓ TICKETED - READY TO FLY</div>
+    </div>
+
+    <!-- Booking Reference -->
+    <div class="section">
+      <div class="section-title">Booking Information</div>
+      <table class="info-table">
+        <tr>
+          <td>PNR Code:</td>
+          <td><strong style="font-size: 11pt">{{ pnr }}</strong></td>
+        </tr>
+        <tr>
+          <td>VOYA Reference:</td>
+          <td>
+            <strong style="font-size: 11pt"
+              >{{ voya_booking_reference }}</strong
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>Issue Date:</td>
+          <td>{{ issue_date }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Fare Summary -->
+    <div class="section">
+      <div class="section-title">Fare Summary</div>
+      <table class="info-table">
+        <tr>
+          <td>Base Fare:</td>
+          <td>{{ currency }} {{ base_fare }}</td>
+        </tr>
+        <tr>
+          <td>Taxes & Fees:</td>
+          <td>{{ currency }} {{ taxes }}</td>
+        </tr>
+        <tr style="border-top: 2px solid #333">
+          <td><strong>Total Paid:</strong></td>
+          <td>
+            <strong style="font-size: 11pt"
+              >{{ currency }} {{ total_fare }}</strong
+            >
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- E-Ticket Numbers -->
+    <div class="section">
+      <div class="section-title">E-Ticket Numbers</div>
+      <div style="background-color: #fafafa; padding: 4px">
+        <p style="margin-top: 0">
+          <strong>Important:</strong> Keep these ticket numbers safe for
+          check-in and boarding.
+        </p>
+        <div class="passenger-list">
+          {% for passenger in passengers %}
+          <div class="passenger-item">
+            <div style="margin-bottom: 2px">
+              <strong style="font-size: 9pt"
+                >{{ passenger.title }} {{ passenger.first_name }} {{
+                passenger.last_name }}</strong
+              >
+            </div>
+            <div>
+              E-Ticket:
+              <span class="ticket-number">{{ passenger.ticket_number }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Flight Itinerary -->
+    <div class="section">
+      <div class="section-title">Flight Itinerary</div>
+      {% for segment in segments %}
+      <div class="flight-segment">
+        <div class="route">
+          {{ segment.origin_city }} ({{ segment.origin }}) → {{
+          segment.destination_city }} ({{ segment.destination }})
+        </div>
+        <table class="info-table">
+          <tr>
+            <td>Airline:</td>
+            <td>
+              <strong style="font-size: 9pt">{{ segment.airline }}</strong>
+            </td>
+          </tr>
+          <tr>
+            <td>Flight Number:</td>
+            <td>
+              <strong style="font-size: 9pt"
+                >{{ segment.flight_number }}</strong
+              >
+            </td>
+          </tr>
+          <tr>
+            <td>Departure:</td>
+            <td>
+              <strong>{{ segment.departure_date }}</strong> at
+              <strong>{{ segment.departure_time }}</strong>
+            </td>
+          </tr>
+          <tr>
+            <td>Arrival:</td>
+            <td>
+              <strong>{{ segment.arrival_date }}</strong> at
+              <strong>{{ segment.arrival_time }}</strong>
+            </td>
+          </tr>
+          <tr>
+            <td>Class / Booking Code:</td>
+            <td>{{ segment.cabin_class }} / {{ segment.booking_class }}</td>
+          </tr>
+          <tr>
+            <td>Duration:</td>
+            <td>{{ segment.duration }}</td>
+          </tr>
+          {% if segment.baggage_allowance %}
+          <tr>
+            <td>Baggage Allowance:</td>
+            <td>{{ segment.baggage_allowance }}</td>
+          </tr>
+          {% endif %}
+        </table>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Passenger Details -->
+    <div class="section">
+      <div class="section-title">Passenger Information</div>
+      <table class="info-table">
+        {% for passenger in passengers %}
+        <tr>
+          <td>Passenger {{ loop.index }}:</td>
+          <td>
+            <strong
+              >{{ passenger.title }} {{ passenger.first_name }} {{
+              passenger.last_name }}</strong
+            ><br />
+            Date of Birth: {{ passenger.date_of_birth }}<br />
+            {% if passenger.passport_number %} Passport: {{
+            passenger.passport_number }} ({{ passenger.passport_country }})<br />
+            Expiry: {{ passenger.passport_expiry }} {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <!-- Important Travel Information -->
+    <div class="section">
+      <div class="section-title">Important Travel Information</div>
+      <ul>
+        <li>
+          <strong>Check-in:</strong> Opens 24-48h before departure. Use PNR {{
+          pnr }} at airline website/app
+        </li>
+        <li>
+          <strong>Airport:</strong> Arrive 2-3 hours before departure with valid
+          passport (6+ months validity)
+        </li>
+        <li>
+          <strong>Documents:</strong> Passport/ID, visa if required, this
+          e-ticket
+        </li>
+        <li>
+          Review airline baggage policies. Contact airline for special requests
+          (meals, seats)
+        </li>
+      </ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Have a safe flight!</strong></p>
+      <p>Thank you for choosing VOYA</p>
+      <p>For support: support@myvoya.ai | www.myvoya.ai</p>
+      <p style="color: #999; margin-top: 3px">
+        Electronically generated e-ticket.
+      </p>
+    </div>
+  </body>
+</html>

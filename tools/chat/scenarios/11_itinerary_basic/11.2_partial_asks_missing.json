@@ -1,0 +1,12 @@
+{
+  "name": "11.2_partial_asks_missing",
+  "description": "Partial info → asks in numbered list",
+  "messages": [
+    {
+      "send": "Plan a 5 day trip to Tokyo",
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 60000,
+      "expect_contains_any": ["when", "how long", "travelers", "who", "dates", "where", "from", "origin", "departing", "itinerary", "Tokyo", "day", "trip"]
+    }
+  ]
+}

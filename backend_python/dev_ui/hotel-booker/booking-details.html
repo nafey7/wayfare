@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Booking Details - Voya</title>
+    <link rel="icon" href="data:," />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .section {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .section h2 {
+        color: #333;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .booking-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 25px;
+        color: white;
+        text-align: center;
+      }
+
+      .booking-reference {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 8px;
+        display: inline-block;
+      }
+
+      .booking-status {
+        font-size: 18px;
+        margin-top: 10px;
+        padding: 8px 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        display: inline-block;
+      }
+
+      .booking-status.confirmed {
+        background: rgba(40, 167, 69, 0.3);
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+      }
+
+      .info-card {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .info-card h3 {
+        color: #667eea;
+        font-size: 14px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      .info-card .value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .hotel-details {
+        background: #f8f9fa;
+        border: 2px solid #667eea;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+      }
+
+      .hotel-name {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .hotel-rating {
+        font-size: 20px;
+        color: #ffc107;
+        margin-bottom: 15px;
+      }
+
+      .hotel-address {
+        font-size: 16px;
+        color: #6c757d;
+        margin-bottom: 20px;
+      }
+
+      .guests-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .guest-item {
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 3px solid #667eea;
+      }
+
+      .guest-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .price-summary {
+        background: #e8f5e8;
+        border: 2px solid #28a745;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 8px 0;
+      }
+
+      .price-row.total {
+        border-top: 2px solid #28a745;
+        margin-top: 15px;
+        padding-top: 15px;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      button.danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      }
+
+      .loading-message {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-size: 18px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 768px) {
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🏨 Hotel Booking Details</h1>
+
+      <!-- Status Messages -->
+      <div id="status" class="status"></div>
+
+      <!-- Booking Status Message (for cancelled bookings) -->
+      <div id="status-message" style="display: none"></div>
+
+      <!-- Booking Details Section -->
+      <div id="booking-details-section" class="section" style="display: none">
+        <!-- Hotel Information -->
+        <div id="hotel-details" class="hotel-details"></div>
+
+        <!-- Booking Information Grid -->
+        <div class="info-grid" id="booking-info-grid"></div>
+
+        <!-- Guests Information -->
+        <div id="guests-section" class="guests-section" style="display: none">
+          <h2 style="margin-bottom: 20px; color: #333">👥 Guest Information</h2>
+          <div id="guests-list"></div>
+        </div>
+
+        <!-- Price Summary -->
+        <div
+          id="price-summary"
+          class="price-summary"
+          style="display: none"
+        ></div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button
+            id="cancel-booking-btn"
+            class="danger"
+            onclick="handleCancelBooking()"
+          >
+            Cancel Booking
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading-section" class="section">
+        <div class="loading-message">Loading booking details...</div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let accessToken = null;
+      let bookingDetails = null;
+      let supplierConfirmationNum = null;
+      let referenceNum = null;
+
+      // ========== UTILITY FUNCTIONS ==========
+
+      function getBaseUrl() {
+        return window.location.origin;
+      }
+
+      function showStatus(message, type = "info") {
+        const statusDiv = document.getElementById("status");
+        statusDiv.className = `status ${type}`;
+        statusDiv.textContent = message;
+        statusDiv.style.display = "block";
+
+        if (type === "success" || type === "error") {
+          setTimeout(() => {
+            statusDiv.style.display = "none";
+          }, 5000);
+        }
+      }
+
+      function showError(message) {
+        showStatus(message, "error");
+      }
+
+      function escapeHtml(text) {
+        if (!text) return "";
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // ========== AUTO-LOGIN FUNCTION ==========
+
+      async function autoLoginHotelBooker() {
+        try {
+          const response = await fetch(`${getBaseUrl()}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: "hotelbooker@example.com",
+              password: "Hotel123!", // pragma: allowlist secret
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.access_token) {
+            accessToken = data.access_token;
+            console.log("✅ Auto-logged in as Hotel Booker");
+            return true;
+          } else {
+            showError("Auto-login failed: " + (data.detail || "Unknown error"));
+            return false;
+          }
+        } catch (error) {
+          showError("Login error: " + error.message);
+          return false;
+        }
+      }
+
+      // ========== URL PARAMETER EXTRACTION ==========
+
+      function extractUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        supplierConfirmationNum = urlParams.get("supplier_confirmation_num");
+        referenceNum = urlParams.get("reference_num");
+
+        console.log("URL Parameters:", {
+          supplier_confirmation_num: supplierConfirmationNum,
+          reference_num: referenceNum,
+        });
+
+        if (!supplierConfirmationNum) {
+          showError("Missing supplier_confirmation_num in URL");
+          return false;
+        }
+
+        if (!referenceNum) {
+          showError("Missing reference_num in URL");
+          return false;
+        }
+
+        return true;
+      }
+
+      // ========== FETCH BOOKING DETAILS ==========
+
+      async function fetchBookingDetails() {
+        if (!supplierConfirmationNum || !referenceNum) {
+          showError(
+            "Cannot fetch booking details: missing supplier_confirmation_num or reference_num"
+          );
+          return null;
+        }
+
+        try {
+          showStatus("Fetching booking details...", "info");
+
+          const response = await fetch(
+            `${getBaseUrl()}/api/hotels/booking-details`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({
+                supplier_confirmation_num: supplierConfirmationNum,
+                reference_num: referenceNum,
+              }),
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            let errorMsg = "Unknown error";
+            if (data.detail) {
+              if (Array.isArray(data.detail)) {
+                errorMsg = data.detail
+                  .map((e) => e.msg || e.message || JSON.stringify(e))
+                  .join("; ");
+              } else if (typeof data.detail === "string") {
+                errorMsg = data.detail;
+              } else {
+                errorMsg = JSON.stringify(data.detail);
+              }
+            } else if (data.message) {
+              errorMsg = data.message;
+            }
+            throw new Error(errorMsg);
+          }
+
+          return data;
+        } catch (error) {
+          console.error("Error fetching booking details:", error);
+          showError("Failed to fetch booking details: " + error.message);
+          return null;
+        }
+      }
+
+      // ========== DISPLAY BOOKING DETAILS ==========
+
+      function displayBookingDetails(data) {
+        bookingDetails = data.booking_details || {};
+
+        // Display hotel information
+        displayHotelInfo(bookingDetails);
+
+        // Display booking information grid
+        displayBookingInfo(bookingDetails);
+
+        // Display guests information
+        displayGuestsInfo(bookingDetails);
+
+        // Display price summary
+        displayPriceSummary(bookingDetails);
+
+        // Display cancellation policy
+        displayCancellationPolicy(bookingDetails);
+
+        // Handle booking status (show cancellation message if cancelled)
+        handleBookingStatus(bookingDetails);
+
+        // Show the booking details section
+        document.getElementById("loading-section").style.display = "none";
+        document.getElementById("booking-details-section").style.display =
+          "block";
+
+        showStatus("Booking details loaded successfully", "success");
+      }
+
+      function displayHotelInfo(details) {
+        const hotelDetailsDiv = document.getElementById("hotel-details");
+        const hotelName = details.hotel_name || "Hotel Name Not Available";
+        const rating = details.hotel_rating || 0;
+        const address =
+          details.address || details.city || "Address not available";
+        const city = details.city || "";
+        const propertyType = details.property_type || "Hotel";
+
+        const stars = "⭐".repeat(Math.min(rating, 5));
+
+        hotelDetailsDiv.innerHTML = `
+          <div class="hotel-name">${escapeHtml(hotelName)}</div>
+          ${rating > 0 ? `<div class="hotel-rating">${stars}</div>` : ""}
+          <div class="hotel-address">📍 ${escapeHtml(address)}${
+          city && city !== address ? `, ${escapeHtml(city)}` : ""
+        }</div>
+          <div style="color: #6c757d; margin-top: 10px;">🛏️ ${escapeHtml(
+            propertyType
+          )}</div>
+        `;
+      }
+
+      function displayBookingInfo(details) {
+        const infoGrid = document.getElementById("booking-info-grid");
+
+        const checkIn = details.check_in || details.check_in_date || "N/A";
+        const checkOut = details.check_out || details.check_out_date || "N/A";
+        const supplierConfirmation = supplierConfirmationNum || "N/A";
+
+        // Format dates
+        const formatDate = (dateStr) => {
+          if (dateStr === "N/A") return "N/A";
+          try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+          } catch (e) {
+            return dateStr;
+          }
+        };
+
+        // Calculate nights
+        let nights = 0;
+        if (checkIn !== "N/A" && checkOut !== "N/A") {
+          try {
+            const checkInTime = new Date(checkIn).getTime();
+            const checkOutTime = new Date(checkOut).getTime();
+            nights = Math.round(
+              (checkOutTime - checkInTime) / (1000 * 60 * 60 * 24)
+            );
+          } catch (e) {
+            nights = 0;
+          }
+        }
+
+        infoGrid.innerHTML = `
+          <div class="info-card">
+            <h3>📅 Check-in</h3>
+            <div class="value">${formatDate(checkIn)}</div>
+          </div>
+          <div class="info-card">
+            <h3>📅 Check-out</h3>
+            <div class="value">${formatDate(checkOut)}</div>
+          </div>
+          <div class="info-card">
+            <h3>🌙 Nights</h3>
+            <div class="value">${nights} ${
+          nights === 1 ? "Night" : "Nights"
+        }</div>
+          </div>
+          <div class="info-card">
+            <h3>🏨 Hotel Confirmation</h3>
+            <div class="value" style="font-size: 14px; word-break: break-all;">${escapeHtml(
+              supplierConfirmation
+            )}</div>
+          </div>
+        `;
+      }
+
+      function displayGuestsInfo(details) {
+        const guestsSection = document.getElementById("guests-section");
+        const guestsList = document.getElementById("guests-list");
+
+        const guests = details.guests || [];
+        const rooms = details.rooms || [];
+
+        if (guests.length === 0 && rooms.length === 0) {
+          guestsSection.style.display = "none";
+          return;
+        }
+
+        guestsSection.style.display = "block";
+
+        let guestsHTML = "";
+
+        // Group guests by room if room information is available
+        if (rooms.length > 0) {
+          rooms.forEach((room, roomIndex) => {
+            const roomGuests = guests.filter(
+              (g) => g.room_number === roomIndex + 1
+            );
+            if (roomGuests.length > 0) {
+              guestsHTML += `<h3 style="margin-top: 20px; margin-bottom: 10px; color: #667eea;">🛏️ Room ${
+                roomIndex + 1
+              }</h3>`;
+              roomGuests.forEach((guest) => {
+                const guestType = guest.is_child ? "👶 Child" : "👤 Adult";
+                const ageInfo = guest.age ? ` (Age: ${guest.age})` : "";
+                guestsHTML += `
+                  <div class="guest-item">
+                    <strong>${guestType}:</strong> ${escapeHtml(
+                  guest.title || ""
+                )} ${escapeHtml(guest.first_name || "")} ${escapeHtml(
+                  guest.last_name || ""
+                )}${ageInfo}
+                  </div>
+                `;
+              });
+            }
+          });
+        } else {
+          // Display all guests without room grouping
+          guests.forEach((guest) => {
+            const guestType = guest.is_child ? "👶 Child" : "👤 Adult";
+            const ageInfo = guest.age ? ` (Age: ${guest.age})` : "";
+            guestsHTML += `
+              <div class="guest-item">
+                <strong>${guestType}:</strong> ${escapeHtml(
+              guest.title || ""
+            )} ${escapeHtml(guest.first_name || "")} ${escapeHtml(
+              guest.last_name || ""
+            )}${ageInfo}
+              </div>
+            `;
+          });
+        }
+
+        guestsList.innerHTML =
+          guestsHTML || "<p>No guest information available</p>";
+      }
+
+      function displayPriceSummary(details) {
+        const priceSummary = document.getElementById("price-summary");
+        const totalPrice = parseFloat(
+          details.total_price || details.NetPrice || 0
+        );
+        const currency = details.currency || "USD";
+
+        if (totalPrice === 0) {
+          priceSummary.style.display = "none";
+          return;
+        }
+
+        priceSummary.style.display = "block";
+
+        const currencySymbol =
+          currency === "USD"
+            ? "$"
+            : currency === "EUR"
+            ? "€"
+            : currency === "GBP"
+            ? "£"
+            : currency;
+
+        priceSummary.innerHTML = `
+          <h2 style="margin-bottom: 15px; color: #155724;">💰 Price Summary</h2>
+          <div class="price-row total">
+            <span>Total Price:</span>
+            <span>${currencySymbol}${totalPrice.toFixed(2)}</span>
+          </div>
+        `;
+      }
+
+      function displayCancellationPolicy(details) {
+        const cancellationPolicy =
+          details.cancellation_policy || details.cancellationPolicy;
+
+        if (!cancellationPolicy) {
+          return; // Don't display if no cancellation policy
+        }
+
+        // Find a good place to insert cancellation policy - after price summary
+        const priceSummary = document.getElementById("price-summary");
+        if (!priceSummary || priceSummary.style.display === "none") {
+          // If price summary is hidden, insert before action buttons
+          const actionButtons = document.querySelector(".action-buttons");
+          if (actionButtons) {
+            const policyDiv = document.createElement("div");
+            policyDiv.className = "section";
+            policyDiv.style.marginTop = "20px";
+            policyDiv.innerHTML = `
+              <h2 style="margin-bottom: 15px; color: #333;">📋 Cancellation Policy</h2>
+              <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px;">
+                <p style="color: #666; margin: 0; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(
+                  cancellationPolicy
+                )}</p>
+              </div>
+            `;
+            actionButtons.parentNode.insertBefore(policyDiv, actionButtons);
+          }
+        } else {
+          // Insert after price summary
+          const policyDiv = document.createElement("div");
+          policyDiv.className = "section";
+          policyDiv.style.marginTop = "20px";
+          policyDiv.innerHTML = `
+            <h2 style="margin-bottom: 15px; color: #333;">📋 Cancellation Policy</h2>
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px;">
+              <p style="color: #666; margin: 0; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(
+                cancellationPolicy
+              )}</p>
+            </div>
+          `;
+          priceSummary.parentNode.insertBefore(
+            policyDiv,
+            priceSummary.nextSibling
+          );
+        }
+      }
+
+      // ========== BOOKING STATUS HANDLER ==========
+
+      function handleBookingStatus(details) {
+        const status = details.status || "";
+        const cancelButton = document.getElementById("cancel-booking-btn");
+        const statusMessageDiv = document.getElementById("status-message");
+
+        if (
+          status === "CANCELLED" ||
+          status === "Cancelled" ||
+          status === "cancelled"
+        ) {
+          // Hide cancel button
+          if (cancelButton) {
+            cancelButton.style.display = "none";
+          }
+
+          // Show cancellation message
+          if (statusMessageDiv) {
+            statusMessageDiv.innerHTML = `
+              <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 10px;">❌</div>
+                <div style="font-size: 24px; font-weight: bold; color: #856404; margin-bottom: 10px;">
+                  Booking Cancelled
+                </div>
+                <div style="color: #856404; font-size: 16px;">
+                  This booking has been cancelled and is no longer active.
+                </div>
+              </div>
+            `;
+            statusMessageDiv.style.display = "block";
+          }
+        } else {
+          // Show cancel button for active bookings
+          if (cancelButton) {
+            cancelButton.style.display = "block";
+          }
+
+          // Hide cancellation message
+          if (statusMessageDiv) {
+            statusMessageDiv.style.display = "none";
+          }
+        }
+      }
+
+      // ========== CANCEL BOOKING HANDLER ==========
+
+      async function handleCancelBooking() {
+        if (
+          !confirm(
+            "Are you sure you want to cancel this booking? This action cannot be undone."
+          )
+        ) {
+          return;
+        }
+
+        const cancelBtn = document.getElementById("cancel-booking-btn");
+        cancelBtn.disabled = true;
+        cancelBtn.textContent = "Cancelling...";
+
+        try {
+          showStatus("Cancelling booking...", "info");
+
+          const response = await fetch(`${getBaseUrl()}/api/hotels/cancel`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              supplier_confirmation_num: supplierConfirmationNum,
+              reference_num: referenceNum,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.detail || "Cancellation failed");
+          }
+
+          showStatus("Booking cancelled successfully", "success");
+          cancelBtn.textContent = "Booking Cancelled";
+          cancelBtn.disabled = true;
+          cancelBtn.style.background = "#6c757d";
+        } catch (error) {
+          console.error("Cancellation error:", error);
+          showError("Cancellation failed: " + error.message);
+          cancelBtn.disabled = false;
+          cancelBtn.textContent = "Cancel Booking";
+        }
+      }
+
+      // ========== INITIALIZATION ==========
+
+      async function initialize() {
+        try {
+          // Step 1: Extract URL parameters
+          if (!extractUrlParameters()) {
+            return;
+          }
+
+          // Step 2: Auto-login
+          const loginSuccess = await autoLoginHotelBooker();
+          if (!loginSuccess) {
+            return;
+          }
+
+          // Step 3: Fetch booking details
+          const bookingData = await fetchBookingDetails();
+          if (!bookingData) {
+            return;
+          }
+
+          // Step 4: Display booking details
+          displayBookingDetails(bookingData);
+        } catch (error) {
+          console.error("Initialization error:", error);
+          showError("Failed to load booking details: " + error.message);
+        }
+      }
+
+      // Initialize on page load
+      window.addEventListener("DOMContentLoaded", initialize);
+    </script>
+  </body>
+</html>

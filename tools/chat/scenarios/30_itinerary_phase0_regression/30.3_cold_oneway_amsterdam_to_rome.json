@@ -1,0 +1,12 @@
+{
+  "name": "30.3_cold_oneway_amsterdam_to_rome",
+  "description": "P0 baseline (#1053): one-way trip — #1038 _HOTEL_REQUIRED needs return_date, so hotel rail is silently skipped on one-way. Locked here; itinerary follow-up may derive return from duration and flip this to also include hotels.",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip from Amsterdam to Rome, one way starting {{today+30:natural}}, 1 adult",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation", "ai_response", "message"],
+      "max_time_ms": 90000,
+      "expect_min_days": 4
+    }
+  ]
+}

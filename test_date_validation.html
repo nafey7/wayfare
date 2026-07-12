@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Validation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+        }
+        .form-field {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 200px;
+        }
+        input.error {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.3) !important;
+            background-color: #fff5f5;
+        }
+        .test-results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .pass { color: green; }
+        .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Date of Birth Validation Test</h1>
+    
+    <div class="form-field">
+        <label>Adult Passenger Date of Birth *</label>
+        <input type="date" id="test-dob" required>
+        <p id="validation-message"></p>
+    </div>
+    
+    <div class="test-results">
+        <h3>Test Results:</h3>
+        <div id="test-output"></div>
+        <button onclick="runTests()">Run Tests</button>
+    </div>
+
+    <script>
+        // Replicate the validation logic from the flight booker
+        function createPassengerFormValidation(dobInput, type) {
+            if (type === 'Adult') {
+                // Set maximum date to ensure minimum age of 18 years
+                const eighteenYearsAgo = new Date();
+                eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18);
+                dobInput.max = eighteenYearsAgo.toISOString().split('T')[0];
+                
+                console.log('Max date set to:', dobInput.max);
+                
+                // Add real-time validation
+                dobInput.addEventListener('change', function() {
+                    const selectedDate = new Date(this.value);
+                    const today = new Date();
+                    const minimumDate = new Date();
+                    minimumDate.setFullYear(minimumDate.getFullYear() - 18);
+                    
+                    console.log('Selected date:', selectedDate);
+                    console.log('Today:', today);
+                    console.log('Minimum date (18 years ago):', minimumDate);
+                    
+                    // Clear previous custom validity
+                    this.setCustomValidity('');
+                    
+                    if (selectedDate > today) {
+                        this.setCustomValidity('Date of birth cannot be in the future');
+                        this.classList.add('error');
+                        document.getElementById('validation-message').textContent = 'Date of birth cannot be in the future';
+                        document.getElementById('validation-message').style.color = 'red';
+                    } else if (selectedDate > minimumDate) {
+                        this.setCustomValidity('Adult passengers must be at least 18 years old');
+                        this.classList.add('error');
+                        document.getElementById('validation-message').textContent = 'Adult passengers must be at least 18 years old';
+                        document.getElementById('validation-message').style.color = 'red';
+                    } else {
+                        this.classList.remove('error');
+                        document.getElementById('validation-message').textContent = 'Valid date';
+                        document.getElementById('validation-message').style.color = 'green';
+                    }
+                    
+                    // Trigger validation display
+                    this.reportValidity();
+                });
+            }
+        }
+
+        // Initialize validation on the test input
+        const dobInput = document.getElementById('test-dob');
+        createPassengerFormValidation(dobInput, 'Adult');
+
+        function runTests() {
+            const output = document.getElementById('test-output');
+            output.innerHTML = '';
+            
+            const tests = [
+                {
+                    name: 'Future date should be invalid',
+                    date: '2025-12-25',
+                    expectedValid: false
+                },
+                {
+                    name: 'Today should be invalid (under 18)',
+                    date: new Date().toISOString().split('T')[0],
+                    expectedValid: false
+                },
+                {
+                    name: '17 years old should be invalid',
+                    date: (() => {
+                        const date = new Date();
+                        date.setFullYear(date.getFullYear() - 17);
+                        return date.toISOString().split('T')[0];
+                    })(),
+                    expectedValid: false
+                },
+                {
+                    name: '18 years old should be valid',
+                    date: (() => {
+                        const date = new Date();
+                        date.setFullYear(date.getFullYear() - 18);
+                        date.setDate(date.getDate() - 1); // Make sure it's past 18th birthday
+                        return date.toISOString().split('T')[0];
+                    })(),
+                    expectedValid: true
+                },
+                {
+                    name: '25 years old should be valid',
+                    date: (() => {
+                        const date = new Date();
+                        date.setFullYear(date.getFullYear() - 25);
+                        return date.toISOString().split('T')[0];
+                    })(),
+                    expectedValid: true
+                }
+            ];
+
+            tests.forEach(test => {
+                dobInput.value = test.date;
+                dobInput.dispatchEvent(new Event('change'));
+                
+                // Check if validation passed
+                const isValid = dobInput.checkValidity() && !dobInput.classList.contains('error');
+                const passed = isValid === test.expectedValid;
+                
+                const result = document.createElement('div');
+                result.innerHTML = `
+                    <strong>${test.name}</strong><br>
+                    Date: ${test.date}<br>
+                    Expected valid: ${test.expectedValid}, Actual valid: ${isValid}<br>
+                    <span class="${passed ? 'pass' : 'fail'}">${passed ? 'PASS' : 'FAIL'}</span>
+                    <hr>
+                `;
+                output.appendChild(result);
+            });
+        }
+
+        // Show current max date on load
+        window.onload = function() {
+            console.log('Page loaded, max date:', dobInput.max);
+        };
+    </script>
+</body>
+</html>

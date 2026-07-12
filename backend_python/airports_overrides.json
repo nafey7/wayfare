@@ -1,0 +1,255 @@
+{
+  "_comment": "Manual overrides for airport data. These take highest priority when building airports_cache.json",
+  "_instructions": "Add entries here to fix incorrect city names, coordinates, or other data issues. Use _exclude: true to remove airports from the dataset.",
+  "_last_updated": "2026-01-08",
+
+  "_section_exclusions": "=== EXCLUDED AIRPORTS (closed, deprecated, or problematic) ===",
+
+  "SXF": {
+    "_exclude": true,
+    "_reason": "Berlin Schönefeld - closed October 2020, replaced by BER"
+  },
+  "THF": {
+    "_exclude": true,
+    "_reason": "Berlin Tempelhof - closed October 2008"
+  },
+  "TXL": {
+    "_exclude": true,
+    "_reason": "Berlin Tegel - closed November 2020, replaced by BER"
+  },
+  "SPL": {
+    "_exclude": true,
+    "_reason": "Amsterdam Schiphol old code - deprecated, use AMS"
+  },
+  "UTC": {
+    "_exclude": true,
+    "_reason": "Soesterberg Air Base - military, not commercial. Closed 2008, now museum."
+  },
+  "LEY": {
+    "_exclude": true,
+    "_reason": "Lelystad Airport - general aviation only, no scheduled commercial flights"
+  },
+  "DHR": {
+    "_exclude": true,
+    "_reason": "De Kooy Airport - military/general aviation, no scheduled commercial flights"
+  },
+
+  "_section_city_fixes": "=== CITY NAME FIXES (English names for geocoding) ===",
+
+  "CGN": {
+    "city": "Cologne",
+    "_note": "German: Köln"
+  },
+  "DUS": {
+    "city": "Dusseldorf",
+    "_note": "German: Düsseldorf"
+  },
+  "MUC": {
+    "city": "Munich",
+    "_note": "German: München"
+  },
+  "HAM": {
+    "city": "Hamburg",
+    "_note": "German: Hamburg (same)"
+  },
+  "NUE": {
+    "city": "Nuremberg",
+    "_note": "German: Nürnberg"
+  },
+  "VIE": {
+    "city": "Vienna",
+    "_note": "German: Wien"
+  },
+  "ZRH": {
+    "city": "Zurich",
+    "_note": "German: Zürich"
+  },
+  "GVA": {
+    "city": "Geneva",
+    "_note": "French: Genève"
+  },
+  "BRU": {
+    "city": "Brussels",
+    "_note": "French: Bruxelles, Dutch: Brussel"
+  },
+  "AMS": {
+    "city": "Amsterdam",
+    "name": "Amsterdam Airport Schiphol",
+    "_note": "Primary airport for Amsterdam, The Hague, Utrecht region"
+  },
+  "RTM": {
+    "city": "Rotterdam",
+    "name": "Rotterdam The Hague Airport",
+    "_note": "Also serves The Hague (Den Haag)"
+  },
+  "EIN": {
+    "city": "Eindhoven",
+    "_note": "Also serves southern Netherlands"
+  },
+  "PRG": {
+    "city": "Prague",
+    "_note": "Czech: Praha"
+  },
+  "WAW": {
+    "city": "Warsaw",
+    "_note": "Polish: Warszawa"
+  },
+  "CPH": {
+    "city": "Copenhagen",
+    "_note": "Danish: København"
+  },
+  "HEL": {
+    "city": "Helsinki",
+    "_note": "Finnish: Helsinki (same)"
+  },
+  "ARN": {
+    "city": "Stockholm",
+    "_note": "Swedish: Stockholm (same)"
+  },
+  "OSL": {
+    "city": "Oslo",
+    "_note": "Norwegian: Oslo (same)"
+  },
+  "ATH": {
+    "city": "Athens",
+    "_note": "Greek: Athína"
+  },
+  "IST": {
+    "city": "Istanbul",
+    "_note": "Turkish: İstanbul"
+  },
+  "SAW": {
+    "city": "Istanbul",
+    "name": "Istanbul Sabiha Gokcen Airport",
+    "_note": "Secondary Istanbul airport on Asian side"
+  },
+  "FCO": {
+    "city": "Rome",
+    "_note": "Italian: Roma"
+  },
+  "CIA": {
+    "city": "Rome",
+    "name": "Rome Ciampino Airport",
+    "_note": "Secondary Rome airport"
+  },
+  "VCE": {
+    "city": "Venice",
+    "_note": "Italian: Venezia"
+  },
+  "MXP": {
+    "city": "Milan",
+    "_note": "Italian: Milano"
+  },
+  "LIN": {
+    "city": "Milan",
+    "name": "Milan Linate Airport",
+    "_note": "Secondary Milan airport, city center"
+  },
+  "NAP": {
+    "city": "Naples",
+    "_note": "Italian: Napoli"
+  },
+  "FLR": {
+    "city": "Florence",
+    "_note": "Italian: Firenze"
+  },
+  "BCN": {
+    "city": "Barcelona",
+    "_note": "Catalan: Barcelona (same)"
+  },
+  "MAD": {
+    "city": "Madrid",
+    "_note": "Spanish: Madrid (same)"
+  },
+  "LIS": {
+    "city": "Lisbon",
+    "_note": "Portuguese: Lisboa"
+  },
+  "OPO": {
+    "city": "Porto",
+    "_note": "Portuguese: Porto (same)"
+  },
+
+  "_section_crete": "=== CRETE AIRPORTS ===",
+
+  "HER": {
+    "city": "Heraklion",
+    "name": "Heraklion International Airport",
+    "_note": "Main Crete airport, also known as Nikos Kazantzakis",
+    "_region": "Crete"
+  },
+  "CHQ": {
+    "city": "Chania",
+    "name": "Chania International Airport",
+    "_note": "Western Crete airport, also known as Ioannis Daskalogiannis",
+    "_region": "Crete"
+  },
+
+  "_section_london": "=== LONDON AIRPORTS ===",
+
+  "LHR": {
+    "city": "London",
+    "name": "London Heathrow Airport",
+    "_note": "Primary London airport"
+  },
+  "LGW": {
+    "city": "London",
+    "name": "London Gatwick Airport",
+    "_note": "Secondary London airport, south"
+  },
+  "STN": {
+    "city": "London",
+    "name": "London Stansted Airport",
+    "_note": "London airport, northeast"
+  },
+  "LTN": {
+    "city": "London",
+    "name": "London Luton Airport",
+    "_note": "London airport, north"
+  },
+  "LCY": {
+    "city": "London",
+    "name": "London City Airport",
+    "_note": "City center airport, Docklands"
+  },
+  "SEN": {
+    "city": "London",
+    "name": "London Southend Airport",
+    "_note": "London airport, east Essex"
+  },
+
+  "_section_goa": "=== GOA / GOI disambiguation ===",
+
+  "GOI": {
+    "city": "Goa",
+    "name": "Goa International Airport",
+    "_note": "Dabolim Airport - main airport for Goa, India. IATA: GOI (not GOA)"
+  },
+  "GOA": {
+    "city": "Genoa",
+    "name": "Genoa Cristoforo Colombo Airport",
+    "_note": "IATA GOA is Genoa, Italy - NOT Goa, India. Goa uses GOI."
+  },
+
+  "_section_examples": "=== TEMPLATE FOR NEW OVERRIDES ===",
+
+  "_examples": {
+    "_comment": "Use this format to add new overrides",
+    "XXX": {
+      "icao": "XXXX",
+      "iata": "XXX",
+      "name": "Airport Name",
+      "city": "City Name",
+      "state": "State/Region",
+      "country": "XX",
+      "elevation": 100,
+      "lat": 40.0,
+      "lon": -70.0,
+      "tz": "America/New_York"
+    },
+    "YYY_exclude": {
+      "_exclude": true,
+      "_reason": "Reason for exclusion"
+    }
+  }
+}

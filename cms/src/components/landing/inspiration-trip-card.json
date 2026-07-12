@@ -1,0 +1,62 @@
+{
+  "collectionName": "components_landing_inspiration_trip_cards",
+  "info": {
+    "displayName": "Inspiration Trip Card",
+    "icon": "plane",
+    "description": "A trip card for the home page rails. Write chatPrompt without an origin city — the codebase appends a random popular city automatically."
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "builtInSeconds": {
+      "type": "integer",
+      "required": true,
+      "default": 45
+    },
+    "flightRoute": {
+      "type": "string",
+      "required": true
+    },
+    "hotelName": {
+      "type": "string",
+      "required": true
+    },
+    "stops": {
+      "type": "integer",
+      "required": true,
+      "default": 0
+    },
+    "totalPrice": {
+      "type": "string",
+      "required": true
+    },
+    "duration": {
+      "type": "string",
+      "required": true
+    },
+    "theme": {
+      "type": "enumeration",
+      "enum": ["lisbon", "tokyo", "bali", "bangkok"],
+      "required": true,
+      "default": "lisbon"
+    },
+    "tag": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "decimal"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "chatPrompt": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

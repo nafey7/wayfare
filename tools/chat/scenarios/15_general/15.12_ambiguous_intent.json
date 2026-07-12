@@ -1,0 +1,12 @@
+{
+  "name": "15.12_ambiguous_intent",
+  "description": "Ambiguous travel intent — asks for more details",
+  "messages": [
+    {
+      "send": "I'm thinking about traveling",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["where", "destination", "mind", "help", "plan", "trip", "travel", "thinking", "idea", "suggest"]
+    }
+  ]
+}

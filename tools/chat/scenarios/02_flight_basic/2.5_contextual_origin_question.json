@@ -1,0 +1,11 @@
+{
+  "name": "2.5_contextual_origin_question",
+  "description": "Destination mentioned → agent asks origin with destination context",
+  "messages": [
+    {
+      "send": "Find flights to Dubai",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["dubai", "flying from", "where are you", "origin", "departure", "airport", "city", "flight"]
+    }
+  ]
+}

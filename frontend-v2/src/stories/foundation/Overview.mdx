@@ -1,0 +1,129 @@
+{/* Foundation/Overview — Voya Design System Getting Started */}
+
+# Voya Design System — Getting Started
+
+Voya uses a **hybrid MUI + Mantine** stack. Both libraries coexist; choose the right one based on the surface you're building.
+
+---
+
+## When to use Mantine
+
+- **New surfaces** — onboarding, nav, new card layouts, form-heavy flows.
+- **Date / time pickers** — use `@mantine/dates` (`DatePickerInput`, `DateTimePicker`). These are locale-aware via `DatesProvider` (configured in `AppProviders`).
+- **Complex primitives** — `Combobox`, `MultiSelect`, `Spotlight`, `Notification`.
+- **Forms** — new features should use `@mantine/form`. It composes cleanly with Zod and is tree-shake-friendly.
+
+## When to stay on MUI
+
+- **Existing features not yet migrated** — chat, existing flight/hotel card surfaces, profile.
+- **Date pickers inside MUI X** — until those surfaces are ported, keep `date-fns` + `LocalizationProvider`.
+- **MUI-specific augmentations** — `Chip.boldAction`, `palette.chat`, `palette.figmaBase`.
+
+---
+
+## Token access
+
+All raw design values live in `src/theme/tokens.ts`:
+
+```ts
+import { tokens } from '@/theme';
+
+tokens.palette.primary.main   // '#BFC6F4'
+tokens.surfaces.navyBlue      // '#2A2F5F'
+tokens.typography.h1          // { fontSize: '2.25rem', lineHeight: '1.2' }
+```
+
+### MUI components
+
+```ts
+import { useTheme } from '@mui/material';
+
+const theme = useTheme();
+theme.palette.primary.main     // from tokens
+theme.palette.chat.botMessage  // Voya-specific augmentation
+```
+
+### Mantine components
+
+```ts
+import { useMantineTheme } from '@mantine/core';
+import type { mantineTheme } from '@/theme/mantineTheme';
+
+const theme = useMantineTheme();
+const other = theme.other as typeof mantineTheme.other;
+other.navyBlue     // '#2A2F5F'
+other.limeAccent   // '#E7FBBC'
+```
+
+---
+
+## Provider rules
+
+**All providers live in `src/providers/AppProviders.tsx`.**
+Do **not** add `ThemeProvider`, `MantineProvider`, `DatesProvider`, or `LocalizationProvider` ad-hoc inside stories, tests, or components.
+
+Provider order (outermost → innermost):
+```
+Redux → GoogleOAuth → BrowserRouter → MUI ThemeProvider + CssBaseline
+  → MantineProvider → DatesProvider (dayjs, en, Mon-first)
+    → MUI X LocalizationProvider (date-fns) → ChatProvider
+```
+
+Storybook uses `StorybookProviders` (same stack, no BrowserRouter).
+
+---
+
+## Date libraries
+
+| Library | Used by | When to use |
+|---------|---------|-------------|
+| `dayjs` | Mantine `@mantine/dates`, `DatesProvider` | All new date UI |
+| `date-fns` | MUI X `LocalizationProvider` | Existing MUI X pickers only |
+
+**Rule:** new code uses `dayjs`. MUI X stays on `date-fns` until its pickers are replaced.
+Use `src/utils/date.ts` helpers for presentation formatting — never call `dayjs().format()` or `format()` directly in components.
+
+---
+
+## Iconography
+
+| Set | Package | When to use |
+|-----|---------|-------------|
+| Lucide | `lucide-react` | New surfaces (Mantine / nav / chat) |
+| MUI Icons | `@mui/icons-material` | Existing MUI surfaces |
+
+---
+
+## Focus rings
+
+- **Mantine** respects `:focus-visible` via `focusClassName`. Do not override globally.
+- **MUI** uses `&.Mui-focusVisible`. Style focus with `sx={{ '&.Mui-focusVisible': { ... } }}`.
+
+---
+
+## Forms
+
+| Stack | When |
+|-------|------|
+| `@mantine/form` | All new surfaces |
+| `react-hook-form` + Zod | Existing MUI surfaces |
+
+Minimal `@mantine/form` example:
+```tsx
+import { useForm } from '@mantine/form';
+
+const form = useForm({
+  initialValues: { email: '', password: '' },
+  validate: { email: (v) => (/^\S+@\S+$/.test(v) ? null : 'Invalid email') },
+});
+```
+
+---
+
+## See also
+
+- [`Foundation/MantineTheme`](?path=/story/foundation-mantinetheme--default) — Mantine palette, typography, components
+- [`Foundation/MuiTheme`](?path=/story/foundation-muitheme--default) — MUI palette, typography, components
+- `src/theme/tokens.ts` — raw design tokens
+- `src/providers/AppProviders.tsx` — provider composition
+- `local-ops/plans/PLAN_mantine-design-system.md` — implementation plan

@@ -1,0 +1,17 @@
+{
+  "name": "12.1_post_generation_modification",
+  "description": "P1: After itinerary, 'make it more relaxed' → regenerates with mod",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Rome for 2 adults starting {{today+30:natural}}, back {{today+33:natural}}",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    },
+    {
+      "send": "Make it more relaxed",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "max_time_ms": 180000
+    }
+  ]
+}

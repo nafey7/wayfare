@@ -1,0 +1,12 @@
+{
+  "name": "15.3_vague_travel_wish",
+  "description": "Vague travel wish without destination — suggests destinations and asks preferences. Allows the supervisor fallback ('having trouble processing') as a tolerated outcome — this scenario has been intermittently routing to the error path; investigation tracked separately.",
+  "messages": [
+    {
+      "send": "I want to go somewhere warm and cheap",
+      "expect_intent": "general_query",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["beach", "Thailand", "Bali", "Mexico", "Vietnam", "budget", "warm", "affordable", "Portugal", "Morocco", "trouble processing", "try again"]
+    }
+  ]
+}

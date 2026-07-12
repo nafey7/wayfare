@@ -1,0 +1,42 @@
+# Labels based on changed files
+# Docs: https://github.com/actions/labeler
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'frontend/**'
+          - 'frontend-v2/**'
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'backend_python/**'
+
+admin:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'admin/**'
+
+testing:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'testing/**'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '**/*.md'
+
+infrastructure:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'terraform/**'
+          - 'docker/**'
+          - 'compose*.yaml'
+          - 'Dockerfile*'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'

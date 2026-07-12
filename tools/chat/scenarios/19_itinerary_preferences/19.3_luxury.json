@@ -1,0 +1,13 @@
+{
+  "name": "19.3_luxury",
+  "description": "Luxury budget → upscale 5-star itinerary",
+  "messages": [
+    {
+      "send": "Plan a luxury 5-star trip to Dubai, {{today+30:natural}} to {{today+35:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_contains_any": ["luxury", "5-star", "premium", "spa", "fine dining", "suite", "Dubai", "Burj", "exclusive", "private"]
+    }
+  ]
+}

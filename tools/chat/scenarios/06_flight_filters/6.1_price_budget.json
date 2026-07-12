@@ -1,0 +1,12 @@
+{
+  "name": "6.1_price_budget",
+  "description": "Budget flight search — agent applies price filter",
+  "messages": [
+    {
+      "send": "Cheap flights from Amsterdam to London, {{today+30:natural}}, one way, 1 adult, under 300 euros",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["flight options", "flights", "Amsterdam", "London", "Found", "couldn't"]
+    }
+  ]
+}

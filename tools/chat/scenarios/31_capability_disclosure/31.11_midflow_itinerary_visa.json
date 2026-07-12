@@ -1,0 +1,24 @@
+{
+  "name": "31.11_midflow_itinerary_visa",
+  "description": "AI-CHAT-013 mid-flow: itinerary in progress, user asks about visa requirements. Voya has no web search — must point at the embassy / IATA Travel Centre and confirm the itinerary is intact.",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to Bali from July 1 to 5, 2 adults",
+      "expect_type_in": [
+        "itinerary_results",
+        "message"
+      ],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "What visa do I need as a UK citizen?",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "visa",
+        "embassy"
+      ],
+      "expect_contains": "continue your itinerary"
+    }
+  ]
+}

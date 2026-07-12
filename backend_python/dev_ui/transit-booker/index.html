@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voya Transit Route Planner</title>
+    <link rel="icon" href="data:," />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .section {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .section h2 {
+        color: #333;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+
+      .form-field {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      input,
+      select,
+      button {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      .route-card {
+        background: #f8f9fa;
+        border: 2px solid #667eea;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+      }
+
+      .route-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .route-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .transit-step {
+        background: white;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+      }
+
+      .transit-step-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .transit-line-name {
+        font-weight: 700;
+        font-size: 16px;
+        padding: 5px 12px;
+        border-radius: 4px;
+        color: white;
+      }
+
+      .transit-headsign {
+        color: #6c757d;
+        font-size: 14px;
+      }
+
+      .transit-stops {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+
+      .stop {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .stop-name {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .stop-time {
+        font-size: 14px;
+        color: #6c757d;
+      }
+
+      .stop-arrow {
+        color: #667eea;
+        font-size: 20px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+      }
+
+      .no-routes {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+      }
+
+      .checkbox-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        width: auto;
+      }
+
+      .checkbox-item label {
+        margin: 0;
+        font-weight: normal;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🗺️ Route Planner</h1>
+
+      <div id="status" class="status"></div>
+
+      <div class="section">
+        <h2>Route Information</h2>
+        <form id="route-form">
+          <div class="form-group">
+            <label>Search Mode</label>
+            <div class="checkbox-group" style="margin-bottom: 15px">
+              <div class="checkbox-item">
+                <input
+                  type="radio"
+                  id="mode-address"
+                  name="search-mode"
+                  value="address"
+                  checked
+                />
+                <label for="mode-address">By Address</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="radio"
+                  id="mode-coordinates"
+                  name="search-mode"
+                  value="coordinates"
+                />
+                <label for="mode-coordinates">By Coordinates (Lat/Lng)</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" id="address-inputs">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="origin">Origin</label>
+                <input
+                  type="text"
+                  id="origin"
+                  placeholder="e.g., Humberto Delgado Airport, Portugal"
+                />
+              </div>
+              <div class="form-field">
+                <label for="destination">Destination</label>
+                <input
+                  type="text"
+                  id="destination"
+                  placeholder="e.g., Basílica of Estrela, Lisboa, Portugal"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="travel-mode">Travel Mode</label>
+            <select id="travel-mode">
+              <option value="TRANSIT">Transit (Bus, Subway, Train)</option>
+              <option value="DRIVE">Drive (Car)</option>
+              <option value="WALK">Walk</option>
+              <option value="BICYCLE">Bicycle</option>
+              <option value="TWO_WHEELER">Two-Wheeler (Motorcycle)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="coordinates-inputs" style="display: none">
+            <div class="form-row">
+              <div class="form-field">
+                <label>Origin Coordinates</label>
+                <div style="display: flex; gap: 10px">
+                  <input
+                    type="number"
+                    id="origin-lat"
+                    placeholder="Latitude"
+                    step="any"
+                    style="flex: 1"
+                  />
+                  <input
+                    type="number"
+                    id="origin-lng"
+                    placeholder="Longitude"
+                    step="any"
+                    style="flex: 1"
+                  />
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Destination Coordinates</label>
+                <div style="display: flex; gap: 10px">
+                  <input
+                    type="number"
+                    id="destination-lat"
+                    placeholder="Latitude"
+                    step="any"
+                    style="flex: 1"
+                  />
+                  <input
+                    type="number"
+                    id="destination-lng"
+                    placeholder="Longitude"
+                    step="any"
+                    style="flex: 1"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" id="transit-preferences-group">
+            <label>Transit Preferences</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="less-walking" />
+                <label for="less-walking">Less Walking</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="less-transfers" />
+                <label for="less-transfers">Less Transfers</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" id="allowed-modes-group">
+            <label>Allowed Travel Modes (Transit only)</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="mode-bus" value="BUS" />
+                <label for="mode-bus">Bus</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="mode-subway" value="SUBWAY" />
+                <label for="mode-subway">Subway</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="mode-train" value="TRAIN" />
+                <label for="mode-train">Train</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="mode-light-rail"
+                  value="LIGHT_RAIL"
+                />
+                <label for="mode-light-rail">Light Rail</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="mode-rail" value="RAIL" />
+                <label for="mode-rail">Rail</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="alternative-routes" />
+              <label for="alternative-routes">Compute Alternative Routes</label>
+            </div>
+          </div>
+
+          <div
+            style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap"
+          >
+            <button
+              type="button"
+              id="load-test-data-btn"
+              style="
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+              "
+            >
+              📋 Load Test Data
+            </button>
+            <button type="submit" id="search-btn">Search Routes</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="section" id="results-section" style="display: none">
+        <h2>Available Routes</h2>
+        <div id="routes-container"></div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = window.location.origin;
+
+      // Authentication state variables
+      let accessToken = null;
+      let refreshToken = null;
+      let currentUser = null;
+
+      // Utility function to get base URL
+      function getBaseUrl() {
+        return window.location.protocol + "//" + window.location.host;
+      }
+
+      // Auto-login function (matching flight-booker pattern - using same credentials)
+      async function autoLoginTransitBooker() {
+        const loginUrl = getBaseUrl() + "/api/auth/login";
+
+        try {
+          const response = await fetch(loginUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: "flightbooker@example.com",
+              password: "Flight123!",
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.access_token) {
+            accessToken = data.access_token;
+            refreshToken = data.refresh_token || null;
+            currentUser = data.user;
+            localStorage.setItem("access_token", accessToken);
+            if (refreshToken) {
+              localStorage.setItem("refresh_token", refreshToken);
+            }
+            const userName = data.user?.first_name || "Flight Booker";
+            console.log(`✅ Auto-logged in as: ${userName}`, currentUser);
+          } else {
+            console.error("Auto-login failed:", data.detail || "Unknown error");
+          }
+        } catch (error) {
+          console.error("Login error:", error.message);
+        }
+      }
+
+      // Check for existing authentication
+      async function checkExistingAuth() {
+        // Check localStorage first
+        const storedToken = localStorage.getItem("access_token");
+        const storedRefreshToken = localStorage.getItem("refresh_token");
+
+        if (storedToken) {
+          accessToken = storedToken;
+          refreshToken = storedRefreshToken;
+          console.log("✅ Found existing auth token in localStorage");
+          return true;
+        }
+
+        return false;
+      }
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", async function () {
+        // Check for existing authentication first, then fallback to auto-login
+        const hasExistingAuth = await checkExistingAuth();
+        if (!hasExistingAuth) {
+          console.log("No existing auth found, using auto-login fallback");
+          await autoLoginTransitBooker();
+        }
+
+        // Setup form handler
+        document
+          .getElementById("route-form")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+            await searchRoutes();
+          });
+
+        // Setup test data button
+        document
+          .getElementById("load-test-data-btn")
+          .addEventListener("click", loadTestData);
+
+        // Setup search mode toggle
+        document
+          .getElementById("mode-address")
+          .addEventListener("change", toggleSearchMode);
+        document
+          .getElementById("mode-coordinates")
+          .addEventListener("change", toggleSearchMode);
+
+        // Setup travel mode toggle (show/hide transit preferences)
+        document
+          .getElementById("travel-mode")
+          .addEventListener("change", toggleTransitPreferences);
+        toggleTransitPreferences();
+      });
+
+      function toggleTransitPreferences() {
+        const travelMode = document.getElementById("travel-mode").value;
+        const transitPrefs = document.getElementById("transit-preferences-group");
+        const allowedModes = document.getElementById("allowed-modes-group");
+        if (travelMode === "TRANSIT") {
+          transitPrefs.style.display = "block";
+          allowedModes.style.display = "block";
+        } else {
+          transitPrefs.style.display = "none";
+          allowedModes.style.display = "none";
+        }
+      }
+
+      function toggleSearchMode() {
+        const addressMode = document.getElementById("mode-address").checked;
+        const addressInputs = document.getElementById("address-inputs");
+        const coordinatesInputs = document.getElementById("coordinates-inputs");
+
+        if (addressMode) {
+          addressInputs.style.display = "block";
+          coordinatesInputs.style.display = "none";
+          // Make address inputs required
+          document.getElementById("origin").required = true;
+          document.getElementById("destination").required = true;
+          // Remove required from coordinate inputs
+          document.getElementById("origin-lat").required = false;
+          document.getElementById("origin-lng").required = false;
+          document.getElementById("destination-lat").required = false;
+          document.getElementById("destination-lng").required = false;
+        } else {
+          addressInputs.style.display = "none";
+          coordinatesInputs.style.display = "block";
+          // Remove required from address inputs
+          document.getElementById("origin").required = false;
+          document.getElementById("destination").required = false;
+          // Make coordinate inputs required
+          document.getElementById("origin-lat").required = true;
+          document.getElementById("origin-lng").required = true;
+          document.getElementById("destination-lat").required = true;
+          document.getElementById("destination-lng").required = true;
+        }
+      }
+
+      function loadTestData() {
+        const currentMode =
+          document.querySelector('input[name="search-mode"]:checked')?.value ||
+          "address";
+        const targetMode = currentMode; // Store the mode we're loading data for
+
+        if (targetMode === "address") {
+          // Set to address mode and populate
+          document.getElementById("mode-address").checked = true;
+          toggleSearchMode();
+          document.getElementById("origin").value =
+            "Humberto Delgado Airport, Portugal";
+          document.getElementById("destination").value =
+            "Basílica of Estrela, Praça da Estrela, 1200-667 Lisboa, Portugal";
+        } else {
+          // Set to coordinates mode and populate
+          document.getElementById("mode-coordinates").checked = true;
+          toggleSearchMode();
+          // Test coordinates (NYC area)
+          document.getElementById("origin-lat").value = 40.7517;
+          document.getElementById("origin-lng").value = -73.9768;
+          // Test coordinates (NYC area)
+          document.getElementById("destination-lat").value = 40.7076;
+          document.getElementById("destination-lng").value = -74.0119;
+        }
+
+        // Set transit preferences
+        document.getElementById("less-walking").checked = true;
+        document.getElementById("less-transfers").checked = false;
+
+        // Set travel modes (only TRAIN)
+        document.getElementById("mode-bus").checked = false;
+        document.getElementById("mode-subway").checked = false;
+        document.getElementById("mode-train").checked = true;
+        document.getElementById("mode-light-rail").checked = false;
+        document.getElementById("mode-rail").checked = false;
+
+        // Set alternative routes
+        document.getElementById("alternative-routes").checked = true;
+
+        // Show success message
+        showStatus("Test data loaded successfully!", "success");
+        if (targetMode === "address") {
+          console.log("✅ Test data loaded (Address mode):", {
+            origin: "Humberto Delgado Airport, Portugal",
+            destination:
+              "Basílica of Estrela, Praça da Estrela, 1200-667 Lisboa, Portugal",
+            travelMode: "TRANSIT",
+            computeAlternativeRoutes: true,
+            transitPreferences: {
+              routingPreference: "LESS_WALKING",
+              allowedTravelModes: ["TRAIN"],
+            },
+          });
+        } else {
+          console.log("✅ Test data loaded (Coordinates mode):", {
+            origin: {
+              location: {
+                latLng: {
+                  latitude: 40.7517,
+                  longitude: -73.9768,
+                },
+              },
+            },
+            destination: {
+              location: {
+                latLng: {
+                  latitude: 40.7076,
+                  longitude: -74.0119,
+                },
+              },
+            },
+            travelMode: "TRANSIT",
+            computeAlternativeRoutes: true,
+            transitPreferences: {
+              routingPreference: "LESS_WALKING",
+              allowedTravelModes: ["TRAIN"],
+            },
+          });
+        }
+      }
+
+      async function searchRoutes() {
+        const addressMode = document.getElementById("mode-address").checked;
+        const lessWalking = document.getElementById("less-walking").checked;
+        const lessTransfers = document.getElementById("less-transfers").checked;
+        const alternativeRoutes =
+          document.getElementById("alternative-routes").checked;
+
+        // Get selected travel modes
+        const travelModes = [];
+        ["bus", "subway", "train", "light-rail", "rail"].forEach((mode) => {
+          const checkbox = document.getElementById(`mode-${mode}`);
+          if (checkbox && checkbox.checked) {
+            travelModes.push(checkbox.value);
+          }
+        });
+
+        const travelMode = document.getElementById("travel-mode").value;
+
+        // Build request based on search mode
+        let request = {
+          travelMode: travelMode,
+          computeAlternativeRoutes: alternativeRoutes,
+        };
+
+        if (addressMode) {
+          const origin = document.getElementById("origin").value.trim();
+          const destination = document
+            .getElementById("destination")
+            .value.trim();
+
+          if (!origin || !destination) {
+            showError("Please enter both origin and destination");
+            return;
+          }
+
+          request.origin = { address: origin };
+          request.destination = { address: destination };
+        } else {
+          const originLat = parseFloat(
+            document.getElementById("origin-lat").value
+          );
+          const originLng = parseFloat(
+            document.getElementById("origin-lng").value
+          );
+          const destinationLat = parseFloat(
+            document.getElementById("destination-lat").value
+          );
+          const destinationLng = parseFloat(
+            document.getElementById("destination-lng").value
+          );
+
+          if (
+            isNaN(originLat) ||
+            isNaN(originLng) ||
+            isNaN(destinationLat) ||
+            isNaN(destinationLng)
+          ) {
+            showError(
+              "Please enter valid coordinates for both origin and destination"
+            );
+            return;
+          }
+
+          if (
+            originLat < -90 ||
+            originLat > 90 ||
+            destinationLat < -90 ||
+            destinationLat > 90
+          ) {
+            showError("Latitude must be between -90 and 90");
+            return;
+          }
+
+          if (
+            originLng < -180 ||
+            originLng > 180 ||
+            destinationLng < -180 ||
+            destinationLng > 180
+          ) {
+            showError("Longitude must be between -180 and 180");
+            return;
+          }
+
+          request.origin = {
+            latLng: {
+              latitude: originLat,
+              longitude: originLng,
+            },
+          };
+          request.destination = {
+            latLng: {
+              latitude: destinationLat,
+              longitude: destinationLng,
+            },
+          };
+        }
+
+        // Add transit preferences only when travel mode is TRANSIT
+        if (
+          travelMode === "TRANSIT" &&
+          (lessWalking || lessTransfers || travelModes.length > 0)
+        ) {
+          request.transitPreferences = {};
+          if (lessWalking) {
+            request.transitPreferences.routingPreference = "LESS_WALKING";
+          } else if (lessTransfers) {
+            request.transitPreferences.routingPreference = "LESS_TRANSFERS";
+          }
+          if (travelModes.length > 0) {
+            request.transitPreferences.allowedTravelModes = travelModes;
+          }
+        }
+
+        // Log request payload (matching flight-booker pattern)
+        console.log("🚇 Transit Routes Request:", request);
+        console.log(
+          "🚇 Transit Routes Request (JSON):",
+          JSON.stringify(request, null, 2)
+        );
+
+        const searchBtn = document.getElementById("search-btn");
+        searchBtn.disabled = true;
+        searchBtn.textContent = "Searching...";
+
+        try {
+          showStatus("Searching for routes...", "info");
+
+          const url = `${API_BASE_URL}/api/transit/routes`;
+          console.log("🚇 Making request to:", url);
+
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(request),
+          });
+
+          console.log(
+            "🚇 Response status:",
+            response.status,
+            response.statusText
+          );
+          console.log(
+            "🚇 Response headers:",
+            Object.fromEntries(response.headers.entries())
+          );
+
+          const data = await response.json();
+          console.log("🚇 Transit Routes Response:", data);
+
+          if (!response.ok) {
+            console.error("❌ Transit routes request failed:", {
+              status: response.status,
+              statusText: response.statusText,
+              data: data,
+            });
+
+            // Handle different error response formats
+            let errorMsg = "Failed to search routes";
+            if (typeof data.detail === "string") {
+              errorMsg = data.detail;
+            } else if (Array.isArray(data.detail)) {
+              // FastAPI 422 validation errors
+              errorMsg = data.detail
+                .map((err) => {
+                  const field = err.loc ? err.loc.join(" -> ") : "unknown";
+                  return `${field}: ${
+                    err.msg || err.message || JSON.stringify(err)
+                  }`;
+                })
+                .join(", ");
+            } else if (data.detail && typeof data.detail === "object") {
+              errorMsg = JSON.stringify(data.detail);
+            }
+
+            throw new Error(errorMsg);
+          }
+
+          displayRoutes(data);
+          showStatus(`Found ${data.routes.length} route(s)`, "success");
+        } catch (error) {
+          console.error("❌ Error searching routes:", error);
+          showError(
+            error.message || "Failed to search routes. Please try again."
+          );
+        } finally {
+          searchBtn.disabled = false;
+          searchBtn.textContent = "Search Routes";
+        }
+      }
+
+      function displayRoutes(data) {
+        const container = document.getElementById("routes-container");
+        const resultsSection = document.getElementById("results-section");
+
+        if (!data.routes || data.routes.length === 0) {
+          container.innerHTML =
+            '<div class="no-routes">No routes found for this journey.</div>';
+          resultsSection.style.display = "block";
+          return;
+        }
+
+        container.innerHTML = "";
+
+        data.routes.forEach((route, routeIndex) => {
+          const routeCard = document.createElement("div");
+          routeCard.className = "route-card";
+
+          const routeHeader = document.createElement("div");
+          routeHeader.className = "route-header";
+          routeHeader.innerHTML = `<div class="route-title">Route ${
+            routeIndex + 1
+          }</div>`;
+          routeCard.appendChild(routeHeader);
+
+          // Route-level summary (distance, duration)
+          const routeSummary = getRouteSummary(route);
+          if (routeSummary) {
+            routeHeader.appendChild(routeSummary);
+          }
+
+          let hasTransitSteps = false;
+          route.legs.forEach((leg) => {
+            leg.steps.forEach((step) => {
+              if (step.transit_details) {
+                hasTransitSteps = true;
+                const transitStep = createTransitStepElement(
+                  step.transit_details
+                );
+                routeCard.appendChild(transitStep);
+              } else if (
+                step.navigation_instruction ||
+                step.localized_values ||
+                step.distance_meters
+              ) {
+                // Driving/walking step with turn-by-turn data
+                const drivingStep = createDrivingStepElement(step);
+                routeCard.appendChild(drivingStep);
+              }
+            });
+          });
+
+          // Fallback when no step details at all (e.g. minimal API response)
+          const stepCount = route.legs.reduce(
+            (n, leg) => n + (leg.steps?.length || 0),
+            0
+          );
+          if (
+            !hasTransitSteps &&
+            !routeCard.querySelector(".transit-step")
+          ) {
+            const fallback = document.createElement("div");
+            fallback.className = "transit-step";
+            fallback.innerHTML = `<div style="color: #6c757d;">✓ Route found (${stepCount} step(s)) — no step details available</div>`;
+            routeCard.appendChild(fallback);
+          }
+
+          container.appendChild(routeCard);
+        });
+
+        resultsSection.style.display = "block";
+      }
+
+      function getRouteSummary(route) {
+        const dist =
+          route.localized_values?.distance_text ||
+          (route.distance_meters
+            ? `${(route.distance_meters / 1000).toFixed(1)} km`
+            : null);
+        const dur = route.localized_values?.duration_text || null;
+        if (!dist && !dur) return null;
+        const span = document.createElement("span");
+        span.style.cssText =
+          "font-size: 14px; color: #6c757d; font-weight: normal;";
+        span.textContent = [dist, dur].filter(Boolean).join(" • ");
+        return span;
+      }
+
+      function createDrivingStepElement(step) {
+        const stepDiv = document.createElement("div");
+        stepDiv.className = "transit-step";
+
+        const parts = [];
+        if (step.navigation_instruction?.instructions) {
+          parts.push(step.navigation_instruction.instructions);
+        }
+        if (step.localized_values?.distance_text) {
+          parts.push(`(${step.localized_values.distance_text})`);
+        }
+        if (step.localized_values?.duration_text) {
+          parts.push(`— ${step.localized_values.duration_text}`);
+        }
+        if (parts.length === 0 && step.distance_meters) {
+          parts.push(`${(step.distance_meters / 1000).toFixed(2)} km`);
+        }
+
+        stepDiv.innerHTML = parts.length
+          ? parts.join(" ")
+          : (step.travel_mode || "Step");
+        return stepDiv;
+      }
+
+      function createTransitStepElement(transitDetails) {
+        const stepDiv = document.createElement("div");
+        stepDiv.className = "transit-step";
+
+        const header = document.createElement("div");
+        header.className = "transit-step-header";
+
+        const lineName = document.createElement("div");
+        lineName.className = "transit-line-name";
+        lineName.textContent = transitDetails.transit_line.name;
+        lineName.style.backgroundColor =
+          transitDetails.transit_line.color || "#667eea";
+        lineName.style.color =
+          transitDetails.transit_line.text_color || "#000000";
+        header.appendChild(lineName);
+
+        const headsign = document.createElement("div");
+        headsign.className = "transit-headsign";
+        headsign.textContent = `→ ${transitDetails.headsign}`;
+        header.appendChild(headsign);
+
+        stepDiv.appendChild(header);
+
+        const stops = document.createElement("div");
+        stops.className = "transit-stops";
+
+        const departureStop = document.createElement("div");
+        departureStop.className = "stop";
+        departureStop.innerHTML = `
+          <div class="stop-name">${transitDetails.stop_details.departure_stop.name}</div>
+          <div class="stop-time">${transitDetails.localized_values.departure_time.time.text}</div>
+        `;
+        stops.appendChild(departureStop);
+
+        const arrow = document.createElement("div");
+        arrow.className = "stop-arrow";
+        arrow.textContent = "→";
+        stops.appendChild(arrow);
+
+        const arrivalStop = document.createElement("div");
+        arrivalStop.className = "stop";
+        arrivalStop.innerHTML = `
+          <div class="stop-name">${transitDetails.stop_details.arrival_stop.name}</div>
+          <div class="stop-time">${transitDetails.localized_values.arrival_time.time.text}</div>
+        `;
+        stops.appendChild(arrivalStop);
+
+        const stopCount = document.createElement("div");
+        stopCount.style.cssText =
+          "margin-left: auto; color: #6c757d; font-size: 14px;";
+        stopCount.textContent = `${transitDetails.stop_count} stops`;
+        stops.appendChild(stopCount);
+
+        stepDiv.appendChild(stops);
+
+        return stepDiv;
+      }
+
+      function showStatus(message, type = "info") {
+        const statusDiv = document.getElementById("status");
+        statusDiv.className = `status ${type}`;
+        statusDiv.textContent = message;
+        statusDiv.style.display = "block";
+
+        if (type === "success" || type === "error") {
+          setTimeout(() => {
+            statusDiv.style.display = "none";
+          }, 5000);
+        }
+      }
+
+      function showError(message) {
+        showStatus(message, "error");
+      }
+    </script>
+  </body>
+</html>

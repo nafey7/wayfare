@@ -1,0 +1,90 @@
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.pac-container {
+  z-index: 9999;
+}
+
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.css-t89xny-MuiDataGrid-columnHeaderTitle{
+  font-weight: 500 !important;
+  font-size: small;
+}
+.rs-picker-popup {
+  z-index: 9999 !important; /* Adjust the z-index value as needed */
+}
+.rs-input{
+  font-size: 14px !important;
+  font-weight: 400;
+}
+ .rs-picker-daterange>.rs-input-group{
+background: none !important;
+ }
+ #duration.rs-date-range-input.rs-input{
+background: none;
+ }
+ #timeDuration.rs-date-range-input.rs-input{
+  background: none;
+   }
+   .rs-input-group.rs-input-group-inside .rs-input{
+    background: none;
+   }
+/* .MuiPickersLayout-actionBar {
+  display: none!important;
+}
+
+.css-1e6y48t-MuiButtonBase-root-MuiButton-root {
+  display: none !important;
+  } */
+  .css-1pnzvtl{
+    background: transparent !important;
+  }
+  .rowscroll{
+    overflow-x: scroll;
+  }
+  .rowscroll::-webkit-scrollbar{
+    height: 0.5px;
+  }
+  /*scrollbar*/
+::-webkit-scrollbar {
+  width: 8px;
+}
+ /* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 20px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background:lightgrey;
+  border-radius: 10px;
+}
+::-webkit-scrollbar {
+  height: 8px;
+}
+::-webkit-scrollbar-thumb:horizontal {
+  background:lightgray;
+  border-radius: 10px;
+}
+
+.wysiwyg-mention, .rdw-mention-link {
+  pointer-events: none !important;
+  text-decoration: none !important;
+  color: unset !important;
+  background-color: unset !important;
+}

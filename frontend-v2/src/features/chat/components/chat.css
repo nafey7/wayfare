@@ -1,0 +1,19 @@
+@keyframes voya-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes voyaBlink {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+
+.voya-chat-markdown p { margin: 0; }
+.voya-chat-markdown p:not(:last-child) { margin-bottom: 8px; }
+.voya-chat-markdown strong { font-weight: 700; }
+.voya-chat-markdown a { color: var(--mantine-color-brand-6); }
+.voya-chat-markdown ul, .voya-chat-markdown ol { padding-left: 20px; margin: 8px 0; }
+.voya-chat-markdown li { margin-bottom: 4px; }
+.voya-chat-markdown code { background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px; font-family: monospace; }
+.voya-chat-markdown pre { background: rgba(0,0,0,0.05); padding: 8px; border-radius: 6px; overflow: auto; }
+.voya-chat-markdown h1, .voya-chat-markdown h2, .voya-chat-markdown h3 { font-weight: 600; margin: 8px 0; }

@@ -1,0 +1,354 @@
+[tool.poetry]
+name = "voya-backend"
+version = "0.1.0"
+description = "Voya Travel Platform Backend"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+fastapi = "0.115.5"
+uvicorn = {extras = ["standard"], version = "0.25.0"}
+python-dotenv = "1.0.0"
+pydantic = "2.10.3"
+email-validator = "*"
+pydantic-settings = "2.6.1"
+motor = "3.7.0"
+PyJWT = "2.10.1"
+passlib = {extras = ["bcrypt"], version = "1.7.4"}
+bcrypt = "4.0.1"
+python-multipart = "0.0.20"  # Security: CVE-2024-53981 DoS fix
+google-auth = "2.36.0"
+google-auth-oauthlib = "1.2.1"
+google-auth-httplib2 = "0.2.0"
+httpx = "0.28.1"
+google-genai = "1.0.0"
+google-api-python-client = "2.179.0"
+stripe = "11.3.0"
+sendgrid = "6.11.0"
+python-dateutil = "2.9.0"
+# LangGraph for AI agent orchestration
+langgraph = ">=0.2.0"
+langgraph-checkpoint-mongodb = ">=0.3.0"
+langchain-google-genai = ">=2.0.0"
+langchain-core = ">=0.3.0"
+# Langfuse for LLM observability
+langfuse = ">=2.0.0"
+# Sentry for error tracking and APM
+sentry-sdk = {extras = ["fastapi"], version = ">=2.0.0"}
+pytz = "2024.2"
+pycountry = "24.6.1"
+phonenumbers = "8.13.51"
+python-stdnum = "1.20"
+babel = "2.16.0"
+rich = "13.9.4"
+jinja2 = ">=3.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.2"
+pytest-asyncio = "^1.1.0"
+pytest-cov = "6.2.1"
+pytest-mock = "3.14.1"
+ruff = "0.8.4"
+mypy = "1.17.1"
+bandit = "1.8.0"
+pre-commit = "4.3.0"
+
+[tool.ruff]
+# Standard Python line length
+line-length = 88
+target-version = "py312"
+
+# Files to exclude
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".venv312",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+[tool.ruff.lint]
+# Enabled rule sets for strict code quality
+select = [
+    "E",     # pycodestyle errors (syntax, indentation)
+    "W",     # pycodestyle warnings (deprecated features)
+    "F",     # pyflakes (undefined names, unused imports)
+    "I",     # isort (import sorting)
+    "B",     # flake8-bugbear (likely bugs and design problems)
+    "C4",    # flake8-comprehensions (list/dict/set comprehension improvements)
+    "UP",    # pyupgrade (upgrade syntax for newer Python versions)
+    "ARG",   # flake8-unused-arguments (unused function arguments)
+    "SIM",   # flake8-simplify (code simplification suggestions)
+    "TCH",   # flake8-type-checking (optimize type checking imports)
+    "DTZ",   # flake8-datetimez (timezone-aware datetime usage)
+    "RUF",   # Ruff-specific rules (additional checks)
+    "S",     # flake8-bandit (security vulnerabilities)
+    "N",     # pep8-naming (naming conventions)
+    "ANN",   # flake8-annotations (enforce type hints)
+    "ASYNC", # flake8-async (async/await best practices) - CRITICAL for FastAPI
+    "FAST",  # FastAPI-specific rules - NEW
+    "PT",    # flake8-pytest-style (pytest conventions)
+    "RET",   # flake8-return (return statement checks)
+    "ERA",   # eradicate (detect commented-out code)
+    "PL",    # Pylint (code complexity and quality)
+]
+
+# Rules to ignore for practical reasons
+ignore = [
+    "E501",    # Line too long (handled by Ruff formatter)
+    "B008",    # Function calls in argument defaults (needed for FastAPI Depends())
+    "C901",    # Function too complex (sometimes complexity is necessary)
+    "W191",    # Indentation contains tabs (not an issue with spaces)
+    "ANN401",  # Dynamically typed expressions (Any type sometimes needed)
+    "S101",    # Use of assert (needed in pytest tests)
+    "PLR0913", # Too many arguments (FastAPI endpoints need many parameters)
+    "N805",    # First argument not named 'self' (FastAPI dependencies)
+    "ASYNC240", # Path/blocking I/O only at startup/shutdown, not in request handlers
+
+    # === CI RELAXED RULES (Progressive Quality Improvement) ===
+    # Complexity rules - improve gradually as files are touched
+    "PLR0912", # Too many branches (>12) - style preference, not critical bug
+    "PLR0915", # Too many statements (>50) - style preference, not critical bug
+    "PLR0911", # Too many return statements (>6) - style preference, not critical bug
+    "PLR2004", # Magic value used in comparison - improve gradually
+
+    # DateTime timezone rules - improve gradually, not critical for CI
+    "DTZ005",  # datetime.now() without timezone - improve as files are touched
+    "DTZ003",  # datetime.utcnow() usage - improve as files are touched
+    "DTZ007",  # strptime() without %z - date-only parsing doesn't need timezone
+
+    # Import placement rules - FastAPI patterns sometimes need flexibility
+    "PLC0415", # Import should be at top-level - FastAPI conditional imports OK
+
+    # Annotation rules - improve gradually, not blocking for legacy code
+    "ANN201",  # Missing return type annotation for public function
+    "ANN001",  # Missing type annotation for function argument
+    "ANN003",  # Missing type annotation for **kwargs
+
+    # FastAPI rules - improve gradually for legacy endpoints
+    "FAST002", # FastAPI non-annotated dependency - legacy patterns OK for CI
+    "FAST001", # FastAPI redundant response_model - improve gradually
+
+    # Style rules - improve gradually as files are touched
+    "N806",    # Non-lowercase variable in function - improve gradually
+    "RUF002",  # Ambiguous unicode character in docstring - style issue
+    "RUF003",  # Ambiguous unicode character in comment - style issue
+    "ERA001",  # Commented-out code - improve gradually
+
+    # Email template false positives - contains "password" in templates but not actual passwords
+    "S105",    # Hardcoded password string - email templates trigger false positives
+    "S106",    # Hardcoded password func arg - test files use mock passwords
+
+    # Additional relaxed rules for progressive improvement
+    "DTZ001",  # datetime() without tzinfo - improve gradually
+    "S110",    # try-except-pass - improve error handling gradually
+    "UP045",   # Union syntax updates - style preference (Pydantic compatibility)
+    "PT028",   # pytest function parameter defaults - test patterns
+    "S104",    # Binding to all interfaces - config settings pattern
+    "N802",    # Function name should be lowercase - legacy naming
+    "PLW0603", # Global statement usage - refactor gradually
+
+    # Low-priority security rules - improve gradually
+    "S607",    # Start process with partial path - subprocess patterns
+    "S603",    # Subprocess without shell=False - subprocess patterns
+    "S602",    # Subprocess popen with shell=True - subprocess patterns
+    "S310",    # Suspicious URL open usage - requests patterns
+
+    # Style and naming rules - improve gradually
+    "RUF100",  # Unused noqa comments - clean up gradually
+    "ANN202",  # Missing return type private function - improve gradually
+    "ANN205",  # Missing return type static method - improve gradually
+    "E741",    # Ambiguous variable name - improve gradually
+    "N801",    # Invalid class name - legacy naming
+    "PLW2901", # Redefined loop name - improve gradually
+    "B019",    # Cached instance method - performance patterns
+    "PT012",   # Pytest raises with multiple statements - test patterns
+
+    # Note: Pre-commit will enforce ALL rules on changed files
+    # This creates progressive improvement without blocking CI
+]
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Auto-fix configuration
+fixable = ["ALL"]  # Allow Ruff to fix all fixable issues
+unfixable = []     # No rules are unfixable
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]  # Allow unused imports in __init__ files
+"tests/*" = ["S101", "ARG", "ANN", "PT011", "B017", "F841"]  # Test-specific relaxations: asserts, unused args, type annotations, broad pytest.raises, assert exceptions, unused mocks
+"app/database/models/*.py" = ["TCH001", "TCH003"]  # Pydantic models need runtime imports for validation
+"app/domains/*/schemas.py" = ["TCH001", "TCH003"]  # Pydantic schemas need runtime imports for validation
+"integrations/*/dto.py" = ["TCH001", "TCH003"]  # DTOs use Pydantic and need runtime imports
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Allow FastAPI dependency injection patterns
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Path"]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "."
+namespace_packages = true
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]  # CRITICAL: Pydantic v2 plugin for proper type checking
+
+# Enable strict mode for comprehensive type checking
+# Note: strict = true is enabled, but we selectively disable overly strict checks below
+strict = true
+
+# ============================================================================
+# PRODUCTION-FRIENDLY CONFIGURATION (2024-2025 Best Practices)
+# ============================================================================
+# Based on industry standards from:
+# - Dropbox (mypy creators): disallow_untyped_calls too strict for real codebases
+# - FastAPI: Uses strict but disables untyped_calls
+# - General consensus: Balance type safety with third-party library reality
+# ============================================================================
+
+# Core type checking (keep strict)
+disallow_untyped_defs = true        # All OUR functions must have type hints
+disallow_incomplete_defs = true     # All OUR functions must be fully typed
+check_untyped_defs = true           # Check inside untyped functions
+no_implicit_optional = true         # Explicit Optional required
+warn_no_return = true               # Warn about missing return statements
+
+# Strict for our code (like Spring/Wolt production codebases)
+disallow_untyped_calls = true       # Enforce type safety in our code
+warn_return_any = false             # Disabled: too noisy with third-party libs (common practice)
+disallow_untyped_decorators = false # Allow untyped decorators (FastAPI, pytest - necessary)
+
+# Import handling
+disallow_any_unimported = false     # Allow Any from imports (too strict otherwise)
+follow_imports = "normal"
+ignore_missing_imports = false      # Still catch typos in import names
+
+# Warnings (helpful but not blocking)
+warn_unused_configs = true          # Warn about unused mypy config
+warn_redundant_casts = true         # Warn about unnecessary casts
+warn_unused_ignores = true          # Warn about unused # type: ignore
+
+# Output formatting
+pretty = true                       # Prettier error messages
+show_column_numbers = true          # Show column numbers in errors
+show_error_codes = true             # Show error codes for suppression (essential!)
+show_error_context = true           # Show code context in errors
+
+# ============================================================================
+# THIRD-PARTY LIBRARY OVERRIDES
+# ============================================================================
+# These libraries have incomplete/missing type stubs
+# We ignore missing imports but still check our usage of them
+# ============================================================================
+
+[[tool.mypy.overrides]]
+module = [
+    "motor.*",                      # MongoDB async driver - deprecated but used
+    "sendgrid.*",                   # Email service
+    "google.genai.*",               # Google AI SDK
+    "passlib.*",                    # Password hashing
+    "bandit.*",                     # Security linter
+    "pytest_mock.*",                # Test mocking
+    "nanoid.*",                     # ID generation
+    "langgraph.*",                  # LangGraph AI agent framework
+    "langchain_core.*",             # LangChain core types
+    "langchain_google_genai.*",     # LangChain Google Genai
+    "langfuse.*",                   # LLM observability
+    "sentry_sdk.*",                 # Error tracking and APM
+]
+ignore_missing_imports = true
+
+# Stripe: Has type stubs but they're incomplete
+# Per-module override allows strict checking of OUR code while being lenient with Stripe
+[[tool.mypy.overrides]]
+module = "stripe.*"
+disallow_untyped_calls = false      # Stripe SDK has incomplete type stubs
+disallow_untyped_defs = false       # Stripe internal functions aren't fully typed
+ignore_missing_imports = false      # Still catch import typos
+
+# Our code calling Stripe: Allow untyped calls in payment domain only
+[[tool.mypy.overrides]]
+module = "app.domains.payment.*"
+disallow_untyped_calls = false      # Needs to call Stripe SDK
+disallow_untyped_defs = true        # But OUR functions must be typed
+
+[[tool.mypy.overrides]]
+module = "app.api.webhooks"
+disallow_untyped_calls = false      # Needs to call Stripe SDK
+disallow_untyped_defs = true        # But OUR functions must be typed
+
+# Pydantic v2 plugin configuration
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+pythonpath = ["."]
+asyncio_default_fixture_loop_scope = "function"
+addopts = [
+    "--verbose",
+    "--strict-markers",
+    "--tb=short",
+    "--asyncio-mode=auto"
+]
+filterwarnings = [
+    "ignore:Type google._upb._message.*:DeprecationWarning",
+]
+markers = [
+    "unit: Fast, isolated unit tests",
+    "integration: Tests with real dependencies",
+    "e2e: End-to-end user flow tests",
+    "critical: Must pass for deployment",
+    "slow: Long-running tests (> 1s)",
+    "flaky: Known intermittent failures",
+    "performance: Performance benchmark tests",
+]
+
+[tool.coverage.run]
+data_file = ".coverage"  # Fixed: was ../dev/code_reports/.coverage
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__init__.py",
+    "app/core/config.py",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"  # Fixed: was ../dev/code_reports/htmlcov
+
+[tool.bandit]
+exclude_dirs = ["tests", "venv"]
+severity = "low"  # Check low severity issues too
+confidence = "low"  # Check low confidence issues too
+skips = []  # Don't skip any tests

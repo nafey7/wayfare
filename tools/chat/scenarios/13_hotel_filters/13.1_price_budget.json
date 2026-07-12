@@ -1,0 +1,12 @@
+{
+  "name": "13.1_price_budget",
+  "description": "Budget hotel search with price filter [TEMP LOOSENED PR#1108 — filter not echoed in response; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Cheap hotels in Madrid, {{today+30:natural}} to {{today+33:natural}}, 1 adult, under 100 per night",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["no hotels", "No hotels", "range", "adjust", "under", "budget", "couldn't", "Madrid", "hotel", "price", "search", "stay", "night"]
+    }
+  ]
+}

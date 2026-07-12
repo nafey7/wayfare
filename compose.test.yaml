@@ -1,0 +1,354 @@
+# Voya Testing Stack with Docker Compose
+#
+# This file provides an isolated testing environment separate from development.
+# It uses different ports and database names to ensure complete test isolation.
+# All ports are hardcoded to avoid conflicts with dev environment via direnv.
+#
+# Usage:
+#   docker compose -f compose.test.yaml up -d
+#   docker compose -f compose.test.yaml down
+#   docker compose -f compose.test.yaml logs
+#
+# Services (hardcoded ports to avoid env var conflicts):
+# - Backend serves SPA at http://localhost:8001
+# - MongoDB (Test DB) at localhost:27018
+# - Mongo Express at http://localhost:8082
+# - MailHog (Test Email) at http://localhost:8026
+# - FlightLogic Mock Server at http://localhost:8004
+# - imgproxy at http://localhost:8011
+
+name: voya-test
+
+services:
+  # Test MongoDB Database (Isolated)
+  mongodb-test:
+    image: mongo:7.0
+    container_name: voya-test-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=voya_test
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - mongodb_test_data:/data/db
+      - ./testing/setup/init-test-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - voya-test-network
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=database"
+
+  # Test Python Backend
+  backend-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USE_POETRY: ${USE_POETRY:-false}
+    container_name: voya-test-backend
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+    environment:
+      - MONGODB_URI=mongodb://mongodb-test:27017
+      - DATABASE_NAME=voya_test
+      - ENVIRONMENT=testing
+      - DEBUG=true
+      - SECRET_KEY=test-secret-key-for-testing-environment-only
+      - JWT_SECRET=test-jwt-secret-for-testing-only
+      # Email Configuration for Testing
+      - USE_MAILHOG=true
+      - MAILHOG_HOST=mailhog-test
+      - MAILHOG_PORT=1025
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - SENDGRID_FROM_EMAIL=test@example.com
+      # Google OAuth Configuration (Test)
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID:-}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET:-}
+      - GOOGLE_OAUTH_REDIRECT_URI=http://localhost:8001/api/auth/google/authenticate
+      # Google AI Configuration (Test)
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-}
+      # Google Places API kill-switch — DISABLED by default in the test stack
+      # for the same reason LANGFUSE_ENABLED is off below: chat-scenario CI
+      # would otherwise burn ~1k Places calls per week against the production
+      # GCP project (image enrichment fires once per itinerary day, and
+      # itinerary scenarios make up the bulk of the test set). Override
+      # locally with PLACES_API_ENABLED=true only when actively debugging a
+      # Places-related CI scenario.
+      - PLACES_API_ENABLED=${PLACES_API_ENABLED:-false}
+      # FlightLogic Mock API (Test)
+      - FLIGHTLOGIC_API_URL=http://flightlogic-mock-test:8002/api/aeroVE5
+      - FLIGHTLOGIC_FLIGHTS_API_BASE_URL=http://flightlogic-mock-test:8002/api/aeroVE5
+      - FLIGHTLOGIC_HOTELS_API_BASE_URL=http://flightlogic-mock-test:8002/api/hotel-api-v6
+      - FLIGHTLOGIC_ACCESS_TYPE=Test
+      - FLIGHTLOGIC_API_KEY=mock-api-key-test
+      - FLIGHTLOGIC_USER_ID=mock_user
+      - FLIGHTLOGIC_PASSWORD=mock_password
+      - FLIGHTLOGIC_IP_ADDRESS=127.0.0.1
+      # Frontend URL for Testing (backend serves SPA)
+      - FRONTEND_URL=http://localhost:8001
+      # OpenAI (all LLM components use OpenAI)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Agents
+      - LLM_SUPERVISOR_PROVIDER=openai
+      - LLM_SUPERVISOR_MODEL=${LLM_SUPERVISOR_MODEL:-gpt-5.4-nano}
+      - LLM_SUPERVISOR_FALLBACK_MODEL=${LLM_SUPERVISOR_FALLBACK_MODEL:-gpt-5.4-mini}
+      - LLM_AGENT_FLIGHT_PROVIDER=openai
+      - LLM_AGENT_FLIGHT_MODEL=${LLM_AGENT_FLIGHT_MODEL:-gpt-5.4-mini}
+      - LLM_AGENT_FLIGHT_FALLBACK_MODEL=${LLM_AGENT_FLIGHT_FALLBACK_MODEL:-gpt-5.4-nano}
+      - LLM_AGENT_HOTEL_PROVIDER=openai
+      - LLM_AGENT_HOTEL_MODEL=${LLM_AGENT_HOTEL_MODEL:-gpt-5.4-mini}
+      - LLM_AGENT_HOTEL_FALLBACK_MODEL=${LLM_AGENT_HOTEL_FALLBACK_MODEL:-gpt-5.4-nano}
+      - LLM_AGENT_ITINERARY_PROVIDER=openai
+      - LLM_AGENT_ITINERARY_MODEL=${LLM_AGENT_ITINERARY_MODEL:-gpt-5.4-mini}
+      - LLM_AGENT_ITINERARY_FALLBACK_MODEL=${LLM_AGENT_ITINERARY_FALLBACK_MODEL:-gpt-5.4-nano}
+      - LLM_AGENT_GENERAL_PROVIDER=openai
+      - LLM_AGENT_GENERAL_MODEL=${LLM_AGENT_GENERAL_MODEL:-gpt-5.4-mini}
+      - LLM_AGENT_GENERAL_FALLBACK_MODEL=${LLM_AGENT_GENERAL_FALLBACK_MODEL:-gpt-5.4-nano}
+      # Tools
+      - LLM_TOOL_DATES_PROVIDER=openai
+      - LLM_TOOL_DATES_MODEL=${LLM_TOOL_DATES_MODEL:-gpt-5.4-nano}
+      - LLM_TOOL_ITINERARY_PROVIDER=openai
+      - LLM_TOOL_ITINERARY_MODEL=${LLM_TOOL_ITINERARY_MODEL:-gpt-5.4-mini}
+      - LLM_TOOL_BUDGET_PROVIDER=openai
+      - LLM_TOOL_BUDGET_MODEL=${LLM_TOOL_BUDGET_MODEL:-gpt-5.4-nano}
+      # Langfuse — DISABLED by default in the test stack (issue #1015).
+      # The test backend MUST NOT write to the production Langfuse project.
+      # Test scenarios would otherwise dump ~1k traces/week of
+      # `testuser@example.com` traffic into the same store real users use,
+      # corrupting the weekly trace-review analytics and inflating cost.
+      # Override locally with LANGFUSE_ENABLED=true only when actively
+      # debugging a CI scenario — never in CI without first rotating to a
+      # dev Langfuse project.
+      - LANGFUSE_ENABLED=${LANGFUSE_ENABLED:-false}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+      # Test-specific settings
+      - AUTO_CLEANUP_TEST_DATA=true
+      - CLEANUP_AFTER_EACH_TEST=true
+      # imgproxy Configuration
+      - IMGPROXY_URL=http://imgproxy-test:8080
+      # S3 (MinIO) for user profile photos. No AWS key env vars; boto3 reads creds
+      # from the mounted shared-credentials file.
+      - S3_PHOTOS_BUCKET=${S3_PHOTOS_BUCKET:-myvoya-local-photos}
+      - S3_PHOTOS_REGION=us-east-1
+      - S3_ENDPOINT_URL=http://minio-test:9000
+      - S3_FORCE_PATH_STYLE=true
+      - AWS_SHARED_CREDENTIALS_FILE=/run/secrets/mock-minio-credentials
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:80/health').read()",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      mongodb-test:
+        condition: service_healthy
+      mailhog-test:
+        condition: service_healthy
+      flightlogic-mock-test:
+        condition: service_healthy
+      minio-test-init:
+        condition: service_completed_successfully
+    networks:
+      - voya-test-network
+    volumes:
+      - ./docker/mock-minio-credentials:/run/secrets/mock-minio-credentials:ro
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=backend"
+
+  # Test MongoDB Express (Database Management for Testing)
+  mongo-express-test:
+    image: mongo-express:1.0.0
+    container_name: voya-test-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb-test
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH=false
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    depends_on:
+      mongodb-test:
+        condition: service_healthy
+    networks:
+      - voya-test-network
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=database-management"
+
+  # Test MailHog (Email Testing Service)
+  mailhog-test:
+    image: mailhog/mailhog:v1.0.1
+    platform: linux/amd64
+    container_name: voya-test-mailhog
+    restart: unless-stopped
+    ports:
+      - "8026:8025"
+    environment:
+      - MH_STORAGE=memory
+      - MH_HOSTNAME=mailhog-test
+    networks:
+      - voya-test-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8025",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=email-testing"
+
+  # Test FlightLogic Mock API Server
+  flightlogic-mock-test:
+    build:
+      context: ./backend_python
+      dockerfile: tests/mocks/flightlogic/Dockerfile
+    container_name: voya-test-flightlogic-mock
+    restart: unless-stopped
+    ports:
+      - "8004:8002"
+    environment:
+      - ENVIRONMENT=testing
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8002/health').read()",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - voya-test-network
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=mock-api"
+
+  # Test imgproxy - High-performance image processing server
+  imgproxy-test:
+    image: darthsim/imgproxy:latest
+    container_name: voya-test-imgproxy
+    restart: unless-stopped
+    ports:
+      - "8011:8080"
+    environment:
+      - IMGPROXY_BIND=:8080
+      - IMGPROXY_ALLOW_INSECURE_URLS=true
+      - IMGPROXY_SANITIZE_SVG=true
+      - IMGPROXY_CONCURRENCY=5
+      - IMGPROXY_USE_ETAG=true
+      - IMGPROXY_ENABLE_WEBP_DETECTION=true
+      - IMGPROXY_READ_TIMEOUT=10
+      - IMGPROXY_WRITE_TIMEOUT=10
+      - IMGPROXY_DOWNLOAD_TIMEOUT=10
+      # S3 source support (MinIO; user profile photos). No AWS key env vars.
+      - IMGPROXY_USE_S3=true
+      - IMGPROXY_S3_ENDPOINT=http://minio-test:9000
+      - IMGPROXY_S3_REGION=us-east-1
+      - AWS_SHARED_CREDENTIALS_FILE=/run/secrets/mock-minio-credentials
+    volumes:
+      - ./docker/mock-minio-credentials:/run/secrets/mock-minio-credentials:ro
+    healthcheck:
+      test: ["CMD", "imgproxy", "health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - voya-test-network
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=image-proxy"
+
+  # Test MinIO (local S3 backend for profile photos E2E tests)
+  minio-test:
+    image: minio/minio:latest
+    container_name: voya-test-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      - "9002:9000"
+      - "9003:9001"
+    environment:
+      - MINIO_ROOT_USER=voya-local
+      - MINIO_ROOT_PASSWORD=voya-local-secret
+    volumes:
+      - voya-test-minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - voya-test-network
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=object-storage"
+
+  minio-test-init:
+    image: minio/mc:latest
+    container_name: voya-test-minio-init
+    depends_on:
+      minio-test:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio-test:9000 voya-local voya-local-secret &&
+      mc mb --ignore-existing local/${S3_PHOTOS_BUCKET:-myvoya-local-photos} &&
+      mc anonymous set none local/${S3_PHOTOS_BUCKET:-myvoya-local-photos} &&
+      echo 'MinIO bucket ready: ${S3_PHOTOS_BUCKET:-myvoya-local-photos}'
+      "
+    restart: "no"
+    networks:
+      - voya-test-network
+    labels:
+      - "voya.environment=testing"
+      - "voya.service=object-storage-init"
+
+volumes:
+  mongodb_test_data:
+    labels:
+      - "voya.environment=testing"
+      - "voya.volume=database"
+  voya-test-minio-data:
+    labels:
+      - "voya.environment=testing"
+      - "voya.volume=object-storage"
+
+networks:
+  voya-test-network:
+    driver: bridge
+    labels:
+      - "voya.environment=testing"
+      - "voya.network=main"

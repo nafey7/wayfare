@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Wrapper for `npx playwright run-test-mcp-server` that ensures the server
+# runs from `testing/` so it picks up `testing/node_modules` and
+# `testing/playwright.config.js`. Allows root .mcp.json to reference it
+# without depending on the user's cwd.
+#
+# Used by the playwright-test MCP server in .mcp.json. Without this wrapper,
+# the server would try to discover the Playwright project from whatever
+# directory Claude Code happened to launch from.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+TESTING_DIR="$REPO_ROOT/testing"
+
+if [ ! -d "$TESTING_DIR/node_modules" ]; then
+  echo "playwright-test-mcp: testing/node_modules not found" >&2
+  echo "Run: cd testing && npm ci" >&2
+  exit 1
+fi
+
+cd "$TESTING_DIR" || exit 1
+exec npx playwright run-test-mcp-server "$@"

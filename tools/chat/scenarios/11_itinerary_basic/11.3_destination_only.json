@@ -1,0 +1,23 @@
+{
+  "name": "11.3_destination_only",
+  "description": "Destination only — bot acknowledges Paris and either asks for dates/duration OR offers itinerary/flights/hotels as next steps. The supervisor sometimes routes a destination-only message to general_query for disambiguation instead of create_itinerary; both are acceptable as long as the response surfaces itinerary as a path forward.",
+  "messages": [
+    {
+      "send": "Plan a trip to Paris",
+      "max_time_ms": 30000,
+      "expect_contains_any": [
+        "when",
+        "how long",
+        "dates",
+        "departure",
+        "how many days",
+        "duration",
+        "Plan an itinerary",
+        "itinerary",
+        "What would you like",
+        "next",
+        "Paris"
+      ]
+    }
+  ]
+}

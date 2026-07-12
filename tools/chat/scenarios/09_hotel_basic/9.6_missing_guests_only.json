@@ -1,0 +1,11 @@
+{
+  "name": "9.6_missing_guests_only",
+  "description": "City + dates given, asks for guests or proceeds with default",
+  "messages": [
+    {
+      "send": "Hotels in Rome {{today+30:natural}} to {{today+33:natural}}",
+      "expect_type_in": ["hotel_conversation", "hotel_search_results"],
+      "max_time_ms": 90000
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+dist-ssr
+.vite
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage
+
+# TypeScript
+*.tsbuildinfo
+*.d.ts.map
+vite.config.d.ts
+vitest.config.d.ts
+
+*storybook.log
+storybook-static

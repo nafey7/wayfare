@@ -1,0 +1,373 @@
+{
+    "AirSearchResponse": {
+        "session_id": "MOCK_SESSION_20251203155733",
+        "supplier": "MockAir",
+        "AirSearchResult": {
+            "FareItineraries": [
+                {
+                    "FareItinerary": {
+                        "DirectionInd": "OneWay",
+                        "AirItineraryFareInfo": {
+                            "DivideInPartyIndicator": false,
+                            "FareSourceCode": "MOCK_FARE_BEST_VALUE_155733",
+                            "FareType": "Public",
+                            "IsRefundable": true,
+                            "ItinTotalFares": {
+                                "BaseFare": {
+                                    "Amount": "250.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "EquivFare": {
+                                    "Amount": "250.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "ServiceTax": {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalTax": {
+                                    "Amount": "45.50",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalFare": {
+                                    "Amount": "295.50",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                }
+                            },
+                            "FareBreakdown": [
+                                {
+                                    "PassengerTypeQuantity": {
+                                        "Code": "ADT",
+                                        "Quantity": 1
+                                    },
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "250.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "250.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "VAT",
+                                                "Amount": "45.50",
+                                                "CurrencyCode": "EUR",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "295.50",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "Baggage": [
+                                        "23KG"
+                                    ],
+                                    "CabinBaggage": [
+                                        "7KG"
+                                    ]
+                                }
+                            ]
+                        },
+                        "OriginDestinationOptions": [
+                            {
+                                "OriginDestinationOption": [
+                                    {
+                                        "FlightSegment": {
+                                            "DepartureAirportLocationCode": "AMS",
+                                            "ArrivalAirportLocationCode": "LHR",
+                                            "DepartureDateTime": "2026-01-02T09:30:00",
+                                            "ArrivalDateTime": "2026-01-02T12:45:00",
+                                            "FlightNumber": "BA1234",
+                                            "MarketingAirlineCode": "BA",
+                                            "MarketingAirlineName": "British Airways",
+                                            "OperatingAirline": {
+                                                "Code": "BA",
+                                                "Name": "British Airways",
+                                                "Equipment": "320",
+                                                "FlightNumber": "BA1234"
+                                            },
+                                            "JourneyDuration": 195,
+                                            "CabinClassCode": "Y",
+                                            "Eticket": true
+                                        },
+                                        "StopQuantity": 1,
+                                        "SeatsRemaining": {
+                                            "Number": 9,
+                                            "BelowMinimum": false
+                                        }
+                                    }
+                                ],
+                                "TotalStops": 1
+                            }
+                        ],
+                        "ValidatingAirlineCode": "BA",
+                        "IsPassportMandatory": "true"
+                    }
+                },
+                {
+                    "FareItinerary": {
+                        "DirectionInd": "OneWay",
+                        "AirItineraryFareInfo": {
+                            "DivideInPartyIndicator": false,
+                            "FareSourceCode": "MOCK_FARE_CHEAPEST_155733",
+                            "FareType": "Public",
+                            "IsRefundable": false,
+                            "ItinTotalFares": {
+                                "BaseFare": {
+                                    "Amount": "180.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "EquivFare": {
+                                    "Amount": "180.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "ServiceTax": {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalTax": {
+                                    "Amount": "35.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalFare": {
+                                    "Amount": "215.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                }
+                            },
+                            "FareBreakdown": [
+                                {
+                                    "PassengerTypeQuantity": {
+                                        "Code": "ADT",
+                                        "Quantity": 1
+                                    },
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "180.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "180.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "VAT",
+                                                "Amount": "35.00",
+                                                "CurrencyCode": "EUR",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "215.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "Baggage": [
+                                        "20KG"
+                                    ],
+                                    "CabinBaggage": [
+                                        "5KG"
+                                    ]
+                                }
+                            ]
+                        },
+                        "OriginDestinationOptions": [
+                            {
+                                "OriginDestinationOption": [
+                                    {
+                                        "FlightSegment": {
+                                            "DepartureAirportLocationCode": "AMS",
+                                            "ArrivalAirportLocationCode": "LHR",
+                                            "DepartureDateTime": "2026-01-02T06:15:00",
+                                            "ArrivalDateTime": "2026-01-02T18:30:00",
+                                            "FlightNumber": "FR5678",
+                                            "MarketingAirlineCode": "FR",
+                                            "MarketingAirlineName": "Ryanair",
+                                            "OperatingAirline": {
+                                                "Code": "FR",
+                                                "Name": "Ryanair",
+                                                "Equipment": "738",
+                                                "FlightNumber": "FR5678"
+                                            },
+                                            "JourneyDuration": 735,
+                                            "CabinClassCode": "Y",
+                                            "Eticket": true
+                                        },
+                                        "StopQuantity": 2,
+                                        "SeatsRemaining": {
+                                            "Number": 15,
+                                            "BelowMinimum": false
+                                        }
+                                    }
+                                ],
+                                "TotalStops": 2
+                            }
+                        ],
+                        "ValidatingAirlineCode": "FR",
+                        "IsPassportMandatory": "true"
+                    }
+                },
+                {
+                    "FareItinerary": {
+                        "DirectionInd": "OneWay",
+                        "AirItineraryFareInfo": {
+                            "DivideInPartyIndicator": false,
+                            "FareSourceCode": "MOCK_FARE_DIRECT_155733",
+                            "FareType": "Public",
+                            "IsRefundable": true,
+                            "ItinTotalFares": {
+                                "BaseFare": {
+                                    "Amount": "320.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "EquivFare": {
+                                    "Amount": "320.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "ServiceTax": {
+                                    "Amount": "0.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalTax": {
+                                    "Amount": "55.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                },
+                                "TotalFare": {
+                                    "Amount": "375.00",
+                                    "CurrencyCode": "EUR",
+                                    "DecimalPlaces": "2"
+                                }
+                            },
+                            "FareBreakdown": [
+                                {
+                                    "PassengerTypeQuantity": {
+                                        "Code": "ADT",
+                                        "Quantity": 1
+                                    },
+                                    "PassengerFare": {
+                                        "BaseFare": {
+                                            "Amount": "320.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "EquivFare": {
+                                            "Amount": "320.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "ServiceTax": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Surcharges": {
+                                            "Amount": "0.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        },
+                                        "Taxes": [
+                                            {
+                                                "TaxCode": "VAT",
+                                                "Amount": "55.00",
+                                                "CurrencyCode": "EUR",
+                                                "DecimalPlaces": "2"
+                                            }
+                                        ],
+                                        "TotalFare": {
+                                            "Amount": "375.00",
+                                            "CurrencyCode": "EUR",
+                                            "DecimalPlaces": "2"
+                                        }
+                                    },
+                                    "Baggage": [
+                                        "30KG"
+                                    ],
+                                    "CabinBaggage": [
+                                        "10KG"
+                                    ]
+                                }
+                            ]
+                        },
+                        "OriginDestinationOptions": [
+                            {
+                                "OriginDestinationOption": [
+                                    {
+                                        "FlightSegment": {
+                                            "DepartureAirportLocationCode": "AMS",
+                                            "ArrivalAirportLocationCode": "LHR",
+                                            "DepartureDateTime": "2026-01-02T14:00:00",
+                                            "ArrivalDateTime": "2026-01-02T15:20:00",
+                                            "FlightNumber": "KL9012",
+                                            "MarketingAirlineCode": "KL",
+                                            "MarketingAirlineName": "KLM Royal Dutch Airlines",
+                                            "OperatingAirline": {
+                                                "Code": "KL",
+                                                "Name": "KLM Royal Dutch Airlines",
+                                                "Equipment": "73J",
+                                                "FlightNumber": "KL9012"
+                                            },
+                                            "JourneyDuration": 80,
+                                            "CabinClassCode": "Y",
+                                            "Eticket": true
+                                        },
+                                        "StopQuantity": 0,
+                                        "SeatsRemaining": {
+                                            "Number": 5,
+                                            "BelowMinimum": true
+                                        }
+                                    }
+                                ],
+                                "TotalStops": 0
+                            }
+                        ],
+                        "ValidatingAirlineCode": "KL",
+                        "IsPassportMandatory": "true"
+                    }
+                }
+            ]
+        }
+    }
+}

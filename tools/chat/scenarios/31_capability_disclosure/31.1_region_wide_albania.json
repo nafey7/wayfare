@@ -1,0 +1,17 @@
+{
+  "name": "31.1_region_wide_albania",
+  "description": "AI-CHAT-013: User asks to search all of Albania. Voya must disclose the one-city limitation immediately, in a single turn (not the 4-iteration loop seen in production).",
+  "messages": [
+    {
+      "send": "Find me hotels all of Albania for next month, 2 adults",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "one city at a time",
+        "can't search a whole country",
+        "specific cities"
+      ],
+      "expect_not_contains": "I'm just an AI"
+    }
+  ]
+}

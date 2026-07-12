@@ -1,0 +1,18 @@
+{
+  "name": "15.4_out_of_scope",
+  "description": "During planning, out-of-scope question → handles as detour or answers [TEMP LOOSENED PR#1108 — new capability_check node (PR#1077) intercepts; tighten when limitations are narrowed]",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to Bali, {{today+30:natural}} to {{today+35:natural}}, 1 adult",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    },
+    {
+      "send": "Do I need a visa for Bali?",
+      "expect_type_in": ["ai_response", "message", "itinerary_conversation", "capability_disclosure"],
+      "max_time_ms": 30000,
+      "expect_contains_any": ["visa", "Indonesia", "passport", "entry", "requirement", "tourist", "days", "Bali", "can't", "cannot", "don't have", "live"]
+    }
+  ]
+}

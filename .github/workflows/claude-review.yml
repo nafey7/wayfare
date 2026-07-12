@@ -1,0 +1,488 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  # Automatic review on PR open/update
+  auto-review:
+    if: >
+      github.event_name == 'pull_request' &&
+      !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          # Allow PRs opened by bots (specifically claude[bot] from the
+          # implement-from-issue job, but also any future Dependabot/Renovate
+          # PRs) to be reviewed. Without this the action refuses to run on
+          # bot-authored PRs to avoid infinite loops.
+          allowed_bots: '*'
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request using the project's code review standards
+            (see docs/CODE_REVIEW.md and the CLAUDE.md files in the repo).
+
+            Focus on:
+            - Code quality: follows existing patterns, no unnecessary complexity
+            - Correctness: logic errors, edge cases, error handling
+            - Security: no hardcoded secrets, input validation, injection prevention
+            - Async safety: no blocking calls in async functions (Python backend)
+            - Test coverage: new/changed code has tests, bug fixes have regression tests
+            - Type safety: type hints on public functions (Python), TypeScript types (frontend)
+
+            Severity levels for comments:
+            - "Important:" for bugs, security issues, or missing tests
+            - "Suggestion:" for improvements that are non-blocking
+            - "Nit:" for style or minor issues
+
+            Start with a brief summary comment on the PR, then use inline comments
+            for specific code issues. Be concise and actionable.
+
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+  # On-demand review / actions via @claude mentions in comments.
+  # Has write access so it can rebase, fix conflicts, edit files, and push.
+  # Excludes structured commands handled by dedicated jobs below:
+  #   - "@claude implement"       -> implement-from-issue
+  #   - "@claude create-tickets"  -> create-tickets-from-session
+  #   - "@claude split"           -> split-issue
+  on-demand:
+    if: >
+      (github.event_name == 'issue_comment' &&
+       contains(github.event.comment.body, '@claude') &&
+       !contains(github.event.comment.body, '@claude implement') &&
+       !contains(github.event.comment.body, '@claude create-tickets') &&
+       !contains(github.event.comment.body, '@claude split')) ||
+      (github.event_name == 'pull_request_review_comment' &&
+       contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "claude-code-bot"
+          git config --global user.email "claude-code-bot@users.noreply.github.com"
+
+      # Hard technical block on pushing to main from inside this runner.
+      # The repo does not (yet) have branch protection on main, and the
+      # github-actions[bot] has contents:write which would otherwise allow a
+      # direct push. The hook only exists in the ephemeral runner's local
+      # clone; it does not affect anyone's local git.
+      - name: Install pre-push hook to block pushes to main
+        run: |
+          cat > .git/hooks/pre-push << 'EOF'
+          #!/bin/sh
+          while read local_ref local_sha remote_ref remote_sha; do
+            if [ "$remote_ref" = "refs/heads/main" ]; then
+              echo "ERROR: Pushing to main is blocked by the workflow." >&2
+              echo "Open a PR from your feature branch instead." >&2
+              exit 1
+            fi
+          done
+          EOF
+          chmod +x .git/hooks/pre-push
+
+      - name: Write CI-only Claude settings override
+        # The committed .claude/settings.json puts git commit/push in the "ask"
+        # list, which blocks the bot in non-interactive CI. settings.local.json
+        # overrides it for this workflow run only (the file is gitignored).
+        run: |
+          mkdir -p .claude
+          cat > .claude/settings.local.json <<'JSON'
+          {
+            "permissions": {
+              "allow": [
+                "Bash(git add:*)",
+                "Bash(git commit:*)",
+                "Bash(git push:*)",
+                "Bash(git config:*)",
+                "Bash(git checkout:*)",
+                "Bash(git fetch:*)",
+                "Bash(git merge:*)",
+                "Bash(git status:*)",
+                "Bash(git diff:*)",
+                "Bash(git log:*)"
+              ]
+            }
+          }
+          JSON
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr checkout:*),Bash(gh pr edit:*),Bash(git:*),Read,Edit,Write,Glob,Grep"
+
+  # Implement an issue from an "@claude implement" comment.
+  # Only triggers from COMMENTS, not issue body. This prevents accidental
+  # triggers when an issue description references "@claude implement" in
+  # documentation, code blocks, or discussion. To trigger implementation,
+  # post a separate comment containing "@claude implement".
+  # Restricted to organisation members and collaborators (author_association
+  # check) so that random external users cannot trigger Claude to write code
+  # against the repo. Claude opens a feature branch and a PR rather than
+  # pushing directly to main.
+  implement-from-issue:
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request == null &&
+      contains(github.event.comment.body, '@claude implement') &&
+      contains(fromJson('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "claude-code-bot"
+          git config --global user.email "claude-code-bot@users.noreply.github.com"
+
+      # Hard technical block on pushing to main from inside this runner.
+      # See on-demand job for full rationale.
+      - name: Install pre-push hook to block pushes to main
+        run: |
+          cat > .git/hooks/pre-push << 'EOF'
+          #!/bin/sh
+          while read local_ref local_sha remote_ref remote_sha; do
+            if [ "$remote_ref" = "refs/heads/main" ]; then
+              echo "ERROR: Pushing to main is blocked by the workflow." >&2
+              echo "Open a PR from your feature branch instead." >&2
+              exit 1
+            fi
+          done
+          EOF
+          chmod +x .git/hooks/pre-push
+
+      - name: Write CI-only Claude settings override
+        # Mirrors on-demand: lift the "ask" gates on git operations for the
+        # bot's ephemeral session only. Gitignored, never committed.
+        run: |
+          mkdir -p .claude
+          cat > .claude/settings.local.json <<'JSON'
+          {
+            "permissions": {
+              "allow": [
+                "Bash(git add:*)",
+                "Bash(git commit:*)",
+                "Bash(git push:*)",
+                "Bash(git config:*)",
+                "Bash(git checkout:*)",
+                "Bash(git fetch:*)",
+                "Bash(git merge:*)",
+                "Bash(git status:*)",
+                "Bash(git diff:*)",
+                "Bash(git log:*)"
+              ]
+            }
+          }
+          JSON
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            ISSUE NUMBER: ${{ github.event.issue.number }}
+            ISSUE TITLE: ${{ github.event.issue.title }}
+            TRIGGERED BY: ${{ github.event.sender.login }}
+
+            You have been triggered by an "@claude implement" mention on this
+            issue. Your task is to implement the changes described in the
+            issue and open a pull request linked back to it.
+
+            YOUR PRIMARY DELIVERABLE IS A PULL REQUEST. If you complete the
+            code changes but fail to create the PR, the work is invisible
+            and wasted. Always finish through step 11.
+
+            Workflow:
+            1. Read the full issue body via `gh issue view ${{ github.event.issue.number }}`.
+            2. Read the relevant project context: root CLAUDE.md, plus the
+               CLAUDE.md of any subdirectory (backend_python/, frontend-v2/,
+               etc.) that the issue touches.
+            3. Read each file the issue mentions BEFORE editing it. Confirm
+               that the line numbers, function names, and code patterns
+               described in the issue actually match the current code. If
+               they don't match, comment on the issue explaining the
+               discrepancy and stop.
+            4. Create a new branch named `claude/issue-${{ github.event.issue.number }}`
+               from origin/main.
+            5. Make the changes specified in the issue. Stay strictly within
+               the described scope.
+            6. Run lint, type-check, and unit tests for the affected stack(s)
+               to verify correctness:
+                 - Frontend: `cd frontend-v2 && npm run lint && npm run type-check && npm run test`
+                 - Backend: `cd backend_python && ruff check . && mypy app/ && pytest tests/unit_tests/ -v`
+            7. If anything fails, fix the underlying issue and re-run. Do not
+               push broken code.
+            8. Stage only the files you changed (no `git add -A`). Commit with
+               a clear conventional commit message and a `Closes #<issue>`
+               line in the body so the issue auto-closes on merge.
+            9. Push the branch to origin.
+            10. Open a pull request with `gh pr create`. Title: a short
+                conventional summary. Body: what was changed, how it was
+                tested, and a `Closes #<issue>` reference.
+            11. Verify the PR exists: run `gh pr view --json url` and confirm
+                it returns successfully. Then comment on the issue with the
+                PR link.
+
+            PRE-FLIGHT CHECK (before writing any code):
+            - If the issue body mentions "Blocked by #NNN" or "Depends on #NNN",
+              use `gh issue view NNN --json state` to check whether those issues
+              are closed. If any blocker is still open, comment on the issue
+              listing the open blockers and stop. Do not implement.
+
+            STRICT RULES (do not violate any of these):
+            - NEVER push directly to main. Always work on the feature branch.
+            - NEVER force push. NEVER use `git reset --hard` on main.
+            - NEVER skip pre-commit or pre-push hooks (no --no-verify).
+            - A pre-push git hook at .git/hooks/pre-push is installed by the
+              workflow that blocks pushes to main. NEVER modify, disable, or
+              remove that hook. If a push to main would be blocked by it,
+              that means you were about to do something wrong: rethink and
+              push to your feature branch instead.
+            - NEVER commit secrets. Do not stage `.env`, credentials files,
+              or files containing API keys.
+            - If the issue is ambiguous or requires a decision you cannot
+              make safely (architectural choice, naming convention, schema
+              design, third-party tool selection), comment on the issue
+              asking for clarification and stop. Do not guess.
+            - If the work is too large or risky for one PR (more than ~10
+              files, or touches multiple unrelated subsystems), comment on
+              the issue with a proposed breakdown into smaller issues and
+              stop.
+            - Only modify files that are explicitly listed in the issue or
+              that are direct, obvious dependencies of the listed changes
+              (e.g. updating an import after renaming a function).
+            - If a test that you didn't write or modify fails, do not "fix"
+              it by changing the test. Investigate the actual cause; if it's
+              unrelated to your change, comment on the issue and stop.
+
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr create:*),Bash(gh pr edit:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(git:*),Bash(cd:*),Bash(npm:*),Bash(npx:*),Bash(pytest:*),Bash(ruff:*),Bash(mypy:*),Read,Edit,Write,Glob,Grep"
+
+      # Safety net: if Claude pushed a branch but never opened a PR, flag it.
+      - name: Verify PR was created
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          BRANCH_PREFIX="claude/issue-${ISSUE_NUMBER}"
+          # Check if any branch was pushed for this issue
+          BRANCH=$(git ls-remote --heads origin "${BRANCH_PREFIX}*" | head -1 | awk '{print $2}' | sed 's|refs/heads/||')
+          if [ -z "$BRANCH" ]; then
+            echo "No branch found — Claude may not have started implementation."
+            exit 0
+          fi
+          # Check if a PR exists from that branch
+          PR_URL=$(gh pr list --head "$BRANCH" --json url --jq '.[0].url' 2>/dev/null || true)
+          if [ -z "$PR_URL" ]; then
+            echo "::warning::Branch $BRANCH exists but no PR was created."
+            gh issue comment "$ISSUE_NUMBER" \
+              --body "⚠️ Claude pushed branch \`$BRANCH\` but did not create a pull request. A human should review the branch and open a PR manually."
+          else
+            echo "PR verified: $PR_URL"
+          fi
+
+  # Create GitHub issues from a Ross frontend session transcript.
+  # Triggered by a "@claude create-tickets" comment on an ISSUE (not a PR) whose
+  # body contains the session transcript / summary. The comment may reference
+  # commit SHAs or rule files (paths to .md files in the repo). The agent
+  # analyses the inputs, classifies each change, and creates labelled GitHub
+  # issues. It does NOT touch code.
+  #
+  # Restricted to organisation members and collaborators so random external
+  # users cannot spam the repo with ticket-creator runs.
+  create-tickets-from-session:
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request == null &&
+      contains(github.event.comment.body, '@claude create-tickets') &&
+      contains(fromJson('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure ticket labels exist
+        # Labels follow the prefix-based scheme documented in
+        # docs/TEAM_WORKFLOW.md ("GitHub Labels System"). `--force` creates the
+        # label if missing and updates colour / description if present.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          while IFS='|' read -r name color description; do
+            [ -z "$name" ] && continue
+            gh label create "$name" --color "$color" --description "$description" --force || true
+          done <<'LABELS'
+          source/session|c5def5|Originated from a Ross frontend session
+          source/agent|c5def5|Created by an agent (ticket-creator or splitter)
+          status/ready-to-split|fbca04|Ticket-creator done, waiting for ticket-splitter
+          status/needs-clarification|d93f0b|Blocked - human must resolve missing info
+          status/ready-to-promote|0e8a16|Passed review, can be promoted from test to staging
+          type/needs-rewrite|d93f0b|Commit works but violates project rules; needs a clean rewrite
+          type/feature|a2eeef|New feature or enhancement
+          type/task|cfd3d7|General task
+          type/bug|d73a4a|Something isn't working
+          area/frontend|1d76db|Frontend work
+          area/backend|5319e7|Backend work
+          area/infrastructure|bfd4f2|Infrastructure work
+          area/ci-cd|bfd4f2|CI/CD work
+          area/testing|bfd4f2|Testing work
+          area/security|b60205|Security work
+          area/observability|bfd4f2|Observability / trace review work
+          area/documentation|0075ca|Documentation work
+          LABELS
+
+      - name: Load ticket-creator prompt
+        id: load_prompt
+        run: |
+          {
+            echo 'PROMPT<<CLAUDE_PROMPT_EOF'
+            cat .github/prompts/ticket-creator.md
+            echo
+            echo 'CLAUDE_PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            TRIGGER ISSUE: ${{ github.event.issue.number }}
+            TRIGGER ISSUE TITLE: ${{ github.event.issue.title }}
+            TRIGGER COMMENT ID: ${{ github.event.comment.id }}
+            TRIGGER COMMENT URL: ${{ github.event.comment.html_url }}
+            TRIGGERED BY: ${{ github.event.sender.login }}
+
+            ${{ steps.load_prompt.outputs.PROMPT }}
+          claude_args: |
+            --allowedTools "Bash(gh issue view:*),Bash(gh issue create:*),Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue list:*),Bash(gh label list:*),Bash(gh pr view:*),Bash(gh api:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Read,Grep,Glob"
+
+  # Split an existing issue into the smallest possible independently-mergeable
+  # sub-tickets. Triggered by a "@claude split" comment on an ISSUE (not a PR).
+  # Parses "#NNN" issue numbers from the comment body and splits each; if none
+  # are present, splits the current trigger issue. Does NOT touch code.
+  #
+  # Restricted to organisation members and collaborators.
+  split-issue:
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request == null &&
+      contains(github.event.comment.body, '@claude split') &&
+      contains(fromJson('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Ensure ticket labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          while IFS='|' read -r name color description; do
+            [ -z "$name" ] && continue
+            gh label create "$name" --color "$color" --description "$description" --force || true
+          done <<'LABELS'
+          source/agent|c5def5|Created by an agent (ticket-creator or splitter)
+          status/ready-to-code|0e8a16|Ticket-splitter done, ready for coding agent
+          status/blocked|d93f0b|Depends on another ticket that isn't done yet
+          type/dependency|b60205|Shared dependency; implement before dependent tickets
+          type/needs-rewrite|d93f0b|Commit works but violates project rules; needs a clean rewrite
+          type/feature|a2eeef|New feature or enhancement
+          type/task|cfd3d7|General task
+          type/bug|d73a4a|Something isn't working
+          area/frontend|1d76db|Frontend work
+          area/backend|5319e7|Backend work
+          area/infrastructure|bfd4f2|Infrastructure work
+          area/ci-cd|bfd4f2|CI/CD work
+          area/testing|bfd4f2|Testing work
+          area/security|b60205|Security work
+          area/observability|bfd4f2|Observability / trace review work
+          area/documentation|0075ca|Documentation work
+          LABELS
+
+      - name: Load ticket-splitter prompt
+        id: load_prompt
+        run: |
+          {
+            echo 'PROMPT<<CLAUDE_PROMPT_EOF'
+            cat .github/prompts/ticket-splitter.md
+            echo
+            echo 'CLAUDE_PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            TRIGGER ISSUE: ${{ github.event.issue.number }}
+            TRIGGER ISSUE TITLE: ${{ github.event.issue.title }}
+            TRIGGER COMMENT ID: ${{ github.event.comment.id }}
+            TRIGGER COMMENT URL: ${{ github.event.comment.html_url }}
+            TRIGGERED BY: ${{ github.event.sender.login }}
+
+            ${{ steps.load_prompt.outputs.PROMPT }}
+          claude_args: |
+            --allowedTools "Bash(gh issue view:*),Bash(gh issue create:*),Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue list:*),Bash(gh label list:*),Bash(gh pr view:*),Bash(gh api:*),Bash(git log:*),Bash(git show:*),Read,Grep,Glob"

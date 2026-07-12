@@ -1,0 +1,12 @@
+{
+  "name": "15.1_greeting",
+  "description": "Greeting → Voya welcomes with suggestions",
+  "messages": [
+    {
+      "send": "Hello!",
+      "expect_intent": "general_query",
+      "max_time_ms": 15000,
+      "expect_contains_any": ["Voya", "voya", "welcome", "assist", "travel", "help", "love to help", "looking for"]
+    }
+  ]
+}

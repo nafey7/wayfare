@@ -1,0 +1,11 @@
+{
+  "name": "30.5_phase2_baseline_vague_destination",
+  "description": "P0 Phase-2 baseline (#1053): the prompt at itinerary_agent.py:195-199 says don't accept vague destinations, but empirically the bot today already suggests a concrete one (e.g. Cancún for 'somewhere warm') and asks for dates. This locks the observed current behavior — the bot must NOT immediately ship a full itinerary on a vague destination without first asking at least one follow-up. Phase 2 (O11 — suggest with a confirmation chip) refines this further.",
+  "messages": [
+    {
+      "send": "Plan a trip somewhere warm",
+      "max_time_ms": 30000,
+      "expect_not_contains": ["Here's your", "Here is your"]
+    }
+  ]
+}

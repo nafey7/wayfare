@@ -1,0 +1,11 @@
+{
+  "name": "5.5_airports_near",
+  "description": "'Airports near X' query",
+  "messages": [
+    {
+      "send": "Any airports near San Luis Obispo?",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["airport", "nearby", "nearest", "miles", "km"]
+    }
+  ]
+}

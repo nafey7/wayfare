@@ -1,0 +1,17 @@
+{
+  "name": "31.8_negative_over_refusal_pronoun",
+  "description": "AI-CHAT-013 over-refusal guard: 'all of them look great' contains 'all of' followed by a pronoun, not a country. Must NOT trigger region_wide_search disclosure.",
+  "messages": [
+    {
+      "send": "I see 3 hotel options",
+      "expect_type_in": ["message", "hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 30000
+    },
+    {
+      "send": "All of them look great, which is best?",
+      "expect_type_in": ["message", "hotel_conversation", "hotel_search_results"],
+      "max_time_ms": 30000,
+      "expect_not_contains": "I can search one city at a time"
+    }
+  ]
+}

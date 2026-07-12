@@ -1,0 +1,12 @@
+{
+  "name": "13.3_amenity_pool",
+  "description": "Hotel search with pool amenity filter",
+  "messages": [
+    {
+      "send": "Hotels with pool in Bangkok, {{today+30:natural}} to {{today+34:natural}}, 2 adults",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["hotel", "Bangkok", "Found", "matching", "couldn't"]
+    }
+  ]
+}

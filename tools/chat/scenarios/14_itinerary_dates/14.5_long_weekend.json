@@ -1,0 +1,13 @@
+{
+  "name": "14.5_long_weekend",
+  "description": "Long weekend → parse_dates resolves or asks clarification",
+  "messages": [
+    {
+      "send": "Plan a long weekend trip to Amsterdam starting next Friday",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_contains_any": ["Amsterdam", "weekend", "Friday", "Saturday", "Sunday", "3", "day", "itinerary", "when"]
+    }
+  ]
+}

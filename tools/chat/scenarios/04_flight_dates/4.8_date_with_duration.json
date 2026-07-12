@@ -1,0 +1,11 @@
+{
+  "name": "4.8_date_with_duration",
+  "description": "'Starting May 10 for a week' → auto round-trip, searches",
+  "messages": [
+    {
+      "send": "Flights from NYC to London, starting {{today+30:natural}} for a week, 2 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000
+    }
+  ]
+}

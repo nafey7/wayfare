@@ -1,0 +1,13 @@
+{
+  "name": "30.11_schema_7day_has_7_days",
+  "description": "P0 baseline (#1053): schema invariant — a 7-day trip must produce 7 entries in structured_itinerary.itineraryItems. Locks the day-count match so Phase 4 (two-stage gen / caching) can't accidentally drop or duplicate days.",
+  "messages": [
+    {
+      "send": "Plan a 7-day trip to Barcelona, {{today+30:natural}} to {{today+36:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 120000,
+      "expect_min_days": 7
+    }
+  ]
+}

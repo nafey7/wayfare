@@ -1,0 +1,13 @@
+{
+  "name": "19.1_food_culture",
+  "description": "Food and culture interests → itinerary reflects culinary/museum focus",
+  "messages": [
+    {
+      "send": "Plan a food and culture trip to Barcelona, {{today+30:natural}} to {{today+35:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_contains_any": ["food", "restaurant", "culinary", "culture", "museum", "art", "tapas", "gastronomy", "market", "Sagrada", "Barcelona", "itinerary"]
+    }
+  ]
+}

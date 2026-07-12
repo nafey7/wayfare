@@ -1,0 +1,11 @@
+{
+  "name": "1.3_route_to_hotel",
+  "description": "Supervisor routes hotel request to hotel agent",
+  "messages": [
+    {
+      "send": "Find me a hotel in Dubai",
+      "max_time_ms": 45000,
+      "expect_contains_any": ["check-in", "checkin", "dates", "adults", "guests", "dubai", "city", "country"]
+    }
+  ]
+}

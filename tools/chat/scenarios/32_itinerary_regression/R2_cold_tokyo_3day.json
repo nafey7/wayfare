@@ -1,0 +1,12 @@
+{
+  "name": "R2_cold_tokyo_3day",
+  "description": "REGRESSION (#1053 Phase 0): cold-turn 3-day Tokyo trip. NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. Asia destination + shorter duration covers a different LLM call shape than R1.",
+  "messages": [
+    {
+      "send": "Plan 3 days in Tokyo from {{today+45:natural}} to {{today+47:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    }
+  ]
+}

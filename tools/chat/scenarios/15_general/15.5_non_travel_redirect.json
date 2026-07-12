@@ -1,0 +1,12 @@
+{
+  "name": "15.5_non_travel_redirect",
+  "description": "Non-travel question — gently redirects to travel topics",
+  "messages": [
+    {
+      "send": "What's the stock market doing today?",
+      "expect_intent": "general_query",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["travel", "trip", "flight", "hotel", "destination", "help", "assist", "plan"]
+    }
+  ]
+}

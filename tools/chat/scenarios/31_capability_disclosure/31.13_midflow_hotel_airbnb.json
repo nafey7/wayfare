@@ -1,0 +1,25 @@
+{
+  "name": "31.13_midflow_hotel_airbnb",
+  "description": "AI-CHAT-013 mid-flow: hotel search returned results, user wants to see Airbnb listings instead. Voya must disclose the external-listings limitation and acknowledge the active hotel search.",
+  "messages": [
+    {
+      "send": "Find hotels in Lisbon for June 18 to 22, 2 adults",
+      "expect_type_in": [
+        "hotel_search_results",
+        "hotel_conversation",
+        "message"
+      ],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "Can you show me Airbnb listings for the same dates instead?",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "external listings",
+        "partner inventory"
+      ],
+      "expect_contains": "hotel"
+    }
+  ]
+}

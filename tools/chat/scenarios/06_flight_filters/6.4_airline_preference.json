@@ -1,0 +1,12 @@
+{
+  "name": "6.4_airline_preference",
+  "description": "Airline preference — preferred_airline filter with KLM",
+  "messages": [
+    {
+      "send": "One way KLM flights from Amsterdam to London, {{today+30:natural}}, 1 adult",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["KLM", "klm", "Royal Dutch", "couldn't", "no flights", "No flights", "Amsterdam", "London", "one-way", "round-trip", "return date"]
+    }
+  ]
+}

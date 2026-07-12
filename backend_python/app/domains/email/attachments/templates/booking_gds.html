@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking Confirmation - Payment Required</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 1cm;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 7pt;
+        color: #333;
+        line-height: 1.2;
+      }
+
+      .header {
+        text-align: center;
+        border-bottom: 2px solid #333;
+        padding-bottom: 5px;
+        margin-bottom: 2px;
+      }
+
+      .logo {
+        font-size: 24pt;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .doc-title {
+        font-size: 9pt;
+        color: #666;
+      }
+
+      .status-badge {
+        background-color: #333;
+        color: white;
+        padding: 3px 12px;
+        display: inline-block;
+        font-weight: bold;
+        margin: 8px 0;
+        font-size: 7pt;
+      }
+
+      .section {
+        margin-bottom: 2px;
+        page-break-inside: avoid;
+      }
+
+      .section-title {
+        font-size: 7pt;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 2px;
+        margin-bottom: 3px;
+      }
+
+      .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2px;
+      }
+
+      .info-table td {
+        padding: 2px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 7pt;
+      }
+
+      .info-table td:first-child {
+        font-weight: bold;
+        width: 40%;
+        color: #666;
+      }
+
+      .passenger-list {
+        margin: 3px 0;
+      }
+
+      .passenger-item {
+        padding: 3px;
+        background-color: #f9f9f9;
+        border-left: 2px solid #333;
+        margin-bottom: 3px;
+        font-size: 7pt;
+      }
+
+      .flight-segment {
+        background-color: #f5f5f5;
+        padding: 4px;
+        margin-bottom: 2px;
+      }
+
+      .route {
+        font-size: 9pt;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 2px;
+      }
+
+      .warning-box {
+        background-color: #f5f5f5;
+        border-left: 2px solid #333;
+        padding: 4px;
+        margin: 6px 0;
+        font-size: 7pt;
+      }
+
+      .critical-box {
+        background-color: #f5f5f5;
+        border-left: 2px solid #333;
+        padding: 4px;
+        margin: 6px 0;
+        font-size: 7pt;
+      }
+
+      .info-box {
+        background-color: #f5f5f5;
+        border-left: 2px solid #333;
+        padding: 4px;
+        margin: 6px 0;
+        font-size: 7pt;
+      }
+
+      .footer {
+        margin-top: 6px;
+        padding-top: 4px;
+        border-top: 1px solid #ccc;
+        text-align: center;
+        font-size: 7pt;
+        color: #666;
+      }
+
+      ul {
+        margin: 3px 0;
+        padding-left: 15px;
+      }
+
+      li {
+        margin: 1px 0;
+        font-size: 7pt;
+      }
+
+      .highlight {
+        background-color: #f5f5f5;
+        padding: 2px 4px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">VOYA</div>
+      <div class="doc-title">BOOKING CONFIRMATION</div>
+      <div style="margin-top: 10px; color: #999; font-size: 7pt">
+        Generated: {{ generated_date }}
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div style="text-align: center">
+      <div class="status-badge">⚠ PAYMENT REQUIRED</div>
+    </div>
+
+    <!-- Payment Warning -->
+    <div class="critical-box">
+      <strong style="font-size: 12pt"
+        >⚠️ IMPORTANT: This is NOT your ticket yet!</strong
+      >
+      <p style="margin: 6px 0 0 0">
+        Your booking is confirmed, but your
+        <strong
+          >tickets will only be issued after payment is completed and
+          verified</strong
+        >.
+      </p>
+      <p style="margin: 6px 0 0 0">
+        <span class="highlight"
+          >Payment must be completed and verified by {{ payment_deadline
+          }}</span
+        >. If payment is not verified by this deadline, your booking will be
+        automatically cancelled.
+      </p>
+    </div>
+
+    <!-- Booking Reference -->
+    <div class="section">
+      <div class="section-title">Booking Information</div>
+      <table class="info-table">
+        <tr>
+          <td>PNR Code:</td>
+          <td><strong style="font-size: 9pt">{{ pnr }}</strong></td>
+        </tr>
+        <tr>
+          <td>VOYA Reference:</td>
+          <td>
+            <strong style="font-size: 9pt">{{ voya_booking_reference }}</strong>
+          </td>
+        </tr>
+        <tr>
+          <td>Booking Date:</td>
+          <td>{{ booking_date }}</td>
+        </tr>
+        <tr style="background-color: #fff3e0">
+          <td><strong style="color: #e65100">Payment Deadline:</strong></td>
+          <td>
+            <strong style="color: #e65100; font-size: 9pt"
+              >{{ payment_deadline }}</strong
+            >
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Fare Breakdown -->
+    <div class="section">
+      <div class="section-title">Fare Summary</div>
+      <table class="info-table">
+        <tr>
+          <td>Base Fare:</td>
+          <td>{{ currency }} {{ base_fare }}</td>
+        </tr>
+        <tr>
+          <td>Taxes & Fees:</td>
+          <td>{{ currency }} {{ taxes }}</td>
+        </tr>
+        <tr style="border-top: 2px solid #333">
+          <td><strong>Total Amount Due:</strong></td>
+          <td>
+            <strong style="font-size: 9pt; color: #e65100"
+              >{{ currency }} {{ total_fare }}</strong
+            >
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Flight Details -->
+    <div class="section">
+      <div class="section-title">Flight Itinerary</div>
+      {% for segment in segments %} {% if segment.leg_type %}
+      <div
+        style="
+          background-color: #333;
+          color: white;
+          padding: 4px 8px;
+          margin: 6px 0 3px 0;
+          font-weight: bold;
+          font-size: 8pt;
+        "
+      >
+        ✈️ {{ segment.leg_type }}
+      </div>
+      {% endif %}
+      <div class="flight-segment">
+        <div class="route">
+          {{ segment.origin }} → {{ segment.destination }}
+        </div>
+        <table class="info-table">
+          <tr>
+            <td>Airline:</td>
+            <td><strong>{{ segment.airline }}</strong></td>
+          </tr>
+          <tr>
+            <td>Flight Number:</td>
+            <td><strong>{{ segment.flight_number }}</strong></td>
+          </tr>
+          <tr>
+            <td>Departure:</td>
+            <td>
+              {{ segment.departure_date }} at {{ segment.departure_time }}
+            </td>
+          </tr>
+          <tr>
+            <td>Arrival:</td>
+            <td>{{ segment.arrival_date }} at {{ segment.arrival_time }}</td>
+          </tr>
+          <tr>
+            <td>Class:</td>
+            <td>{{ segment.cabin_class }}</td>
+          </tr>
+          <tr>
+            <td>Duration:</td>
+            <td>{{ segment.duration }}</td>
+          </tr>
+        </table>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Passenger Details -->
+    <div class="section">
+      <div class="section-title">Passenger Details</div>
+      <table class="info-table">
+        {% for passenger in passengers %}
+        <tr>
+          <td>Passenger {{ loop.index }} ({{ passenger.type }}):</td>
+          <td>
+            <strong
+              >{{ passenger.title }} {{ passenger.first_name }} {{
+              passenger.last_name }}</strong
+            ><br />
+            Date of Birth: {{ passenger.date_of_birth }}<br />
+            {% if passenger.passport_number %} Passport: {{
+            passenger.passport_number }} ({{ passenger.passport_country }}) {%
+            endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <!-- Fare Rules -->
+    <div class="section">
+      <div class="section-title">Fare Rules & Penalties</div>
+      {% if cancellation_policy_text %}
+      <div class="info-box" style="margin-bottom: 8px">
+        <div style="font-size: 8pt; white-space: pre-wrap">
+          {{ cancellation_policy_text | safe }}
+        </div>
+      </div>
+      {% endif %} {% if fare_rules %} {% for rule in fare_rules %}
+      <div
+        style="
+          margin-bottom: 8px;
+          padding: 6px;
+          background-color: #f9f9f9;
+          border-left: 2px solid #666;
+        "
+      >
+        <strong style="font-size: 8pt; color: #333"
+          >{{ rule.passenger_type }} ({{ rule.passenger_count }} passenger{{ 's'
+          if rule.passenger_count > 1 else '' }})</strong
+        >
+        <table class="info-table" style="margin-top: 3px">
+          <tr>
+            <td style="width: 30%">Cancellation:</td>
+            <td>
+              {% if rule.is_cancellation_allowed %}
+              <span style="color: #2e7d32">✓ Allowed</span> - Fee:
+              <strong>{{ rule.cancellation_fee }}</strong>
+              {% else %}
+              <span style="color: #c62828">✗ Not Allowed</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>Changes:</td>
+            <td>
+              {% if rule.is_change_allowed %}
+              <span style="color: #2e7d32">✓ Allowed</span> - Fee:
+              <strong>{{ rule.change_fee }}</strong>
+              {% else %}
+              <span style="color: #c62828">✗ Not Allowed</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+      {% endfor %} {% elif not cancellation_policy_text %}
+      <div class="info-box">
+        <p style="margin: 0; font-size: 8pt">
+          <strong>Note:</strong> Detailed fare rules including cancellation and
+          change policies will be available in your e-ticket after payment is
+          completed and tickets are issued.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Payment & Next Steps -->
+    <div class="section">
+      <div class="section-title">Payment & Next Steps</div>
+      <ul>
+        <li>
+          <strong>Complete payment</strong> through your VOYA account before {{
+          payment_deadline }}
+        </li>
+        <li>
+          <strong>Ticket issuance:</strong> E-tickets sent within hours after
+          payment verification
+        </li>
+        <li>
+          <strong>If payment fails:</strong> Booking auto-cancelled, seats
+          released, prices may change
+        </li>
+        <li>
+          <strong>PNR Code:</strong> Use {{ pnr }} for airline check-in once
+          tickets are issued
+        </li>
+        <li>
+          Valid passport (6+ months), visa if required. Contact
+          support@myvoya.ai for questions
+        </li>
+      </ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Thank you for choosing VOYA</strong></p>
+      <p>For support: support@myvoya.ai | www.myvoya.ai</p>
+      <p style="color: #999">
+        This is an electronically generated document and does not require a
+        signature.
+      </p>
+    </div>
+  </body>
+</html>

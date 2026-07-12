@@ -1,0 +1,12 @@
+{
+  "name": "14.2_relative_dates",
+  "description": "Relative date + duration → parse_dates resolves, generates",
+  "messages": [
+    {
+      "send": "3-day trip to Barcelona starting next Friday",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    }
+  ]
+}

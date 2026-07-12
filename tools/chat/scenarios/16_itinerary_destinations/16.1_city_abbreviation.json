@@ -1,0 +1,13 @@
+{
+  "name": "16.1_city_abbreviation",
+  "description": "City abbreviation 'NYC' → resolves to New York, generates",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to NYC, {{today+30:natural}} to {{today+34:natural}}, 1 adult",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_contains_any": ["New York", "NYC", "Manhattan", "Brooklyn", "Central Park", "itinerary", "day"]
+    }
+  ]
+}

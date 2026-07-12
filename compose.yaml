@@ -1,0 +1,39 @@
+# Voya Development Stack - Convenience File
+#
+# This file provides the complete development environment
+# for easy local development with a single command.
+#
+# Includes (compose.dev.yaml):
+#   - MongoDB at localhost:27017
+#   - Mongo Express at http://localhost:8081
+#   - n8n (Workflow Automation) at http://localhost:5678
+#   - Frontend Vite at http://localhost:3002
+#   - Backend (FastAPI) at http://localhost:8000
+#   - MailHog (email testing) at http://localhost:8025
+#   - FlightLogic Mock Server at http://localhost:8002
+#   - Strapi CMS at http://localhost:1337/admin
+#   - ngrok (webhook tunnel) at http://localhost:4040
+#
+# Usage:
+#   docker compose up -d           # Start all dev services
+#   docker compose down            # Stop all services
+#   docker compose logs -f backend # View backend logs
+#   docker compose ps              # Check service status
+#
+# Advanced Usage:
+#   # Start dev environment explicitly
+#   docker compose -f compose.dev.yaml up -d
+#
+#   # Start test environment (completely isolated)
+#   docker compose -f compose.test.yaml up -d
+#
+#   # Run both simultaneously (dev and test are now completely isolated)
+#   docker compose -f compose.dev.yaml up -d
+#   docker compose -f compose.test.yaml up -d
+#
+#   # Use real FlightLogic API instead of mock
+#   FLIGHTLOGIC_API_URL=https://travelnext.works/api/aeroVE5 \
+#     docker compose up -d backend
+
+include:
+  - compose.dev.yaml   # Complete development stack

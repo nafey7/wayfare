@@ -1,0 +1,12 @@
+{
+  "name": "2.2_roundtrip_all_fields",
+  "description": "P0: All fields provided → searches immediately, no trip type question [TEMP LOOSENED PR#1108 — agent returns flight_conversation instead of search results; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Flights from Amsterdam to Barcelona, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_not_contains": ["one-way or round"]
+    }
+  ]
+}

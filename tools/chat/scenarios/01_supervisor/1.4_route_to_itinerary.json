@@ -1,0 +1,11 @@
+{
+  "name": "1.4_route_to_itinerary",
+  "description": "Supervisor routes trip planning request to itinerary agent",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to Bali",
+      "max_time_ms": 60000,
+      "expect_contains_any": ["when", "travelers", "dates", "departure", "who", "Bali", "trip", "itinerary", "beach", "day", "thinking"]
+    }
+  ]
+}

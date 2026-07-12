@@ -1,0 +1,131 @@
+name: Deploy Strapi to Staging
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cms/**'
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: myvoya-staging-strapi
+  ECS_CLUSTER: staging-cluster
+  ECS_SERVICE: staging-strapi
+  CONTAINER_NAME: strapi
+
+jobs:
+  build-and-push:
+    name: Build & Push Strapi Image
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    outputs:
+      image_tag: ${{ steps.image_info.outputs.image_tag }}
+      image_uri: ${{ steps.image_info.outputs.image_uri }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::155304839180:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Determine Image Tag
+        id: image_info
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_TAG="${GITHUB_SHA::8}"
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image_uri=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.image_info.outputs.image_tag }}
+        run: |
+          docker build \
+            --build-arg STRAPI_ADMIN_BACKEND_URL=https://cms-staging.myvoya.ai \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            cms/
+
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          echo "Pushed image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+  deploy:
+    name: Deploy to ECS Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::155304839180:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download Current Task Definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition staging-strapi \
+            --query taskDefinition > task-definition.json
+
+      - name: Update Task Definition with New Image
+        env:
+          IMAGE_URI: ${{ needs.build-and-push.outputs.image_uri }}
+        run: |
+          cat task-definition.json | \
+            jq --arg IMAGE "$IMAGE_URI" --arg CONTAINER "${{ env.CONTAINER_NAME }}" \
+              '.containerDefinitions |= map(if .name == $CONTAINER then . + {image: $IMAGE} else . end)' | \
+            jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            > new-task-definition.json
+
+      - name: Register New Task Definition
+        id: register-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-definition.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          echo "task_definition_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+
+      - name: Update ECS Service
+        env:
+          TASK_DEF_ARN: ${{ steps.register-task-def.outputs.task_definition_arn }}
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition $TASK_DEF_ARN \
+            --force-new-deployment
+
+      - name: Wait for Service Stability
+        run: |
+          echo "Waiting for Strapi service to stabilize (max 10 minutes)..."
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }}
+          echo "Strapi deployment completed successfully!"
+
+      - name: Get Service Status
+        if: always()
+        run: |
+          aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }} \
+            --query 'services[0].{Status:status,RunningCount:runningCount,DesiredCount:desiredCount}'

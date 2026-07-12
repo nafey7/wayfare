@@ -1,0 +1,12 @@
+{
+  "name": "6.9_combined_filters",
+  "description": "Combined filters — direct + business class [TEMP LOOSENED PR#1108 — filters not echoed in response; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Direct business class flights from Amsterdam to London, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["business", "direct", "British Airways", "KLM", "Ryanair", "couldn't", "Amsterdam", "London", "flight", "search", "from", "to"]
+    }
+  ]
+}

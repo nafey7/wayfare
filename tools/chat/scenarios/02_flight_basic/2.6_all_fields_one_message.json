@@ -1,0 +1,12 @@
+{
+  "name": "2.6_all_fields_one_message",
+  "description": "P0: All fields including multi-pax → searches immediately",
+  "messages": [
+    {
+      "send": "Round trip flights from Amsterdam to Tokyo, {{today+30:natural}} to {{today+44:natural}}, 2 adults 1 child",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_not_contains": ["one-way or round"]
+    }
+  ]
+}

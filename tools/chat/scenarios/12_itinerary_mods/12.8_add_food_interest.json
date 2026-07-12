@@ -1,0 +1,18 @@
+{
+  "name": "12.8_add_food_interest",
+  "description": "After itinerary, 'add more food experiences' → regenerates with food focus",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Bangkok, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    },
+    {
+      "send": "Add more food experiences",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "max_time_ms": 180000,
+      "expect_contains_any": ["food", "restaurant", "street food", "culinary", "tasting", "cuisine", "Bangkok", "Thai"]
+    }
+  ]
+}

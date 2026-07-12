@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Build
+build/
+dist/
+*.tsbuildinfo
+
+# Strapi
+.strapi/
+.tmp/
+.cache/
+exports/
+.strapi-updater.json
+# types/generated/ — now tracked; regenerate with: npm run generate
+
+# Keep `src/extensions/` (including upload-provider overrides under
+# `src/extensions/upload`) tracked in git — do not ignore that tree.
+# See "Custom Strapi code" in README.md.
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1 @@
+export { ItineraryResultMessage } from './ItineraryResultMessage';

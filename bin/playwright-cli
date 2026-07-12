@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Wrapper for @playwright/cli installed in testing/node_modules
+# Allows the playwright-cli skill to invoke from anywhere in the repo.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+CLI="$REPO_ROOT/testing/node_modules/.bin/playwright-cli"
+if [ ! -x "$CLI" ]; then
+  echo "playwright-cli not found at $CLI" >&2
+  echo "Run: cd testing && npm ci" >&2
+  exit 1
+fi
+exec "$CLI" "$@"

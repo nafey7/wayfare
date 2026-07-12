@@ -1,0 +1,12 @@
+{
+  "name": "14.4_duration_only_no_start",
+  "description": "Duration but no start date → asks when to depart",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to Rome",
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["when", "departure", "date", "start", "depart", "travel"]
+    }
+  ]
+}

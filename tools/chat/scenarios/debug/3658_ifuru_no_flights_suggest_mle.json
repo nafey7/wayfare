@@ -1,0 +1,16 @@
+{
+  "name": "3658_ifuru_no_flights_suggest_mle",
+  "description": "Session 3658c692 follow-up: When user picks Ifuru (small domestic airport), no flights are found. System should suggest Male International Airport (MLE) as the main gateway.",
+  "messages": [
+    {
+      "send": "search flights from Chicago to Vaadhoo Island, Maldives departing 1 June returning 15 June, 2 passengers",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["Male", "Malé", "MLE", "Velana", "Ifuru"]
+    },
+    {
+      "send": "option 1, Ifuru",
+      "max_time_ms": 60000,
+      "expect_contains_any": ["no flights", "No flights", "Male", "Malé", "MLE", "international", "gateway", "domestic", "couldn't find", "not available"]
+    }
+  ]
+}

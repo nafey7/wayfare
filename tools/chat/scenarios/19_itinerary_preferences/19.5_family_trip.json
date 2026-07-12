@@ -1,0 +1,13 @@
+{
+  "name": "19.5_family_trip",
+  "description": "Family trip with kids → kid-friendly activities",
+  "messages": [
+    {
+      "send": "Plan a family trip to Orlando for 2 adults and 2 kids, {{today+30:natural}} to {{today+35:natural}}",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_contains_any": ["family", "kids", "children", "theme park", "Disney", "Universal", "Orlando", "fun", "ride"]
+    }
+  ]
+}

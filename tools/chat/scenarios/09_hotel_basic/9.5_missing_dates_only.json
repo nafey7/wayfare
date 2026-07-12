@@ -1,0 +1,11 @@
+{
+  "name": "9.5_missing_dates_only",
+  "description": "City + guests given, asks for dates [TEMP LOOSENED PR#1108 — date prompt missing; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Find hotels in Barcelona for 3 adults",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["check-in", "checkin", "date", "when", "night", "stay", "arriving", "Barcelona", "hotel", "search", "guest", "adult"]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "5.7_same_origin_destination",
+  "description": "Origin same as destination — agent should catch and ask for different city",
+  "messages": [
+    {
+      "send": "Flights from London to London, {{today+30:natural}}, one way, 1 adult",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["same", "different", "origin", "destination", "cannot", "can't"]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "11.7_multi_pax_extraction",
+  "description": "Multi-passenger extraction — 2 adults 2 kids generates immediately",
+  "messages": [
+    {
+      "send": "Family trip to Tokyo for 2 adults and 2 kids, {{today+30:natural}} to {{today+35:natural}}",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    }
+  ]
+}

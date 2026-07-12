@@ -1,0 +1,13 @@
+{
+  "name": "18.2_response_has_dates",
+  "description": "Full fields → response includes structured data with dates",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Rome, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_has_data": true
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "13.2_star_rating",
+  "description": "5-star hotel filter",
+  "messages": [
+    {
+      "send": "5 star hotels in Dubai, {{today+30:natural}} to {{today+35:natural}}, 2 adults",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["5-star", "5 star", "Atlantis", "Burj", "couldn't", "5★", "No hotels", "no hotels", "filters", "star", "Dubai", "rating"]
+    }
+  ]
+}

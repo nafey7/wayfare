@@ -1,0 +1,12 @@
+{
+  "name": "1.10_multicity_not_itinerary",
+  "description": "Multi-city route should go to flight agent, not itinerary",
+  "messages": [
+    {
+      "send": "LHR to CDG {{today+30:natural}}, CDG to FCO {{today+37:natural}}, FCO to LHR {{today+44:natural}}, 1 adult",
+      "expect_intent": "flight_conversation",
+      "max_time_ms": 90000,
+      "expect_type_in": ["flight_search_results", "multicity_flight_search_results", "flight_conversation"]
+    }
+  ]
+}

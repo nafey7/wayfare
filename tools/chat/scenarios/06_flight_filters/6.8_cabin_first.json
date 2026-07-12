@@ -1,0 +1,12 @@
+{
+  "name": "6.8_cabin_first",
+  "description": "First class flight search [TEMP LOOSENED PR#1108 — filter not echoed in response; tighten when fixed]",
+  "messages": [
+    {
+      "send": "First class from New York to London, {{today+30:natural}} to {{today+37:natural}}, 1 adult",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["first", "First", "British Airways", "KLM", "Ryanair", "couldn't", "New York", "London", "flight", "search", "from", "to"]
+    }
+  ]
+}

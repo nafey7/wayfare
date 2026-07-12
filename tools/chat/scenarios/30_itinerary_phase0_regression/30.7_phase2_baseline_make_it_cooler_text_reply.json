@@ -1,0 +1,18 @@
+{
+  "name": "30.7_phase2_baseline_make_it_cooler_text_reply",
+  "description": "REGRESSION (#1053 Phase 0+2): vibe-shift amend phrasing ('make it cooler'). NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. PHASE 2 BASELINE UPDATE 2026-05-21: Phase 2 O12 added vibe-shift phrases ('make it cooler', 'switch it up', 'more adventurous', 'more chill') to the regen-trigger list at itinerary_agent.py. The old behavior — bot replies with text asking what to change — was a UX bug: the user named a clear intent ('cooler vibe'), the bot should act on it. New behavior: regenerate the itinerary with modification_notes='make it cooler' and surface an updated plan (itinerary_results). The scenario name ('text_reply') is now historical — kept for traceability. If the new regen-on-vibe behavior regresses to text-only replies, this scenario must fail.",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Rome, {{today+30:natural}} to {{today+32:natural}}, 1 adult",
+      "expect_type_in": ["itinerary_results"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 90000,
+      "expect_min_days": 3
+    },
+    {
+      "send": "Make it cooler",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation", "ai_response", "message"],
+      "max_time_ms": 180000
+    }
+  ]
+}

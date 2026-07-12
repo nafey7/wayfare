@@ -1,0 +1,17 @@
+# CODEOWNERS — auto-request reviewers on sensitive surfaces.
+#
+# Note: on Free-tier private repos, GitHub does not enforce CODEOWNERS as a
+# required review (that's a Pro feature). This file still auto-requests
+# reviewers and surfaces ownership in the PR UI, which is the safety-net we
+# can have today.
+
+# Chat-scenario regression suite — loosening an assertion should always go
+# through a human review with the loosening protocol in mind
+# (tools/chat/scenarios/CONTRIBUTING.md).
+/tools/chat/scenarios/                              @aneeq-khatri-ai
+
+# Itinerary flow code paths — paired with the chat-scenarios review above.
+/backend_python/app/ai/graph/itinerary_graph.py     @aneeq-khatri-ai
+/backend_python/app/ai/graph/itinerary_*.py         @aneeq-khatri-ai
+/backend_python/app/ai/graph/prompts/itinerary_agent.py @aneeq-khatri-ai
+/backend_python/app/ai/graph/tools/itinerary.py     @aneeq-khatri-ai

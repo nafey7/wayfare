@@ -1,0 +1,11 @@
+{
+  "name": "9.1_asks_missing_fields",
+  "description": "Hotel search with only city → asks for dates and guests or clarifies intent",
+  "messages": [
+    {
+      "send": "Find hotels in Dubai",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["check-in", "checkin", "date", "guest", "adult", "dubai", "city", "confirm", "hotel", "help", "find", "flights"]
+    }
+  ]
+}

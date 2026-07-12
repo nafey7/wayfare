@@ -1,0 +1,200 @@
+name: 🚀 Feature Request
+description: Propose a new feature or enhancement
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🚀 Feature Request
+        Thank you for suggesting a new feature! Please fill out the sections below.
+
+        **Be specific:** describe **current behavior** (today’s product) and **expected behavior** (after the feature)
+        so the outcome is clear for users and reviewers.
+
+  - type: input
+    id: feature-title
+    attributes:
+      label: Feature Title
+      description: A clear, concise title for this feature
+      placeholder: "Add user authentication system"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: |
+        How does the product work **today** for this area (limits, gaps, workarounds, confusion)? Enough detail to
+        contrast with expected behavior below.
+      placeholder: |
+        Anyone with a link can open trip data; there is no login. Users manually export or screenshot to “share”
+        access. Support often answers how to keep trips private.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: |
+        After this feature is delivered, what should **users** experience? Flows, screens, permissions, and edge
+        cases—written so PM/QA can verify against current behavior above.
+      placeholder: |
+        Users must sign in to view trips; they only see their own data. They can invite others by email with read-only
+        or edit roles. Deep links prompt login then open the right page.
+    validations:
+      required: true
+
+  - type: textarea
+    id: business-context
+    attributes:
+      label: 📊 Business Context
+      description: Why is this feature needed? What business problem does it solve?
+      placeholder: |
+        - Current state: Users can access all data without authentication
+        - Problem: Security vulnerability and no user personalization
+        - Opportunity: Secure platform + personalized user experience
+    validations:
+      required: true
+
+  - type: textarea
+    id: business-value
+    attributes:
+      label: 💰 Business Value
+      description: What value will this feature provide?
+      placeholder: |
+        - Reduced security risk
+        - Improved user engagement through personalization
+        - Compliance with data protection regulations
+        - Estimated impact: [quantify if possible]
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: 👤 User Story
+      description: Describe this from the user's perspective
+      placeholder: |
+        As a [type of user]
+        I want [functionality]
+        So that [benefit/value]
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-implementation
+    attributes:
+      label: 🔧 Technical Implementation
+      description: High-level technical approach and considerations
+      placeholder: |
+        **Proposed Solution:**
+        - Authentication service integration (e.g., Auth0, Firebase Auth)
+        - User session management
+        - Route protection middleware
+
+        **Technical Considerations:**
+        - Database schema changes needed
+        - API endpoints to modify
+        - Frontend components affected
+        - Third-party integrations required
+
+        **Dependencies:**
+        - List any blocking issues or prerequisites
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: ✅ Acceptance Criteria
+      description: Specific, testable criteria that must be met
+      placeholder: |
+        - [ ] User can register with email/password
+        - [ ] User can login with valid credentials
+        - [ ] User sessions persist across browser sessions
+        - [ ] Invalid login attempts are handled gracefully
+        - [ ] User can logout successfully
+        - [ ] Protected routes redirect unauthenticated users
+        - [ ] Unit tests added for all new functionality
+        - [ ] Existing unit tests verified and updated as needed
+        - [ ] CLAUDE.md updated with new feature documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: 🎯 Success Criteria
+      description: How will we measure the success of this feature?
+      placeholder: |
+        **Metrics:**
+        - User registration rate: [target]
+        - Login success rate: >95%
+        - Security incidents: 0
+
+        **Qualitative measures:**
+        - User feedback score: [target]
+        - Development team satisfaction
+        - Performance benchmarks
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: What's the priority of this feature?
+      options:
+        - Critical (P0)
+        - High (P1)
+        - Medium (P2)
+        - Low (P3)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort-estimate
+    attributes:
+      label: Effort Estimate
+      description: Rough estimate of development effort
+      options:
+        - XS (1-2 days)
+        - S (3-5 days)
+        - M (1-2 weeks)
+        - L (2-4 weeks)
+        - XL (1+ months)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📎 Additional Context
+      description: Screenshots, mockups, links, or any other relevant information
+      placeholder: |
+        - Links to research/documentation
+        - Screenshots or mockups
+        - Related issues or PRs
+        - External references
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧪 Testing & Documentation Requirements
+
+        **All features must include:**
+        - Comprehensive unit tests for new functionality
+        - Integration tests where applicable
+        - E2E tests where applicable: ONLY add these tests in environments where it is possible to run them in order to verify they pass
+        - Verify BOTH existing and newly added tests pass
+        - Update CLAUDE.md only for AI context changes (brief behavioral notes, not implementation details)
+        - Document features in appropriate files:
+          - CHANGELOG.md (user summary)
+          - docs/ (technical details)
+          - README.md (major features)
+          - API docs (endpoints)

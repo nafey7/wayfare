@@ -1,0 +1,12 @@
+{
+  "name": "13.10_locality_shinjuku_tokyo",
+  "description": "Locality filter — 'Shinjuku' in Tokyo should match all 3 Shinjuku hotels",
+  "messages": [
+    {
+      "send": "Hotels in Shinjuku, Tokyo, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["Shinjuku", "Park Hyatt", "Granbell", "9 Hours"]
+    }
+  ]
+}

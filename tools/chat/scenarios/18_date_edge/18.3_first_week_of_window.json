@@ -1,0 +1,11 @@
+{
+  "name": "18.3_first_week_of_window",
+  "description": "P1: 'first week of May' = departure window",
+  "messages": [
+    {
+      "send": "Flights from AMS to BCN, first week of {{month+2}}, 1 adult, one way",
+      "expect_type_in": ["flight_search_results", "flight_date_range_results", "flight_conversation"],
+      "max_time_ms": 120000
+    }
+  ]
+}

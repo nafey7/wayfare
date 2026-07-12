@@ -1,0 +1,18 @@
+{
+  "name": "12.6_change_to_luxury",
+  "description": "After itinerary, 'change to 5-star hotels' → regenerates with luxury focus",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Dubai, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    },
+    {
+      "send": "Change to 5-star luxury hotels",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "max_time_ms": 180000,
+      "expect_contains_any": ["5-star", "luxury", "premium", "five-star", "spa", "suite", "Dubai", "updated", "revised"]
+    }
+  ]
+}

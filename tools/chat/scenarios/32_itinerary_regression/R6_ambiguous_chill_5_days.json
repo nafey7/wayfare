@@ -1,0 +1,12 @@
+{
+  "name": "R6_ambiguous_chill_5_days",
+  "description": "REGRESSION (#1053 Phase 0+2): vibe-only input ('somewhere chill'). NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. PHASE 2 BASELINE UPDATE 2026-05-21: Phase 2 O11 fixed the bug captured here (bot used to invent a city literally called 'Somewhere Chill'); new behavior suggests 2-3 specific chill destinations and asks user to pick. The expect_contains_any list now matches both the old buggy behavior (in case Phase 2 regresses) and the new graceful behavior. If a future change reintroduces silent invention of nonsense city names, this scenario must fail.",
+  "messages": [
+    {
+      "send": "5 days, somewhere chill, 1 adult, starting {{today+30:natural}}",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation", "ai_response", "message"],
+      "max_time_ms": 60000,
+      "expect_contains_any": ["chill", "itinerary", "city", "destination", "specific", "5-day", "5 days", "relax", "where"]
+    }
+  ]
+}

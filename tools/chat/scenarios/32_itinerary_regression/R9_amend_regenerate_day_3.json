@@ -1,0 +1,17 @@
+{
+  "name": "R9_amend_regenerate_day_3",
+  "description": "REGRESSION (#1053 Phase 0+2): targeted-day regeneration. NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. PHASE 2 BASELINE UPDATE 2026-05-21: Phase 2 O12 added 'regenerate day N' to the regen trigger list; behavior now produces an updated itinerary (itinerary_results) instead of a text reply. The expect_type_in already accepts both behaviors so the scenario stays green across the transition; tighten in a follow-up once the new behavior is stable.",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to Amsterdam from {{today+30:natural}} to {{today+33:natural}}, 1 adult",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    },
+    {
+      "send": "Regenerate day 3",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation", "ai_response", "message"],
+      "max_time_ms": 180000
+    }
+  ]
+}

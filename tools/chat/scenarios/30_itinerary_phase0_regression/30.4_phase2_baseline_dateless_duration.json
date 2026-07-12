@@ -1,0 +1,12 @@
+{
+  "name": "30.4_phase2_baseline_dateless_duration",
+  "description": "P0 Phase-2 baseline (#1053): today, the hard date gate (itinerary_agent.py:188, tools/itinerary.py:528) forces a clarifying turn when the user gives a duration but no date anchor. Locked here so Phase 2 (O9 — soften the date gate via placeholder dates + chip) can be detected as an intentional change. When Phase 2 ships, this scenario must be updated with a justified loosening.",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to Rome",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["when", "dates", "departure", "how long", "start", "trip dates"],
+      "expect_not_contains": ["Here's your 4-day Rome itinerary", "Here is your 4-day"]
+    }
+  ]
+}

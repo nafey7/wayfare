@@ -1,0 +1,152 @@
+name: 🐛 Bug Report
+description: Report a bug or issue
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🐛 Bug Report
+        Thanks for taking the time to report a bug!
+
+        **Be specific:** describe **current behavior** and **expected behavior** in enough detail that someone
+        unfamiliar with the feature can tell what is wrong and what “fixed” looks like from the **user’s perspective**
+        (screens, messages, flows—not only stack traces).
+
+  - type: input
+    id: bug-title
+    attributes:
+      label: Bug Summary
+      description: A clear, concise summary of the bug
+      placeholder: "User login fails with valid credentials"
+    validations:
+      required: true
+
+  - type: textarea
+    id: business-impact
+    attributes:
+      label: 📊 Business Impact
+      description: How does this bug affect the business or users?
+      placeholder: |
+        - Users cannot access their accounts
+        - Customer support tickets increasing
+        - Potential revenue loss: [if applicable]
+        - Affects X% of users
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: |
+        What happens **today** when you reproduce the issue? Include what the user sees, exact errors, and wrong UI
+        or data.
+      placeholder: |
+        After entering valid credentials and clicking Log in, the page shows “Invalid credentials” and the user stays
+        on the login screen. No redirect; session cookie is not set.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: |
+        What **should** happen when this bug is fixed? Describe the correct user-visible outcome clearly enough to
+        verify the fix (where the user lands, what they see, what data appears).
+      placeholder: |
+        Valid email + password logs the user in, redirects to the home dashboard, shows their name in the header, and
+        keeps them signed in for a normal session. Wrong password shows an error only in that case.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 🔄 Steps to Reproduce
+      description: Detailed steps to reproduce the issue
+      placeholder: |
+        1. Navigate to login page
+        2. Enter valid email: user@example.com
+        3. Enter correct password
+        4. Click "Login" button
+        5. Observe error message
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: 🔧 Technical Details
+      description: Technical information about the bug
+      placeholder: |
+        **Environment:**
+        - Browser: Chrome 120.0
+        - OS: macOS 14.0
+        - App version: 1.2.3
+
+        **Error logs:**
+        ```
+        [Paste any error messages or logs here]
+        ```
+
+        **Network requests:**
+        - API endpoint failing: POST /api/login
+        - Status code: 401
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (System down/data loss)
+        - High (Major functionality broken)
+        - Medium (Feature partially broken)
+        - Low (Minor issue/cosmetic)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Frequency
+      description: How often does this occur?
+      options:
+        - Always (100%)
+        - Often (75-99%)
+        - Sometimes (25-74%)
+        - Rarely (<25%)
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: ✅ Fix Success Criteria
+      description: How will we know this bug is fixed?
+      placeholder: |
+        - [ ] Users can login with valid credentials
+        - [ ] No error messages for valid logins
+        - [ ] Login success rate >99%
+        - [ ] No related error logs in monitoring
+        - [ ] Unit tests added/updated to prevent regression
+        - [ ] CLAUDE.md updated if bug reveals system behavior changes
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧪 Testing & Documentation Requirements
+
+        **All bug fixes must include:**
+        - Add regression tests to prevent future occurrences
+        - Verify existing unit tests still pass after fix
+        - Update CLAUDE.md if the bug revealed system behavior that should be documented
+        - Include testing requirements in success criteria

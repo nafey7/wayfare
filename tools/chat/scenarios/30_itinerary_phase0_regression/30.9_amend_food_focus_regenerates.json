@@ -1,0 +1,19 @@
+{
+  "name": "30.9_amend_food_focus_regenerates",
+  "description": "P0 baseline (#1053): concrete amend with a named focus ('change day 2 to focus on food') is in the MODE 2 list today and triggers a regen. This is the *positive* baseline — should keep regenerating after Phase 2 ships, otherwise we broke something.",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Rome, {{today+30:natural}} to {{today+32:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 90000,
+      "expect_min_days": 3
+    },
+    {
+      "send": "Change day 2 to focus on food",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation", "ai_response", "message"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["food", "culinary", "restaurant", "tasting", "Rome", "pasta", "gelato", "trattoria"]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "b219_amend_no_itinerary",
+  "description": "Session b219ab9d: User asks to amend itinerary that doesn't exist in this session. Should tell user clearly and offer to create a new one. Note: ``paste`` removed from the deny list because the bot's primary response is the helpful 'I can help you amend the itinerary, just send me the days/stops/style' path; suggesting paste as a secondary fallback no longer counts as a stall. The stronger imperative phrases ('send me your itinerary' / 'copy your itinerary') still trip the test.",
+  "messages": [
+    {
+      "send": "Hi Voya can you help me to amend my itinerary for London, i live here and I would like to start my day at 10 am",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["help", "create", "plan", "amend", "London", "trip", "itinerary"],
+      "expect_not_contains": ["send me your itinerary", "copy your itinerary"]
+    },
+    {
+      "send": "next week for 5 days",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["2026", "does that work", "sound right", "confirm"]
+    },
+    {
+      "send": "yes",
+      "expect_type_in": ["itinerary_results", "message"],
+      "max_time_ms": 60000,
+      "expect_contains_any": ["itinerary", "London", "plan", "generate"]
+    }
+  ]
+}

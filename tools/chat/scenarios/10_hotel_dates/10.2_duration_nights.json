@@ -1,0 +1,11 @@
+{
+  "name": "10.2_duration_nights",
+  "description": "Hotel search with 'for 3 nights' duration",
+  "messages": [
+    {
+      "send": "Hotels in Berlin {{today+30:natural}} for 3 nights, 2 adults",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000
+    }
+  ]
+}

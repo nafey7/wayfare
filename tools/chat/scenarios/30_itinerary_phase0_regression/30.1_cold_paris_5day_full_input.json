@@ -1,0 +1,13 @@
+{
+  "name": "30.1_cold_paris_5day_full_input",
+  "description": "P0 baseline (#1053): cold-turn full-input itinerary. Asserts day-count + latency on main. NOTE: once #1034 (the side-search orchestrator that adds data.flights[] / data.hotels[] arrays) merges to main, this scenario must be tightened to add expect_min_flights: 1 and expect_min_hotels: 1.",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip from London to Paris, {{today+30:natural}} to {{today+34:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 90000,
+      "expect_min_days": 5
+    }
+  ]
+}

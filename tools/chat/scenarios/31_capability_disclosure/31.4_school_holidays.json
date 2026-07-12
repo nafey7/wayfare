@@ -1,0 +1,17 @@
+{
+  "name": "31.4_school_holidays",
+  "description": "AI-CHAT-013: User asks about UK school holidays. Voya doesn't have web search / school-calendar data \u2014 must disclose and offer to plan around a user-supplied date range.",
+  "messages": [
+    {
+      "send": "When are the UK school holidays this summer?",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "school-calendar",
+        "date range",
+        "specific date"
+      ],
+      "expect_not_contains": "I'm just an AI"
+    }
+  ]
+}

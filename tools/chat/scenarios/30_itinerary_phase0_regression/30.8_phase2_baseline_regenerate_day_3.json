@@ -1,0 +1,18 @@
+{
+  "name": "30.8_phase2_baseline_regenerate_day_3",
+  "description": "P0 Phase-2 baseline (#1053): today, day-targeted regen requests ('regenerate day 3') do not match the narrow MODE 2 list; the bot replies with text rather than regenerating. Locked so Phase 2 (O12 — allow day-targeted regen) is detectable. Must be loosened with justification when O12 ships.",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Rome, {{today+30:natural}} to {{today+32:natural}}, 1 adult",
+      "expect_type_in": ["itinerary_results"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 90000,
+      "expect_min_days": 3
+    },
+    {
+      "send": "Regenerate day 3",
+      "expect_type_in": ["ai_response", "itinerary_conversation", "message", "itinerary_results"],
+      "max_time_ms": 60000
+    }
+  ]
+}

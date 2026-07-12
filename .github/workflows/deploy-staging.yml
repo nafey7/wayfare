@@ -1,0 +1,313 @@
+name: Deploy to Staging
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: myvoya-staging-fastapi-react
+  ECS_CLUSTER: staging-cluster
+  ECS_SERVICE: staging-fastapi-react-service
+  CONTAINER_NAME: fastapi-react-container
+
+# NOTE: Terraform is applied manually, not via CI/CD.
+# The GitHubActionsDeployRole only has ECR/ECS permissions.
+# For infrastructure changes, run terraform locally with voya-admin profile.
+
+jobs:
+  # Build and push Docker image (only if CI succeeded)
+  build-and-push:
+    name: Build & Push Docker Image
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC authentication
+      contents: read
+
+    outputs:
+      image_tag: ${{ steps.image_info.outputs.image_tag }}
+      image_uri: ${{ steps.image_info.outputs.image_uri }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0  # Full history for git describe
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::155304839180:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Determine Image Tag
+        id: image_info
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          IMAGE_TAG="${COMMIT_SHA::8}"
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image_uri=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "Using image tag: $IMAGE_TAG"
+
+      - name: Build, tag, and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.image_info.outputs.image_tag }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          # Fetch tags for git describe
+          git fetch --tags --force
+
+          # Get git describe version without 'v' prefix (e.g., 2026.1.8 or 2026.1.8-3-g4620075)
+          GIT_VERSION=$(git describe --tags --always 2>/dev/null | sed 's/^v//' || echo "unknown")
+
+          # Build image with commit hash and version for /health endpoint
+          docker build \
+            --build-arg COMMIT_HASH=$COMMIT_SHA \
+            --build-arg GIT_VERSION=$GIT_VERSION \
+            --build-arg VITE_ENV=staging \
+            --build-arg VITE_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID_STAGING }} \
+            --build-arg VITE_GOOGLE_MAPS_API_KEY=${{ secrets.VITE_GOOGLE_MAPS_API_KEY_STAGING }} \
+            --build-arg VITE_GOOGLE_MAPS_MAP_ID=${{ secrets.VITE_GOOGLE_MAPS_MAP_ID_STAGING }} \
+            --build-arg VITE_STRAPI_URL=${{ secrets.VITE_STRAPI_URL_STAGING }} \
+            --build-arg VITE_STRAPI_API_TOKEN=${{ secrets.VITE_STRAPI_API_TOKEN_STAGING }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            .
+
+          # Push both tags
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          echo "Pushed image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "Commit hash: $COMMIT_SHA"
+
+  # Run migrations (one-off ECS task with new image)
+  migrate:
+    name: Run Migrations
+    uses: ./.github/workflows/run-migrations.yml
+    needs: build-and-push
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      image_uri: ${{ needs.build-and-push.outputs.image_uri }}
+      task_definition_name: staging-fastapi-react
+      migrate_family: staging-migrate
+      ecs_cluster: staging-cluster
+      ecs_service: staging-fastapi-react-service
+      aws_region: us-east-1
+      container_name: fastapi-react-container
+
+  # Deploy to ECS
+  deploy:
+    name: Deploy to ECS Staging
+    needs: [build-and-push, migrate]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::155304839180:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Download Current Task Definition
+        id: download-task-def
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition staging-fastapi-react \
+            --query taskDefinition > task-definition.json
+
+          echo "Downloaded current task definition"
+
+      - name: Update Task Definition with New Image
+        id: update-task-def
+        env:
+          IMAGE_URI: ${{ needs.build-and-push.outputs.image_uri }}
+          CONTAINER: ${{ env.CONTAINER_NAME }}
+        run: |
+          # Update image in task definition (use named lookup to support sidecars)
+          cat task-definition.json | \
+            jq --arg IMAGE "$IMAGE_URI" --arg CONTAINER "$CONTAINER" \
+              '.containerDefinitions |= map(if .name == $CONTAINER then . + {image: $IMAGE} else . end)' | \
+            jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            > new-task-definition.json
+
+          echo "Updated task definition with image: $IMAGE_URI"
+
+      - name: Register New Task Definition
+        id: register-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-definition.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          echo "task_definition_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+          echo "Registered new task definition: $TASK_DEF_ARN"
+
+      - name: Update ECS Service
+        id: deploy-service
+        env:
+          TASK_DEF_ARN: ${{ steps.register-task-def.outputs.task_definition_arn }}
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition $TASK_DEF_ARN \
+            --force-new-deployment
+
+          echo "Service update initiated"
+
+      - name: Wait for Service Stability
+        run: |
+          echo "Waiting for service to stabilize (max 10 minutes)..."
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }}
+
+          echo "Service stable. Verifying old tasks are drained..."
+
+          # Wait until only one deployment exists (old tasks fully drained)
+          for i in {1..30}; do
+            DEPLOYMENT_COUNT=$(aws ecs describe-services \
+              --cluster ${{ env.ECS_CLUSTER }} \
+              --services ${{ env.ECS_SERVICE }} \
+              --query 'length(services[0].deployments)' \
+              --output text)
+
+            if [ "$DEPLOYMENT_COUNT" -eq 1 ]; then
+              echo "Old tasks drained. Only primary deployment remains."
+              break
+            fi
+
+            echo "Waiting for old tasks to drain... ($DEPLOYMENT_COUNT deployments, attempt $i/30)"
+            sleep 10
+          done
+
+          echo "Deployment completed successfully!"
+
+      - name: Get Service Status
+        if: always()
+        run: |
+          aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }} \
+            --query 'services[0].{Status:status,RunningCount:runningCount,DesiredCount:desiredCount,Deployments:deployments[].{Status:status,TaskDefinition:taskDefinition}}'
+
+  # Purge CloudFlare cache for staging
+  purge-cache:
+    name: Purge CloudFlare Cache
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge CloudFlare Cache
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          echo "Purging CloudFlare cache for staging.myvoya.ai..."
+          RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"hosts":["staging.myvoya.ai"]}')
+
+          SUCCESS=$(echo $RESPONSE | jq -r '.success')
+          if [ "$SUCCESS" = "true" ]; then
+            echo "CloudFlare cache purged successfully for staging.myvoya.ai"
+          else
+            echo "Warning: Cache purge may have failed"
+            echo $RESPONSE | jq '.'
+          fi
+
+  # Post-deploy E2E smoke tests against staging
+  e2e-staging:
+    name: E2E Smoke Tests (Staging)
+    needs: [deploy, purge-cache]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: testing/package-lock.json
+
+      - name: Install dependencies
+        working-directory: testing
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: testing
+        run: npx playwright install chromium --with-deps
+
+      - name: Run E2E tests against staging
+        working-directory: testing
+        env:
+          TEST_ENV: staging
+          STAGING_TEST_USER_EMAIL: ${{ secrets.STAGING_TEST_USER_EMAIL }}
+          STAGING_TEST_USER_PASSWORD: ${{ secrets.STAGING_TEST_USER_PASSWORD }}
+          CF_TEST_BYPASS_TOKEN: ${{ secrets.CF_TEST_BYPASS_TOKEN }}
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-e2e-report
+          path: testing/playwright-report/
+          retention-days: 7
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-e2e-test-results
+          path: testing/test-results/
+          retention-days: 7
+
+  # Notify deployment status
+  notify:
+    name: Deployment Notification
+    needs: [build-and-push, deploy, purge-cache, e2e-staging]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deployment Summary
+        env:
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+          CI_RESULT: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          echo "## Staging Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**CI Result:** $CI_RESULT" >> $GITHUB_STEP_SUMMARY
+          echo "**Deploy Status:** ${{ needs.deploy.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**E2E Tests:** ${{ needs.e2e-staging.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${COMMIT_SHA::8}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed Image:** ${{ needs.build-and-push.outputs.image_uri }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Staging URL:** https://staging.myvoya.ai" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Cluster:** ${{ env.ECS_CLUSTER }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Service:** ${{ env.ECS_SERVICE }}" >> $GITHUB_STEP_SUMMARY

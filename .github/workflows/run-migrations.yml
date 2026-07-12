@@ -1,0 +1,141 @@
+# Reusable workflow: run MongoDB migrations as one-off ECS task
+# Called by deploy-staging.yml and deploy-prod.yml before service update
+name: Run Migrations
+
+on:
+  workflow_call:
+    inputs:
+      image_uri:
+        required: true
+        type: string
+      task_definition_name:
+        required: true
+        type: string
+        description: Base task definition (e.g. staging-fastapi-react, production-fastapi-react)
+      migrate_family:
+        required: true
+        type: string
+        description: Family for migration task (e.g. staging-migrate, production-migrate)
+      ecs_cluster:
+        required: true
+        type: string
+      ecs_service:
+        required: true
+        type: string
+      aws_region:
+        required: false
+        type: string
+        default: us-east-1
+      container_name:
+        required: false
+        type: string
+        default: fastapi-react-container
+        description: ECS container name (named lookup supports sidecars)
+
+jobs:
+  migrate:
+    name: Run Migrations
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::155304839180:role/GitHubActionsDeployRole
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Download Task Definition for Migration
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ inputs.task_definition_name }} \
+            --query taskDefinition > task-definition.json
+          echo "Downloaded task definition"
+
+      - name: Create Migration Task Definition
+        env:
+          IMAGE_URI: ${{ inputs.image_uri }}
+          CONTAINER: ${{ inputs.container_name }}
+        run: |
+          cat task-definition.json | \
+            jq --arg IMAGE "$IMAGE_URI" --arg CONTAINER "$CONTAINER" \
+              '.containerDefinitions |= map(if .name == $CONTAINER then . + {image: $IMAGE, command: ["python", "-m", "app.database.migrate"]} else . end)' | \
+            jq --arg FAMILY "${{ inputs.migrate_family }}" \
+              'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | .family = $FAMILY' \
+            > migrate-task-definition.json
+          echo "Created migration task definition with image: $IMAGE_URI"
+
+      - name: Register Migration Task Definition
+        id: register-migrate
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://migrate-task-definition.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "task_definition_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+          echo "Registered: $TASK_DEF_ARN"
+
+      - name: Get Service Network Configuration
+        run: |
+          aws ecs describe-services \
+            --cluster ${{ inputs.ecs_cluster }} \
+            --services ${{ inputs.ecs_service }} \
+            --query 'services[0].networkConfiguration' > network-config.json
+          echo "Extracted network configuration"
+
+      - name: Run Migration Task
+        id: run-migrate
+        run: |
+          NETWORK_JSON=$(jq -c '.' network-config.json)
+          TASK_ARN=$(aws ecs run-task \
+            --cluster ${{ inputs.ecs_cluster }} \
+            --task-definition ${{ steps.register-migrate.outputs.task_definition_arn }} \
+            --launch-type FARGATE \
+            --network-configuration "$NETWORK_JSON" \
+            --query 'tasks[0].taskArn' \
+            --output text)
+          echo "task_arn=$TASK_ARN" >> $GITHUB_OUTPUT
+          echo "Started migration task: $TASK_ARN"
+
+      - name: Wait for Migration Task
+        timeout-minutes: 5
+        run: |
+          echo "Waiting for migration task to complete..."
+          aws ecs wait tasks-stopped \
+            --cluster ${{ inputs.ecs_cluster }} \
+            --tasks ${{ steps.run-migrate.outputs.task_arn }}
+
+      - name: Verify Migration Success
+        run: |
+          TASK_JSON=$(aws ecs describe-tasks \
+            --cluster ${{ inputs.ecs_cluster }} \
+            --tasks ${{ steps.run-migrate.outputs.task_arn }} \
+            --output json)
+          EXIT_CODE=$(echo "$TASK_JSON" | jq -r --arg CONTAINER "${{ inputs.container_name }}" '.tasks[0].containers[] | select(.name == $CONTAINER) | .exitCode')
+          if [ "$EXIT_CODE" != "0" ] || [ -z "$EXIT_CODE" ] || [ "$EXIT_CODE" = "null" ]; then
+            echo "Migration failed with exit code: $EXIT_CODE"
+            echo "$TASK_JSON" | jq -r --arg CONTAINER "${{ inputs.container_name }}" '.tasks[0].containers[] | select(.name == $CONTAINER) | .reason // "No reason provided"'
+            exit 1
+          fi
+          echo "Migrations completed successfully"
+
+      - name: Fetch Migration Logs on Failure
+        if: failure() && steps.run-migrate.outputs.task_arn != ''
+        run: |
+          LOG_GROUP=$(jq -r --arg CONTAINER "${{ inputs.container_name }}" '(.containerDefinitions[] | select(.name == $CONTAINER)).logConfiguration.options["awslogs-group"] // empty' migrate-task-definition.json)
+          if [ -z "$LOG_GROUP" ]; then
+            echo "No CloudWatch log configuration in task definition; see AWS Console for migration task logs."
+            exit 0
+          fi
+          TASK_ID=$(echo "${{ steps.run-migrate.outputs.task_arn }}" | rev | cut -d'/' -f1 | rev)
+          LOG_STREAM="ecs/${{ inputs.container_name }}/$TASK_ID"
+          echo "=== Migration task logs (CloudWatch: $LOG_GROUP / $LOG_STREAM) ==="
+          aws logs get-log-events \
+            --log-group-name "$LOG_GROUP" \
+            --log-stream-name "$LOG_STREAM" \
+            --query 'events[*].message' \
+            --output text 2>/dev/null || echo "Could not fetch logs (stream may not exist yet)"

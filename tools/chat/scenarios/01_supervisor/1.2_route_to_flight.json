@@ -1,0 +1,12 @@
+{
+  "name": "1.2_route_to_flight",
+  "description": "Supervisor routes flight request to flight agent",
+  "messages": [
+    {
+      "send": "Find flights to Tokyo",
+      "expect_intent": "flight_conversation",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["flying from", "where are you", "origin", "departure", "Tokyo", "flight", "when", "date", "from", "got"]
+    }
+  ]
+}

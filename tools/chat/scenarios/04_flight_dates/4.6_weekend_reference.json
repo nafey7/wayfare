@@ -1,0 +1,11 @@
+{
+  "name": "4.6_weekend_reference",
+  "description": "P1: 'next weekend' one-way → searches or confirms dates",
+  "messages": [
+    {
+      "send": "Flights from Paris to London next weekend, 1 adult, one way",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000
+    }
+  ]
+}

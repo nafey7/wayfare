@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hotel Booking Confirmation</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 1cm;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 9pt;
+        color: #333;
+        line-height: 1.2;
+      }
+
+      .header {
+        text-align: center;
+        border-bottom: 2px solid #333;
+        padding-bottom: 5px;
+        margin-bottom: 8px;
+      }
+
+      .logo {
+        font-size: 24pt;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .doc-title {
+        font-size: 11pt;
+        color: #666;
+      }
+
+      .status-badge {
+        background-color: #28a745;
+        color: white;
+        padding: 6px 12px;
+        display: inline-block;
+        font-weight: bold;
+        margin: 8px 0;
+        font-size: 9pt;
+      }
+
+      .section {
+        margin-bottom: 5px;
+        page-break-inside: avoid;
+      }
+
+      .section-title {
+        font-size: 9pt;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 2px;
+        margin-bottom: 4px;
+      }
+
+      .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 5px;
+      }
+
+      .info-table td {
+        padding: 2px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 8pt;
+      }
+
+      .info-table td:first-child {
+        font-weight: bold;
+        width: 40%;
+        color: #666;
+      }
+
+      .guest-item {
+        padding: 3px;
+        background-color: #f9f9f9;
+        border-left: 2px solid #333;
+        margin-bottom: 3px;
+        font-size: 8pt;
+      }
+
+      .info-box {
+        background-color: #f5f5f5;
+        border-left: 3px solid #333;
+        padding: 8px;
+        margin: 10px 0;
+        font-size: 9pt;
+      }
+
+      .footer {
+        margin-top: 6px;
+        padding-top: 4px;
+        border-top: 1px solid #ccc;
+        text-align: center;
+        font-size: 7pt;
+        color: #666;
+      }
+
+      ul {
+        margin: 3px 0;
+        padding-left: 15px;
+      }
+
+      li {
+        margin: 1px 0;
+        font-size: 8pt;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">VOYA</div>
+      <div class="doc-title">HOTEL BOOKING CONFIRMATION</div>
+      <div style="margin-top: 10px; color: #999; font-size: 9pt">
+        Generated: {{ generated_date }}
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div style="text-align: center">
+      <div class="status-badge">✓ BOOKING CONFIRMED</div>
+    </div>
+
+    <!-- Booking Reference -->
+    <div class="section">
+      <div class="section-title">Booking Information</div>
+      <table class="info-table">
+        <tr>
+          <td>VOYA Reference:</td>
+          <td>
+            <strong style="font-size: 11pt"
+              >{{ voya_booking_reference }}</strong
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>Hotel Confirmation:</td>
+          <td><strong>{{ supplier_confirmation_num }}</strong></td>
+        </tr>
+        <tr>
+          <td>Reference Number:</td>
+          <td>{{ reference_num }}</td>
+        </tr>
+        <tr>
+          <td>Booking Date:</td>
+          <td>{{ booking_date }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Hotel Information -->
+    <div class="section">
+      <div class="section-title">Hotel Information</div>
+      <table class="info-table">
+        <tr>
+          <td>Hotel Name:</td>
+          <td><strong>{{ hotel_name }}</strong></td>
+        </tr>
+        {% if hotel_address %}
+        <tr>
+          <td>Address:</td>
+          <td>
+            {{ hotel_address }}{% if hotel_city %}, {{ hotel_city }}{% endif %}
+          </td>
+        </tr>
+        {% endif %} {% if hotel_rating > 0 %}
+        <tr>
+          <td>Rating:</td>
+          <td>{% for i in range(hotel_rating) %}⭐{% endfor %}</td>
+        </tr>
+        {% endif %}
+      </table>
+    </div>
+
+    <!-- Stay Details -->
+    <div class="section">
+      <div class="section-title">Stay Details</div>
+      <table class="info-table">
+        <tr>
+          <td>Check-in:</td>
+          <td><strong>{{ check_in_date }}</strong></td>
+        </tr>
+        <tr>
+          <td>Check-out:</td>
+          <td><strong>{{ check_out_date }}</strong></td>
+        </tr>
+        <tr>
+          <td>Nights:</td>
+          <td>
+            <strong
+              >{{ nights }} {% if nights == 1 %}Night{% else %}Nights{% endif
+              %}</strong
+            >
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Price Summary -->
+    <div class="section">
+      <div class="section-title">Price Summary</div>
+      <table class="info-table">
+        <tr style="border-top: 2px solid #333">
+          <td><strong>Total Price:</strong></td>
+          <td>
+            <strong style="font-size: 11pt"
+              >{{ currency }} {{ total_price }}</strong
+            >
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Guest Information -->
+    {% if guests %}
+    <div class="section">
+      <div class="section-title">Guest Information</div>
+      {% for guest in guests %}
+      <div class="guest-item">
+        <strong
+          >{{ guest.title }} {{ guest.first_name }} {{ guest.last_name
+          }}</strong
+        >
+        {% if guest.is_child %}
+        <span style="color: #666"
+          >(Child{% if guest.age %}, Age: {{ guest.age }}{% endif %})</span
+        >
+        {% else %}
+        <span style="color: #666">(Adult)</span>
+        {% endif %} {% if guest.room_number %}
+        <span style="color: #666"> - Room {{ guest.room_number }}</span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Cancellation Policy -->
+    {% if cancellation_policy %}
+    <div class="section">
+      <div class="section-title">Cancellation Policy</div>
+      <div class="info-box">
+        <div style="font-size: 8pt; white-space: pre-wrap">
+          {{ cancellation_policy | safe }}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Important Information -->
+    <div class="section">
+      <div class="section-title">Important Information</div>
+      <ul>
+        <li>
+          <strong>Check-in:</strong> Usually from 14:00 (2:00 PM). Early
+          check-in may be available upon request
+        </li>
+        <li>
+          <strong>Check-out:</strong> Usually by 11:00 (11:00 AM). Late
+          check-out may be available upon request
+        </li>
+        <li>
+          <strong>Hotel Confirmation:</strong> Use {{ supplier_confirmation_num
+          }} when contacting the hotel
+        </li>
+        <li>
+          Contact the hotel directly for special requests, room preferences, or
+          additional services
+        </li>
+        {% if cancellation_policy %}
+        <li>
+          Please review the cancellation policy above for cancellation terms and
+          conditions
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Thank you for choosing VOYA</strong></p>
+      <p>For support: support@myvoya.ai | www.myvoya.ai</p>
+      <p style="color: #999">
+        This is an electronically generated document and does not require a
+        signature.
+      </p>
+    </div>
+  </body>
+</html>

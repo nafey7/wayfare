@@ -1,0 +1,59 @@
+name: Weekly Trace Review
+
+on:
+  schedule:
+    - cron: '0 4 * * MON' # Every Monday at 4 AM UTC (9 AM PKT)
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+    inputs:
+      days:
+        description: 'Number of days to review'
+        default: '7'
+
+jobs:
+  trace-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install python-dotenv python-dateutil
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Run the weekly Langfuse trace review following the /review-traces skill instructions.
+
+            Steps:
+            1. Fetch trace data:
+               cd tools/langfuse && python trace_review.py --days ${{ github.event.inputs.days || '7' }} -o /tmp/traces.json
+
+            2. Read /tmp/traces.json
+
+            3. Analyze all sessions where "reviewed": true — follow the skill instructions
+               in .claude/skills/review-traces/SKILL.md for exactly what to look for
+               and how to format the report.
+
+            4. Create a GitHub Issue with the report:
+               gh issue create \
+                 --title "Weekly Trace Review — $(date +%Y-%m-%d) (${{ github.event.inputs.days || '7' }}d)" \
+                 --label "trace-review,automated" \
+                 --body "$(cat /tmp/report.md)"
+
+            Save the report to /tmp/report.md before creating the issue.
+
+          claude_args: |
+            --allowedTools "Bash(python*),Bash(cd *),Bash(cat *),Bash(gh issue create*),Bash(date*),Read,Write"
+        env:
+          LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PROD_PUBLIC_KEY }}
+          LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_PROD_SECRET_KEY }}

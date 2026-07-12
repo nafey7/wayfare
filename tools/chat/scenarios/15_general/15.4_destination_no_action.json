@@ -1,0 +1,12 @@
+{
+  "name": "15.4_destination_no_action",
+  "description": "Destination mentioned without clear action — asks what user needs",
+  "messages": [
+    {
+      "send": "I want to go to Japan",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["Japan", "flight", "hotel", "itinerary", "plan", "trip", "book", "search"]
+    }
+  ]
+}

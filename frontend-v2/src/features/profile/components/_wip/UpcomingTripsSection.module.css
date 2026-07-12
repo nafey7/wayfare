@@ -1,0 +1,15 @@
+.flightRow {
+  background-color: var(--mantine-color-brand-0);
+  transition: background-color 0.15s ease;
+}
+.flightRow:hover {
+  background-color: var(--mantine-color-brand-1);
+}
+
+.hotelRow {
+  background-color: var(--mantine-color-grape-0);
+  transition: background-color 0.15s ease;
+}
+.hotelRow:hover {
+  background-color: var(--mantine-color-grape-1);
+}

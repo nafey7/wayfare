@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Booker Navigation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        .step-item {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #e9ecef;
+            color: #6c757d;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .step-item.active {
+            background: #667eea;
+            color: white;
+        }
+        .step-item.completed {
+            background: #28a745;
+            color: white;
+        }
+        .step-item.completed:hover {
+            background: #218838;
+        }
+        .step-item.active.completed {
+            background: #667eea;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #5a6fd8; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        #log { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Flight Booker Navigation Tests</h1>
+        
+        <div class="test-section">
+            <h2>Step Indicator Simulation</h2>
+            <div class="step-indicator">
+                <div class="step-item active" id="step-search-indicator" onclick="navigateToStep('search')">Search</div>
+                <div class="step-item" id="step-select-indicator" onclick="navigateToStep('select')">Select</div>
+                <div class="step-item" id="step-rules-indicator" onclick="navigateToStep('rules')">Rules</div>
+                <div class="step-item" id="step-passenger-indicator" onclick="navigateToStep('passenger')">Passenger</div>
+                <div class="step-item" id="step-review-indicator" onclick="navigateToStep('review')">Review</div>
+                <div class="step-item" id="step-payment-indicator" onclick="navigateToStep('payment')">Payment</div>
+                <div class="step-item" id="step-confirmation-indicator" onclick="navigateToStep('confirmation')">Confirmation</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Manual Testing Controls</h2>
+            <button onclick="simulateProgress()">Simulate Booking Progress</button>
+            <button onclick="resetSteps()">Reset All Steps</button>
+            <button onclick="runAutomatedTests()">Run Automated Tests</button>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Activity Log</h2>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate flight booker state
+        let currentStep = 'search';
+        let searchResults = null;
+        let selectedFlight = null;
+        let fareRules = null;
+        let testLog = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            testLog.push(logMessage);
+            document.getElementById('log').textContent = testLog.slice(-20).join('\n');
+        }
+
+        function showStatus(message, type) {
+            log(`Status: ${message} (${type})`, 'status');
+        }
+
+        function navigateToStep(targetStep) {
+            try {
+                log(`Navigation attempt: ${currentStep} -> ${targetStep}`, 'nav');
+                
+                // Define the order of steps for validation
+                const stepOrder = ['search', 'select', 'rules', 'passenger', 'review', 'payment', 'confirmation'];
+                
+                // Only allow navigation to completed steps (steps before current) or current step
+                const targetIndicator = document.getElementById(`step-${targetStep}-indicator`);
+                if (!targetIndicator) {
+                    log(`Target step indicator not found: ${targetStep}`, 'error');
+                    return;
+                }
+                
+                // Allow navigation to current step or completed steps
+                const isCurrentStep = targetStep === currentStep;
+                const isCompletedStep = targetIndicator.classList.contains('completed');
+                
+                if (isCurrentStep || isCompletedStep) {
+                    // Check if required data exists for the target step
+                    if (targetStep === 'select' && (!searchResults || searchResults.length === 0)) {
+                        showStatus('Please search for flights first.', 'error');
+                        log('Navigation blocked: No search results', 'warning');
+                        return;
+                    }
+                    if (targetStep === 'rules' && !selectedFlight) {
+                        showStatus('Please select a flight first.', 'error');
+                        log('Navigation blocked: No selected flight', 'warning');
+                        return;
+                    }
+                    if (targetStep === 'passenger' && !fareRules) {
+                        showStatus('Please review flight rules first.', 'error');
+                        log('Navigation blocked: No fare rules', 'warning');
+                        return;
+                    }
+                    
+                    showStep(targetStep);
+                    showStatus(`Navigated to ${targetStep} step.`, 'info');
+                    log(`Navigation successful: ${targetStep}`, 'success');
+                } else {
+                    showStatus(`Please complete previous steps to access ${targetStep}.`, 'error');
+                    log(`Navigation blocked: Step not completed (${targetStep})`, 'warning');
+                }
+            } catch (error) {
+                log(`Navigation error: ${error.message}`, 'error');
+                showStatus('Navigation error occurred.', 'error');
+            }
+        }
+
+        function showStep(stepName) {
+            try {
+                // Hide all steps (visual feedback)
+                document.querySelectorAll('.step-item').forEach(item => item.classList.remove('active'));
+                
+                // Show current step
+                const indicatorElement = document.getElementById(`step-${stepName}-indicator`);
+                if (indicatorElement) {
+                    indicatorElement.classList.add('active');
+                    log(`Step displayed: ${stepName}`, 'display');
+                } else {
+                    log(`Step indicator not found: step-${stepName}-indicator`, 'error');
+                }
+                
+                currentStep = stepName;
+            } catch (error) {
+                log(`Error in showStep: ${error.message}`, 'error');
+            }
+        }
+
+        function markStepCompleted(stepName) {
+            try {
+                const indicatorElement = document.getElementById(`step-${stepName}-indicator`);
+                if (indicatorElement) {
+                    indicatorElement.classList.add('completed');
+                    log(`Step marked completed: ${stepName}`, 'complete');
+                } else {
+                    log(`Step indicator not found for completion: step-${stepName}-indicator`, 'error');
+                }
+            } catch (error) {
+                log(`Error in markStepCompleted: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateProgress() {
+            log('Starting booking simulation...', 'test');
+            
+            // Simulate search results
+            searchResults = ['flight1', 'flight2'];
+            markStepCompleted('search');
+            showStep('select');
+            
+            setTimeout(() => {
+                // Simulate flight selection
+                selectedFlight = 'flight1';
+                markStepCompleted('select');
+                showStep('rules');
+                
+                setTimeout(() => {
+                    // Simulate fare rules
+                    fareRules = { rules: 'sample rules' };
+                    markStepCompleted('rules');
+                    showStep('passenger');
+                    
+                    setTimeout(() => {
+                        markStepCompleted('passenger');
+                        showStep('review');
+                        log('Booking simulation completed - try clicking previous steps', 'test');
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+
+        function resetSteps() {
+            log('Resetting all steps...', 'test');
+            currentStep = 'search';
+            searchResults = null;
+            selectedFlight = null;
+            fareRules = null;
+            
+            document.querySelectorAll('.step-item').forEach(item => {
+                item.classList.remove('active', 'completed');
+            });
+            
+            showStep('search');
+            log('Reset completed', 'test');
+        }
+
+        function runAutomatedTests() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '';
+            log('Starting automated tests...', 'test');
+
+            const tests = [
+                {
+                    name: 'Initial state - only search step should be active',
+                    test: () => {
+                        resetSteps();
+                        const searchIndicator = document.getElementById('step-search-indicator');
+                        return searchIndicator.classList.contains('active') && 
+                               !searchIndicator.classList.contains('completed');
+                    }
+                },
+                {
+                    name: 'Cannot navigate to future steps without completion',
+                    test: () => {
+                        resetSteps();
+                        navigateToStep('select');
+                        return currentStep === 'search'; // Should stay on search
+                    }
+                },
+                {
+                    name: 'Can navigate to completed steps',
+                    test: () => {
+                        resetSteps();
+                        searchResults = ['test'];
+                        markStepCompleted('search');
+                        showStep('select');
+                        navigateToStep('search');
+                        return currentStep === 'search';
+                    }
+                },
+                {
+                    name: 'Step indicators show correct classes',
+                    test: () => {
+                        resetSteps();
+                        markStepCompleted('search');
+                        showStep('select');
+                        const searchIndicator = document.getElementById('step-search-indicator');
+                        const selectIndicator = document.getElementById('step-select-indicator');
+                        return searchIndicator.classList.contains('completed') && 
+                               selectIndicator.classList.contains('active');
+                    }
+                },
+                {
+                    name: 'Navigation validates required data',
+                    test: () => {
+                        resetSteps();
+                        markStepCompleted('search');
+                        markStepCompleted('select');
+                        // Try to navigate to rules without selectedFlight
+                        navigateToStep('rules');
+                        return currentStep !== 'rules'; // Should be blocked
+                    }
+                },
+                {
+                    name: 'Full flow progression works',
+                    test: () => {
+                        resetSteps();
+                        searchResults = ['flight'];
+                        selectedFlight = 'flight';
+                        fareRules = { rules: 'test' };
+                        
+                        markStepCompleted('search');
+                        markStepCompleted('select');
+                        markStepCompleted('rules');
+                        
+                        navigateToStep('passenger');
+                        return currentStep === 'passenger';
+                    }
+                }
+            ];
+
+            tests.forEach((test, index) => {
+                try {
+                    const result = test.test();
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = `test-result ${result ? 'pass' : 'fail'}`;
+                    resultDiv.textContent = `Test ${index + 1}: ${test.name} - ${result ? 'PASS' : 'FAIL'}`;
+                    results.appendChild(resultDiv);
+                    log(`Test ${index + 1}: ${result ? 'PASS' : 'FAIL'} - ${test.name}`, 'test');
+                } catch (error) {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'test-result fail';
+                    resultDiv.textContent = `Test ${index + 1}: ${test.name} - ERROR: ${error.message}`;
+                    results.appendChild(resultDiv);
+                    log(`Test ${index + 1}: ERROR - ${test.name}: ${error.message}`, 'error');
+                }
+            });
+
+            log('Automated tests completed', 'test');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Navigation test page loaded', 'init');
+            log('Click "Simulate Booking Progress" to test navigation', 'init');
+        });
+    </script>
+</body>
+</html>

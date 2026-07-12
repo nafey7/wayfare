@@ -1,0 +1,12 @@
+{
+  "name": "8.1_children_with_ages",
+  "description": "Flight with adults and children — multi-passenger types",
+  "messages": [
+    {
+      "send": "Flights from Amsterdam to Barcelona, {{today+30:natural}} to {{today+37:natural}}, 2 adults and 1 child age 8",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["flight options", "flights", "Amsterdam", "Barcelona", "Found", "couldn't"]
+    }
+  ]
+}

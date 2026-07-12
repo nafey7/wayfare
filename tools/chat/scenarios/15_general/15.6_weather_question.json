@@ -1,0 +1,12 @@
+{
+  "name": "15.6_weather_question",
+  "description": "Weather question — provides seasonal info with caveats",
+  "messages": [
+    {
+      "send": "What's the weather like in Bali in August?",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["dry", "season", "warm", "temperature", "weather", "August", "Bali", "rain"]
+    }
+  ]
+}

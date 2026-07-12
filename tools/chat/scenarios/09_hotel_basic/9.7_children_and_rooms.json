@@ -1,0 +1,11 @@
+{
+  "name": "9.7_children_and_rooms",
+  "description": "Multi-room with children → search or ask clarification",
+  "messages": [
+    {
+      "send": "Hotels in Paris, {{today+30:natural}} to {{today+35:natural}}, 2 rooms, 3 adults, 1 child",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000
+    }
+  ]
+}

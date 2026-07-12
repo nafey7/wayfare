@@ -1,0 +1,111 @@
+name: Storybook Deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    # Narrow include list — `frontend-v2/**` would also match docs (`*.md`,
+    # `docs/**`, `CLAUDE.md`) which don't affect the Storybook build. Refs #921.
+    paths:
+      - 'frontend-v2/src/**'
+      - 'frontend-v2/.storybook/**'
+      - 'frontend-v2/package.json'
+      - 'frontend-v2/package-lock.json'
+      - 'frontend-v2/vite.config.*'
+      - 'frontend-v2/vitest.config.*'
+      - 'frontend-v2/tsconfig*.json'
+      - 'frontend-v2/index.html'
+      - '.github/workflows/storybook-deploy.yml'
+  push:
+    # No paths filter on push: deploy on every main push and tag push.
+    # Storybook builds in ~1-2 min and we want it auto-deployed for both
+    # main and production tags. Path filter on tags is ignored by GitHub
+    # anyway, so removing it for consistency.
+    branches: [main]
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+.p[0-9]+'
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  deploy:
+    name: Build & Deploy Storybook
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: storybook-deploy-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend-v2/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend-v2
+        run: npm ci
+
+      - name: Build Storybook
+        working-directory: frontend-v2
+        # Inline VITE_* env vars so map-using stories (HotelRecommendationsMap,
+        # MapComponent, ItineraryDetailsComponent) render the real Google Maps
+        # widget instead of an empty container. Use the staging key, never prod
+        # — Storybook is publicly deployed to *.voya-storybook.pages.dev and
+        # mixing the prod key here would muddy prod billing/quota.
+        # The staging key's HTTP-referrer allowlist must include
+        # `*.voya-storybook.pages.dev` and `pr-*.voya-storybook.pages.dev`
+        # (configured in Google Cloud Console, not here).
+        env:
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY_STAGING }}
+        run: npm run build-storybook -- -o storybook-static
+
+      - name: Determine deployment branch and URL
+        id: branch
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BRANCH="pr-${{ github.event.pull_request.number }}"
+            URL="https://${BRANCH}.voya-storybook.pages.dev"
+            SHA="${{ github.event.pull_request.head.sha }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # Cloudflare branch names can't contain dots: v2026.4.3 -> v2026-4-3
+            TAG="${GITHUB_REF##refs/tags/}"
+            BRANCH="${TAG//./-}"
+            URL="https://${BRANCH}.voya-storybook.pages.dev"
+            SHA="${{ github.sha }}"
+          else
+            # Production branch (main) deploys to the bare domain
+            BRANCH="main"
+            URL="https://voya-storybook.pages.dev"
+            SHA="${{ github.sha }}"
+          fi
+          echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHA:0:8}" >> "$GITHUB_OUTPUT"
+          echo "Deploying to branch: $BRANCH"
+          echo "URL: $URL"
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend-v2/storybook-static --project-name=voya-storybook --branch=${{ steps.branch.outputs.name }}
+
+      - name: Comment PR with preview URL
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728  # v2.9.1
+        with:
+          header: storybook-preview
+          message: |
+            ## Storybook Preview
+
+            :art: **[Open Storybook](${{ steps.branch.outputs.url }})**
+
+            Commit: `${{ steps.branch.outputs.short_sha }}` | Updates on each push.

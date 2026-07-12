@@ -1,0 +1,17 @@
+{
+  "name": "R8_amend_make_cheaper",
+  "description": "REGRESSION (#1053 Phase 0): post-generation budget amend. NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. Pins CURRENT behavior on price-driven modification requests.",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Barcelona from {{today+30:natural}} to {{today+32:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    },
+    {
+      "send": "Make it cheaper",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation", "ai_response", "message"],
+      "max_time_ms": 180000
+    }
+  ]
+}

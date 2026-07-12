@@ -1,0 +1,12 @@
+{
+  "name": "2.1_one_way_asks_all",
+  "description": "Standard flight search — agent asks missing fields, doesn't default to 1 pax [TEMP LOOSENED PR#1108 — agent goes into city disambiguation; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Find me a flight from London to Paris",
+      "expect_intent": "flight_conversation",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["date", "when", "passenger", "adult", "one-way", "round", "London", "Paris", "city", "which", "mean"]
+    }
+  ]
+}

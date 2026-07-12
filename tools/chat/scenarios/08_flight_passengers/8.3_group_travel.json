@@ -1,0 +1,12 @@
+{
+  "name": "8.3_group_travel",
+  "description": "Group travel — 4 adults",
+  "messages": [
+    {
+      "send": "Flights from Paris to Amsterdam, {{today+30:natural}}, one way, 4 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["British Airways", "KLM", "Ryanair", "cheapest", "fastest", "value", "couldn't", "Paris", "Amsterdam", "4 adults", "one-way", "round-trip"]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "30.12_cold_turn_latency_guard",
+  "description": "P0 latency guardrail (#1053): cold-turn itinerary with full input must complete under 90s today. This is a generous upper bound (#1053 §1 measures ~36-70s p50). Phase 3 (skeleton streaming + early kickoff) should drop this to <30s — at which point the threshold here should be tightened as part of that PR's docs update.",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip from Paris to Lisbon, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 90000,
+      "expect_min_days": 4
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "16.3_country_name",
+  "description": "Country name 'Japan' → picks city (Tokyo) or asks which city",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to Japan, {{today+30:natural}} to {{today+35:natural}}",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_contains_any": ["Tokyo", "Kyoto", "Osaka", "Japan", "city", "which", "itinerary", "day"]
+    }
+  ]
+}

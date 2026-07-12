@@ -1,0 +1,137 @@
+name: Terraform Apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  TF_ROLE_ARN: arn:aws:iam::155304839180:role/GitHubActionsTerraformRole
+
+jobs:
+  detect-changes:
+    name: Detect Changed Environments
+    runs-on: ubuntu-latest
+    outputs:
+      test: ${{ steps.detect.outputs.test }}
+      staging: ${{ steps.detect.outputs.staging }}
+      prod: ${{ steps.detect.outputs.prod }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: detect
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+
+          MODULES_CHANGED="false"
+          if echo "$CHANGED" | grep -q "^terraform/modules/"; then
+            MODULES_CHANGED="true"
+          fi
+
+          for env in test staging prod; do
+            if [ "$MODULES_CHANGED" = "true" ] || echo "$CHANGED" | grep -q "^terraform/environments/${env}/"; then
+              echo "${env}=true" >> $GITHUB_OUTPUT
+            else
+              echo "${env}=false" >> $GITHUB_OUTPUT
+            fi
+          done
+
+  apply-test:
+    name: Apply (test)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.test == 'true'
+    runs-on: ubuntu-latest
+    environment: terraform-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.7"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.TF_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: terraform/environments/test
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        working-directory: terraform/environments/test
+        run: terraform apply -auto-approve -input=false -var-file=ci.tfvars
+
+  apply-staging:
+    name: Apply (staging)
+    needs: [detect-changes, apply-test]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.staging == 'true' &&
+      (needs.apply-test.result == 'success' || needs.apply-test.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment: terraform-staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.7"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.TF_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: terraform/environments/staging
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        working-directory: terraform/environments/staging
+        run: terraform apply -auto-approve -input=false -var-file=staging.tfvars -var-file=ci.tfvars
+
+  apply-prod:
+    name: Apply (prod)
+    needs: [detect-changes, apply-staging]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.prod == 'true' &&
+      (needs.apply-staging.result == 'success' || needs.apply-staging.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment: terraform-prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.7"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.TF_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: terraform/environments/prod
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        working-directory: terraform/environments/prod
+        run: |
+          terraform apply -auto-approve -input=false \
+            -var-file=ci.tfvars \
+            -var="imgproxy_key=${{ secrets.IMGPROXY_KEY }}" \
+            -var="imgproxy_salt=${{ secrets.IMGPROXY_SALT }}"

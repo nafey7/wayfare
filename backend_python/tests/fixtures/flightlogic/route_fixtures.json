@@ -1,0 +1,666 @@
+{
+  "_metadata": {
+    "description": "Request-keyed flight fixtures for deterministic test results",
+    "key_format": "{origin}-{destination}-{journey_type}",
+    "journey_types": ["oneway", "roundtrip"],
+    "note": "Each route has unique airlines and pricing for realistic test scenarios"
+  },
+  "routes": {
+    "AMS-BCN-oneway": {
+      "airlines": ["Vueling", "KLM", "Transavia"],
+      "flights": [
+        {
+          "airline_code": "VY",
+          "airline_name": "Vueling",
+          "flight_number": "VY8302",
+          "departure_time": "07:15",
+          "arrival_time": "09:40",
+          "duration_minutes": 145,
+          "stops": 0,
+          "price_eur": 89.00,
+          "cabin_class": "Y",
+          "refundable": false
+        },
+        {
+          "airline_code": "KL",
+          "airline_name": "KLM Royal Dutch Airlines",
+          "flight_number": "KL1677",
+          "departure_time": "11:30",
+          "arrival_time": "13:55",
+          "duration_minutes": 145,
+          "stops": 0,
+          "price_eur": 156.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "HV",
+          "airline_name": "Transavia",
+          "flight_number": "HV5141",
+          "departure_time": "18:45",
+          "arrival_time": "21:10",
+          "duration_minutes": 145,
+          "stops": 0,
+          "price_eur": 72.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "AMS-LHR-oneway": {
+      "airlines": ["British Airways", "KLM", "easyJet"],
+      "flights": [
+        {
+          "airline_code": "BA",
+          "airline_name": "British Airways",
+          "flight_number": "BA431",
+          "departure_time": "08:00",
+          "arrival_time": "08:25",
+          "duration_minutes": 85,
+          "stops": 0,
+          "price_eur": 145.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "KL",
+          "airline_name": "KLM Royal Dutch Airlines",
+          "flight_number": "KL1001",
+          "departure_time": "12:15",
+          "arrival_time": "12:40",
+          "duration_minutes": 85,
+          "stops": 0,
+          "price_eur": 132.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "U2",
+          "airline_name": "easyJet",
+          "flight_number": "U28832",
+          "departure_time": "16:30",
+          "arrival_time": "16:55",
+          "duration_minutes": 85,
+          "stops": 0,
+          "price_eur": 58.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "AMS-CDG-oneway": {
+      "airlines": ["Air France", "KLM", "Transavia"],
+      "flights": [
+        {
+          "airline_code": "AF",
+          "airline_name": "Air France",
+          "flight_number": "AF1241",
+          "departure_time": "07:00",
+          "arrival_time": "08:20",
+          "duration_minutes": 80,
+          "stops": 0,
+          "price_eur": 118.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "KL",
+          "airline_name": "KLM Royal Dutch Airlines",
+          "flight_number": "KL2001",
+          "departure_time": "14:00",
+          "arrival_time": "15:20",
+          "duration_minutes": 80,
+          "stops": 0,
+          "price_eur": 125.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "HV",
+          "airline_name": "Transavia",
+          "flight_number": "HV5101",
+          "departure_time": "19:30",
+          "arrival_time": "20:50",
+          "duration_minutes": 80,
+          "stops": 0,
+          "price_eur": 65.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "AMS-LIS-oneway": {
+      "airlines": ["TAP Portugal", "KLM", "Transavia"],
+      "flights": [
+        {
+          "airline_code": "TP",
+          "airline_name": "TAP Air Portugal",
+          "flight_number": "TP669",
+          "departure_time": "06:30",
+          "arrival_time": "08:35",
+          "duration_minutes": 185,
+          "stops": 0,
+          "price_eur": 142.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "KL",
+          "airline_name": "KLM Royal Dutch Airlines",
+          "flight_number": "KL1691",
+          "departure_time": "10:45",
+          "arrival_time": "12:50",
+          "duration_minutes": 185,
+          "stops": 0,
+          "price_eur": 168.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "HV",
+          "airline_name": "Transavia",
+          "flight_number": "HV6901",
+          "departure_time": "15:20",
+          "arrival_time": "17:25",
+          "duration_minutes": 185,
+          "stops": 0,
+          "price_eur": 89.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "AMS-MAD-oneway": {
+      "airlines": ["Iberia", "KLM", "Vueling"],
+      "flights": [
+        {
+          "airline_code": "IB",
+          "airline_name": "Iberia",
+          "flight_number": "IB3721",
+          "departure_time": "08:15",
+          "arrival_time": "10:55",
+          "duration_minutes": 160,
+          "stops": 0,
+          "price_eur": 134.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "KL",
+          "airline_name": "KLM Royal Dutch Airlines",
+          "flight_number": "KL1701",
+          "departure_time": "13:00",
+          "arrival_time": "15:40",
+          "duration_minutes": 160,
+          "stops": 0,
+          "price_eur": 152.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "VY",
+          "airline_name": "Vueling",
+          "flight_number": "VY8300",
+          "departure_time": "17:45",
+          "arrival_time": "20:25",
+          "duration_minutes": 160,
+          "stops": 0,
+          "price_eur": 78.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "LHR-CDG-oneway": {
+      "airlines": ["British Airways", "Air France", "easyJet"],
+      "flights": [
+        {
+          "airline_code": "BA",
+          "airline_name": "British Airways",
+          "flight_number": "BA308",
+          "departure_time": "07:30",
+          "arrival_time": "09:45",
+          "duration_minutes": 75,
+          "stops": 0,
+          "price_eur": 125.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "AF",
+          "airline_name": "Air France",
+          "flight_number": "AF1681",
+          "departure_time": "12:00",
+          "arrival_time": "14:15",
+          "duration_minutes": 75,
+          "stops": 0,
+          "price_eur": 118.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "U2",
+          "airline_name": "easyJet",
+          "flight_number": "U28453",
+          "departure_time": "18:15",
+          "arrival_time": "20:30",
+          "duration_minutes": 75,
+          "stops": 0,
+          "price_eur": 52.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "LHR-DXB-oneway": {
+      "airlines": ["Emirates", "British Airways", "Virgin Atlantic"],
+      "flights": [
+        {
+          "airline_code": "EK",
+          "airline_name": "Emirates",
+          "flight_number": "EK002",
+          "departure_time": "09:00",
+          "arrival_time": "19:55",
+          "duration_minutes": 415,
+          "stops": 0,
+          "price_eur": 485.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "BA",
+          "airline_name": "British Airways",
+          "flight_number": "BA107",
+          "departure_time": "14:30",
+          "arrival_time": "01:20",
+          "duration_minutes": 410,
+          "stops": 0,
+          "price_eur": 425.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "VS",
+          "airline_name": "Virgin Atlantic",
+          "flight_number": "VS201",
+          "departure_time": "21:00",
+          "arrival_time": "07:45",
+          "duration_minutes": 405,
+          "stops": 0,
+          "price_eur": 398.00,
+          "cabin_class": "Y",
+          "refundable": true
+        }
+      ]
+    },
+    "JFK-LAX-oneway": {
+      "airlines": ["Delta", "JetBlue", "American Airlines"],
+      "flights": [
+        {
+          "airline_code": "DL",
+          "airline_name": "Delta Air Lines",
+          "flight_number": "DL1287",
+          "departure_time": "08:00",
+          "arrival_time": "11:30",
+          "duration_minutes": 390,
+          "stops": 0,
+          "price_eur": 215.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "B6",
+          "airline_name": "JetBlue Airways",
+          "flight_number": "B6223",
+          "departure_time": "12:15",
+          "arrival_time": "15:45",
+          "duration_minutes": 390,
+          "stops": 0,
+          "price_eur": 178.00,
+          "cabin_class": "Y",
+          "refundable": false
+        },
+        {
+          "airline_code": "AA",
+          "airline_name": "American Airlines",
+          "flight_number": "AA177",
+          "departure_time": "18:30",
+          "arrival_time": "22:00",
+          "duration_minutes": 390,
+          "stops": 0,
+          "price_eur": 198.00,
+          "cabin_class": "Y",
+          "refundable": true
+        }
+      ]
+    },
+    "JFK-LHR-oneway": {
+      "airlines": ["British Airways", "Virgin Atlantic", "American Airlines"],
+      "flights": [
+        {
+          "airline_code": "BA",
+          "airline_name": "British Airways",
+          "flight_number": "BA178",
+          "departure_time": "19:00",
+          "arrival_time": "07:15",
+          "duration_minutes": 435,
+          "stops": 0,
+          "price_eur": 545.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "VS",
+          "airline_name": "Virgin Atlantic",
+          "flight_number": "VS26",
+          "departure_time": "21:30",
+          "arrival_time": "09:45",
+          "duration_minutes": 435,
+          "stops": 0,
+          "price_eur": 498.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "AA",
+          "airline_name": "American Airlines",
+          "flight_number": "AA104",
+          "departure_time": "22:00",
+          "arrival_time": "10:15",
+          "duration_minutes": 435,
+          "stops": 0,
+          "price_eur": 512.00,
+          "cabin_class": "Y",
+          "refundable": true
+        }
+      ]
+    },
+    "MIA-ATL-oneway": {
+      "airlines": ["Delta", "American Airlines", "Spirit"],
+      "flights": [
+        {
+          "airline_code": "DL",
+          "airline_name": "Delta Air Lines",
+          "flight_number": "DL2478",
+          "departure_time": "06:00",
+          "arrival_time": "08:10",
+          "duration_minutes": 130,
+          "stops": 0,
+          "price_eur": 145.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "AA",
+          "airline_name": "American Airlines",
+          "flight_number": "AA1987",
+          "departure_time": "11:30",
+          "arrival_time": "13:40",
+          "duration_minutes": 130,
+          "stops": 0,
+          "price_eur": 138.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "NK",
+          "airline_name": "Spirit Airlines",
+          "flight_number": "NK458",
+          "departure_time": "17:15",
+          "arrival_time": "19:25",
+          "duration_minutes": 130,
+          "stops": 0,
+          "price_eur": 68.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "ORD-DEN-oneway": {
+      "airlines": ["United Airlines", "Southwest", "Frontier"],
+      "flights": [
+        {
+          "airline_code": "UA",
+          "airline_name": "United Airlines",
+          "flight_number": "UA1243",
+          "departure_time": "07:45",
+          "arrival_time": "09:30",
+          "duration_minutes": 165,
+          "stops": 0,
+          "price_eur": 178.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "WN",
+          "airline_name": "Southwest Airlines",
+          "flight_number": "WN2341",
+          "departure_time": "13:00",
+          "arrival_time": "14:45",
+          "duration_minutes": 165,
+          "stops": 0,
+          "price_eur": 142.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "F9",
+          "airline_name": "Frontier Airlines",
+          "flight_number": "F9871",
+          "departure_time": "19:30",
+          "arrival_time": "21:15",
+          "duration_minutes": 165,
+          "stops": 0,
+          "price_eur": 85.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "ORD-LAX-oneway": {
+      "airlines": ["United Airlines", "American Airlines", "Spirit"],
+      "flights": [
+        {
+          "airline_code": "UA",
+          "airline_name": "United Airlines",
+          "flight_number": "UA1508",
+          "departure_time": "08:30",
+          "arrival_time": "10:45",
+          "duration_minutes": 255,
+          "stops": 0,
+          "price_eur": 225.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "AA",
+          "airline_name": "American Airlines",
+          "flight_number": "AA2451",
+          "departure_time": "14:15",
+          "arrival_time": "16:30",
+          "duration_minutes": 255,
+          "stops": 0,
+          "price_eur": 198.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "NK",
+          "airline_name": "Spirit Airlines",
+          "flight_number": "NK612",
+          "departure_time": "20:00",
+          "arrival_time": "22:15",
+          "duration_minutes": 255,
+          "stops": 0,
+          "price_eur": 112.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "BOS-LAX-oneway": {
+      "airlines": ["JetBlue", "Delta", "American Airlines"],
+      "flights": [
+        {
+          "airline_code": "B6",
+          "airline_name": "JetBlue Airways",
+          "flight_number": "B6687",
+          "departure_time": "06:30",
+          "arrival_time": "10:15",
+          "duration_minutes": 345,
+          "stops": 0,
+          "price_eur": 198.00,
+          "cabin_class": "Y",
+          "refundable": false
+        },
+        {
+          "airline_code": "DL",
+          "airline_name": "Delta Air Lines",
+          "flight_number": "DL1892",
+          "departure_time": "12:00",
+          "arrival_time": "15:45",
+          "duration_minutes": 345,
+          "stops": 0,
+          "price_eur": 245.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "AA",
+          "airline_name": "American Airlines",
+          "flight_number": "AA289",
+          "departure_time": "17:30",
+          "arrival_time": "21:15",
+          "duration_minutes": 345,
+          "stops": 0,
+          "price_eur": 218.00,
+          "cabin_class": "Y",
+          "refundable": true
+        }
+      ]
+    },
+    "SEA-JFK-oneway": {
+      "airlines": ["Delta", "JetBlue", "Alaska Airlines"],
+      "flights": [
+        {
+          "airline_code": "DL",
+          "airline_name": "Delta Air Lines",
+          "flight_number": "DL978",
+          "departure_time": "07:00",
+          "arrival_time": "15:30",
+          "duration_minutes": 330,
+          "stops": 0,
+          "price_eur": 275.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "B6",
+          "airline_name": "JetBlue Airways",
+          "flight_number": "B6216",
+          "departure_time": "11:45",
+          "arrival_time": "20:15",
+          "duration_minutes": 330,
+          "stops": 0,
+          "price_eur": 225.00,
+          "cabin_class": "Y",
+          "refundable": false
+        },
+        {
+          "airline_code": "AS",
+          "airline_name": "Alaska Airlines",
+          "flight_number": "AS12",
+          "departure_time": "16:30",
+          "arrival_time": "01:00",
+          "duration_minutes": 330,
+          "stops": 0,
+          "price_eur": 248.00,
+          "cabin_class": "Y",
+          "refundable": true
+        }
+      ]
+    },
+    "LHR-AMS-oneway": {
+      "airlines": ["KLM", "British Airways", "easyJet"],
+      "flights": [
+        {
+          "airline_code": "KL",
+          "airline_name": "KLM Royal Dutch Airlines",
+          "flight_number": "KL1008",
+          "departure_time": "07:15",
+          "arrival_time": "09:35",
+          "duration_minutes": 80,
+          "stops": 0,
+          "price_eur": 128.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "BA",
+          "airline_name": "British Airways",
+          "flight_number": "BA434",
+          "departure_time": "11:45",
+          "arrival_time": "14:05",
+          "duration_minutes": 80,
+          "stops": 0,
+          "price_eur": 142.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "U2",
+          "airline_name": "easyJet",
+          "flight_number": "U28835",
+          "departure_time": "18:00",
+          "arrival_time": "20:20",
+          "duration_minutes": 80,
+          "stops": 0,
+          "price_eur": 55.00,
+          "cabin_class": "Y",
+          "refundable": false
+        }
+      ]
+    },
+    "AMS-JFK-oneway": {
+      "airlines": ["Delta", "KLM", "United Airlines"],
+      "flights": [
+        {
+          "airline_code": "DL",
+          "airline_name": "Delta Air Lines",
+          "flight_number": "DL47",
+          "departure_time": "10:30",
+          "arrival_time": "13:15",
+          "duration_minutes": 525,
+          "stops": 0,
+          "price_eur": 485.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "KL",
+          "airline_name": "KLM Royal Dutch Airlines",
+          "flight_number": "KL641",
+          "departure_time": "14:00",
+          "arrival_time": "16:45",
+          "duration_minutes": 525,
+          "stops": 0,
+          "price_eur": 512.00,
+          "cabin_class": "Y",
+          "refundable": true
+        },
+        {
+          "airline_code": "UA",
+          "airline_name": "United Airlines",
+          "flight_number": "UA71",
+          "departure_time": "17:30",
+          "arrival_time": "20:15",
+          "duration_minutes": 525,
+          "stops": 0,
+          "price_eur": 468.00,
+          "cabin_class": "Y",
+          "refundable": true
+        }
+      ]
+    }
+  }
+}

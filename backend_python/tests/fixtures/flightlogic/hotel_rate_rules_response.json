@@ -1,0 +1,39 @@
+{
+  "sessionId": "TVRjMk16WTRNRE0zTjE4NE5qVmZPVGd1T0RrdU1USTFMakl3Tnc9PV8xMjE2ODcz",
+  "hotelId": 316798,
+  "tokenId": "XYsMFWGhuE8vCJBgnijp",
+  "roomRates": {
+    "perBookingRates": [
+      {
+        "productId": "trx109",
+        "roomType": "Standard Double Room - Shared",
+        "description": "1 Standard Double Room - Shared",
+        "roomCode": "DBL.FH",
+        "fareType": "Non-Refundable",
+        "rateBasisId": "NDEwODAwMQ==",
+        "currency": "USD",
+        "netPrice": 476.74,
+        "taxes": [
+          [
+            {
+              "type": "TAXESANDFEES",
+              "amount": "72.23",
+              "currency": "USD",
+              "included": true
+            }
+          ]
+        ],
+        "boardType": "ROOM ONLY",
+        "maxOccupancyPerRoom": "2",
+        "inventoryType": "prepaid",
+        "cancellationPolicy": "If cancelled from Thu 20 Nov 2025 05:29:00 Amount USD 476.74 will charge!",
+        "roomImages": [],
+        "facilities": [
+          "Number of bedrooms : 1"
+        ],
+        "extrabeds": "0",
+        "remark": ".  Check-in hour 14:00-.Car park NO.Check-out hour -11:00.Minimum check-in age 18."
+      }
+    ]
+  }
+}

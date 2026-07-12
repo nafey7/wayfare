@@ -1,0 +1,31 @@
+{
+  "name": "31.15_disclosure_then_resume",
+  "description": "AI-CHAT-013 resume behavior: after a capability disclosure, the user's next NON-limitation message must flow back to the original active agent normally (no further disclosure, no lost context).",
+  "messages": [
+    {
+      "send": "Plan a 3-day trip to Paris from June 25 to 27, 2 adults",
+      "expect_type_in": [
+        "itinerary_results",
+        "message"
+      ],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "Find me a 5 bedroom villa too",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains": "continue your itinerary"
+    },
+    {
+      "send": "OK just continue with the itinerary",
+      "expect_type_in": [
+        "itinerary_results",
+        "message",
+        "flight_search_results",
+        "hotel_search_results"
+      ],
+      "max_time_ms": 90000,
+      "expect_not_contains": "I can search one city at a time"
+    }
+  ]
+}

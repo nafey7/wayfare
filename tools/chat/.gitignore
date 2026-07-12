@@ -1,0 +1,6 @@
+# Scenario results are generated per-run and not tracked
+scenario_results/*.json
+
+# Test reports contain session-specific data (timestamps, chat IDs, trace IDs)
+# and are regenerated each test session
+test_reports/

@@ -1,0 +1,106 @@
+# Optimized pre-commit configuration
+# All checks run on commit, only on staged files (Boy Scout Rule)
+# Excludes virtual environments and cache directories
+#
+# 🏕️ BOY SCOUT RULE: Leave code better than you found it
+# - ALWAYS fix errors in files you modified
+# - mypy and bandit only check files you're committing
+# - ONLY skip (SKIP=mypy,bandit git commit) when absolutely necessary
+# - See CLAUDE.md for detailed guidelines
+
+exclude: '^(migrations/|\.venv/|__pycache__/|\.mypy_cache/|\.ruff_cache/)'
+default_language_version:
+  python: python3.12
+fail_fast: false
+
+repos:
+  # Fast checks - run on every commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.2
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        stages: [pre-commit]
+        files: ^backend_python/
+      - id: ruff-format
+        stages: [pre-commit]
+        files: ^backend_python/
+
+  # Type checking - run on commit, only on staged files
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.2
+    hooks:
+      - id: mypy
+        stages: [pre-commit]  # Run on commit for immediate feedback
+        files: ^backend_python/app/
+        # Pass individual files to mypy (only checks staged files)
+        pass_filenames: true
+        args: [--ignore-missing-imports, --follow-imports=silent]
+        additional_dependencies: [
+          types-python-dateutil,
+          types-pytz,
+          types-requests,
+          pydantic,
+          motor-types,
+        ]
+
+  # Security scanning - run on commit, only on staged files
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        stages: [pre-commit]  # Run on commit for immediate feedback
+        args: ["-c", "backend_python/pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+        files: ^backend_python/app/
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        stages: [pre-commit]
+        args: [-c, .yamllint]
+
+  # General file checks - fast, run on commit
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        exclude: 'package-lock\.json$'  # Lock files are legitimately large
+        args: ['--maxkb=500']  # Fail on files > 500KB (default is 500KB)
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: mixed-line-ending
+      - id: detect-private-key  # Detect private keys (*.pem, *.key, etc.)
+
+  # Migration import guard — prevent circular imports at ECS deploy time
+  - repo: local
+    hooks:
+      - id: migration-no-app-imports
+        name: migrations must not import app modules
+        entry: >-
+          bash -c 'grep -En "^(from app\.domains\.|import app\.domains\.)" "$@" &&
+          echo "ERROR: migrations must not import from app.domains.*" &&
+          exit 1 || exit 0' --
+        language: system
+        files: ^backend_python/app/database/migrations/.*\.py$
+
+  # Sensitive data detection
+  # Wrapper script blocks NEW secrets but silently ignores line-number-only
+  # baseline drift. CI auto-regenerates the baseline on main, so PRs never
+  # carry .secrets.baseline changes that cause merge conflicts.
+  - repo: local
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+        language: python
+        additional_dependencies: ['detect-secrets==1.5.0']
+        entry: python scripts/check_secrets.py
+        types: [text]
+        exclude: '(\.lock$|\.min\.js$|package-lock\.json$)'

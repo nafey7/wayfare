@@ -1,0 +1,13 @@
+{
+  "name": "11.6_default_1_adult",
+  "description": "No passengers mentioned — defaults to 1 adult, does NOT ask",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to Amsterdam, {{today+30:natural}} to {{today+34:natural}}",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000,
+      "expect_not_contains": ["how many", "travelers", "passengers", "who's going"]
+    }
+  ]
+}

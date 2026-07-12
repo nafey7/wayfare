@@ -1,0 +1,12 @@
+{
+  "name": "R12_partial_no_destination",
+  "description": "REGRESSION (#1053 Phase 0): partial input — no destination, only travel intent + dates. NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. Pins CURRENT behavior on destination-less inputs.",
+  "messages": [
+    {
+      "send": "I want to plan a trip from {{today+30:natural}} to {{today+34:natural}}, 2 adults",
+      "expect_type_in": ["ai_response", "message", "itinerary_conversation"],
+      "max_time_ms": 30000,
+      "expect_contains_any": ["where", "destination", "city", "country", "going", "place"]
+    }
+  ]
+}

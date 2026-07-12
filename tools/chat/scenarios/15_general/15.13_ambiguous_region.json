@@ -1,0 +1,12 @@
+{
+  "name": "15.13_ambiguous_region",
+  "description": "Vague region preference — suggests specific cities and asks preferences",
+  "messages": [
+    {
+      "send": "Maybe somewhere in Europe",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["Europe", "Paris", "Rome", "Barcelona", "London", "Amsterdam", "Italy", "France", "Spain", "Switzerland", "Portugal"]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "11.1_immediate_generation",
+  "description": "P0: All required fields → generates itinerary immediately",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to Bali for 2 adults starting next Monday",
+      "expect_type_in": ["itinerary_results", "ai_response", "message", "itinerary_conversation"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 180000
+    }
+  ]
+}

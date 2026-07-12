@@ -1,0 +1,12 @@
+{
+  "name": "13.6_property_type",
+  "description": "Resort property type filter",
+  "messages": [
+    {
+      "send": "Find a resort hotel in Bali, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["Resort", "resort", "property type", "No Resort", "couldn't", "hotel", "Bali", "bali"]
+    }
+  ]
+}

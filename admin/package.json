@@ -1,0 +1,95 @@
+{
+  "name": "chat-bot-builder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ChatBot Builder Application",
+  "dependencies": {
+    "@dagrejs/dagre": "^1.1.4",
+    "@devexpress/dx-react-core": "^4.0.6",
+    "@devexpress/dx-react-grid": "^4.0.6",
+    "@devexpress/dx-react-scheduler": "^4.0.6",
+    "@devexpress/dx-react-scheduler-material-ui": "^4.0.6",
+    "@emotion/cache": "11.10.8",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/inter": "^5.0.16",
+    "@iconify/react": "^4.1.1",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/joy": "^5.0.0-beta.23",
+    "@mui/lab": "^5.0.0-alpha.165",
+    "@mui/material": "^7.1.0",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.11",
+    "@mui/x-data-grid": "6.10.0",
+    "@mui/x-date-pickers": "^8.5.0",
+    "@react-oauth/google": "^0.12.1",
+    "@reduxjs/toolkit": "^2.8.2",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@xyflow/react": "^12.3.2",
+    "ajv": "^8.17.1",
+    "axios": "^1.4.0",
+    "chroma-js": "2.4.2",
+    "dagrejs": "^0.2.1",
+    "dompurify": "^3.1.7",
+    "draft-js": "^0.11.7",
+    "draftjs-to-html": "^0.9.1",
+    "formik": "^2.4.2",
+    "immutable": "^4.3.7",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.44",
+    "node-modules": "^1.0.1",
+    "react": "^19.0.0",
+    "react-color": "^2.19.3",
+    "react-dom": "^19.0.0",
+    "react-draft-wysiwyg": "^1.15.0",
+    "react-github-btn": "1.4.0",
+    "react-phone-number-input": "^3.4.8",
+    "react-redux": "^8.0.7",
+    "react-router-dom": "6.11.0",
+    "react-scripts": "5.0.1",
+    "react-swiper": "0.1.5",
+    "react-table": "7.8.0",
+    "react-toastify": "^9.1.3",
+    "react-transition-group": "^4.4.5",
+    "rsuite": "^5.70.3",
+    "styled-components": "^6.1.6",
+    "stylis": "4.1.4",
+    "stylis-plugin-rtl": "2.1.1",
+    "swiper": "^11.1.14",
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5",
+    "yup": "^1.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "rm -rf ../backend_python/static/admin && react-scripts build && cp -r ./build ../backend_python/static/admin",
+    "build:copy": "rm -rf ../backend_python/static/admin && npm run build && cp -r ./build ../backend_python/static/admin",
+    "build:window": "powershell -Command \"Remove-Item ../backend_python/static/admin -Recurse -Force -ErrorAction SilentlyContinue; react-scripts build; Copy-Item -Path ./build -Destination ../backend_python/static/admin -Recurse -Force\"",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "overrides": {
+    "svgo": "3.0.2"
+  },
+  "proxy": "http://localhost:8000"
+}

@@ -1,0 +1,200 @@
+# Chat Scenario Tests
+#
+# Runs tools/chat/voya_chat.py scenario tests against the full test stack.
+# Builds the PR's code into Docker, starts all services (backend, MongoDB,
+# FlightLogic mock, MailHog), runs 30 chat scenarios with assertions on
+# response type, intent, search params, and timing, then tears down.
+#
+# Trigger: PRs targeting main that touch chat/AI/backend code
+# Manual: workflow_dispatch for debugging
+#
+# SECURITY: Do NOT change to pull_request_target — that would expose secrets
+# to fork PRs running untrusted code. The current pull_request trigger is safe
+# because GitHub does not pass secrets to fork PRs by default.
+
+name: Chat Scenario Tests
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, ready_for_review]
+    paths:
+      - 'backend_python/app/ai/**'
+      - 'backend_python/app/domains/chat/**'
+      - 'backend_python/app/domains/hotel/**'
+      - 'backend_python/app/domains/flight/**'
+      - 'backend_python/app/domains/airport/**'
+      - 'tools/chat/**'
+      - 'compose.test.yaml'
+      - '.github/workflows/chat-scenarios.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: chat-scenarios-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chat-scenarios:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: chat-ci
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Need full history so "Surface scenario JSON changes for reviewer"
+          # below can diff PR head against base SHA (#1053 P0.1).
+          fetch-depth: 0
+
+      - name: Start test stack
+        run: docker compose -f compose.test.yaml up -d --build
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # Langfuse keys intentionally NOT passed — chat-scenario test
+          # traffic must never reach the production Langfuse project
+          # (issue #1015). compose.test.yaml also defaults
+          # LANGFUSE_ENABLED=false as a second line of defence.
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+
+      - name: Wait for backend health
+        run: |
+          echo "Waiting for backend to become healthy..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8001/health > /dev/null 2>&1; then
+              echo "Backend healthy after $((i * 2))s"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend failed to start within 120s"
+          echo "--- Container status ---"
+          docker compose -f compose.test.yaml ps
+          echo "--- Backend logs ---"
+          docker compose -f compose.test.yaml logs backend-test --tail 50
+          echo "--- MongoDB logs ---"
+          docker compose -f compose.test.yaml logs mongodb-test --tail 20
+          echo "--- FlightLogic Mock logs ---"
+          docker compose -f compose.test.yaml logs flightlogic-mock-test --tail 20
+          exit 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run chat scenarios
+        run: |
+          FAILED=0
+          PASSED=0
+          TOTAL=0
+          FAILED_LIST=""
+
+          while IFS= read -r scenario; do
+            TOTAL=$((TOTAL + 1))
+            echo ""
+            echo "=========================================="
+            echo "[$TOTAL] Running: $(basename "$scenario")"
+            echo "=========================================="
+
+            if python tools/chat/voya_chat.py --env test --scenario "$scenario"; then
+              PASSED=$((PASSED + 1))
+            else
+              FAILED=$((FAILED + 1))
+              FAILED_LIST="$FAILED_LIST\n- \`$(basename "$scenario")\`"
+            fi
+          done < <(find tools/chat/scenarios -name "*.json" -type f | sort)
+
+          echo ""
+          echo "=========================================="
+          echo "Results: $PASSED/$TOTAL passed, $FAILED failed"
+          echo "=========================================="
+
+          # Write step summary so failures are visible without scrolling logs
+          # (issue #1053 P0.1 — chat-scenarios is the regression safety net for
+          # itinerary changes; surface failures loudly so reviewers see them)
+          {
+            echo "## Chat Scenario Results"
+            echo ""
+            if [ $FAILED -eq 0 ]; then
+              echo "✅ **$PASSED / $TOTAL scenarios passed**"
+            else
+              echo "❌ **$FAILED / $TOTAL scenarios FAILED** ($PASSED passed)"
+              echo ""
+              echo "### Failed scenarios"
+              echo ""
+              echo -e "$FAILED_LIST"
+              echo ""
+              echo "### Did this PR loosen any assertions?"
+              echo ""
+              echo "If a scenario JSON's \`expect_contains_any\` / \`expect_not_contains\` was relaxed,"
+              echo "the scenario's \`description\` field must explain why. See"
+              echo "[tools/chat/scenarios/CONTRIBUTING.md](../../tools/chat/scenarios/CONTRIBUTING.md)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ $FAILED -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Surface scenario JSON changes for reviewer
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          # When a PR modifies scenario JSONs, list the diff at the top of the
+          # step summary so the reviewer notices assertion changes without
+          # opening each file. Targets the #1037 pattern where 15 assertions
+          # got loosened in one PR and the suite became less trustworthy.
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          CHANGED=$(git diff --name-only "$BASE_SHA"...HEAD -- 'tools/chat/scenarios/' | grep '\.json$' || true)
+          if [ -n "$CHANGED" ]; then
+            {
+              echo "## Scenario JSON changes in this PR"
+              echo ""
+              echo "The following scenario files were modified. Verify the \`description\` field"
+              echo "documents any assertion relaxation (see"
+              echo "[tools/chat/scenarios/CONTRIBUTING.md](../../tools/chat/scenarios/CONTRIBUTING.md))."
+              echo ""
+              echo "$CHANGED" | while read -r f; do
+                [ -n "$f" ] && echo "- \`$f\`"
+              done
+              echo ""
+              echo "<details><summary>Show diffs</summary>"
+              echo ""
+              echo "\`\`\`diff"
+              git diff "$BASE_SHA"...HEAD -- 'tools/chat/scenarios/' | head -400
+              echo "\`\`\`"
+              echo "</details>"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          docker compose -f compose.test.yaml logs backend-test > backend-logs.txt 2>&1
+          docker compose -f compose.test.yaml logs flightlogic-mock-test > mock-logs.txt 2>&1
+          docker compose -f compose.test.yaml logs mongodb-test > mongodb-logs.txt 2>&1
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chat-scenario-logs
+          if-no-files-found: ignore
+          path: |
+            backend-logs.txt
+            mock-logs.txt
+            mongodb-logs.txt
+            tools/chat/scenario_results/
+
+      - name: Upload scenario results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scenario-results
+          if-no-files-found: ignore
+          path: tools/chat/scenario_results/
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f compose.test.yaml down -v

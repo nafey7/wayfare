@@ -1,0 +1,23 @@
+{
+  "name": "31.10_midflow_itinerary_car_rental",
+  "description": "AI-CHAT-013 mid-flow: itinerary in progress, user asks for a car rental. Voya must disclose the car-rental gap and reassure the user the itinerary is preserved.",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to Rome from June 15 to 19, 2 adults",
+      "expect_type_in": [
+        "itinerary_results",
+        "message"
+      ],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "And I'll need a car rental for 3 of those days",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "car rentals"
+      ],
+      "expect_contains": "continue your itinerary"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "15.7_visa_question",
+  "description": "Visa question — provides visa information",
+  "messages": [
+    {
+      "send": "Do I need a visa for Thailand?",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["visa", "Thailand", "passport", "entry", "days", "exempt", "arrival", "requirement"]
+    }
+  ]
+}

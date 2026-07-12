@@ -1,0 +1,14 @@
+{
+  "name": "73993_venice_disambiguation",
+  "description": "Session 73993b44: Venice resolves to Venice FL instead of Venice Italy (VCE). Multi-city DFW→PMO→CTA→VCE→DFW.",
+  "messages": [
+    {
+      "send": "I want to find flights. DFW to Palermo Sicily on Oct 10, Catania Sicily to Venice Italy on Oct 18, Venice Italy to DFW on Oct 21. 2 adults economy.",
+      "max_time_ms": 30000
+    },
+    {
+      "send": "yes go ahead and search",
+      "max_time_ms": 60000
+    }
+  ]
+}

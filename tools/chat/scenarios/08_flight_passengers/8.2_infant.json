@@ -1,0 +1,12 @@
+{
+  "name": "8.2_infant",
+  "description": "Flight with infant passenger",
+  "messages": [
+    {
+      "send": "Round trip London to Rome, {{today+30:natural}} to {{today+37:natural}}, 2 adults 1 infant",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["flight options", "flights", "London", "Rome", "Found", "couldn't"]
+    }
+  ]
+}

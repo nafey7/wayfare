@@ -1,0 +1,12 @@
+{
+  "name": "20.2_results_contain_airlines",
+  "description": "Flight search returns flight_search_results with a result summary in the LLM message. Note: airline names + prices are on the FE artifact (#1034 contract), NOT in the LLM message text.",
+  "messages": [
+    {
+      "send": "Round trip flights from London to Paris, {{today+30:natural}} to {{today+37:natural}}, 1 adult",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["flight options", "flights", "London", "Paris", "Found", "couldn't"]
+    }
+  ]
+}

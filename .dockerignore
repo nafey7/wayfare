@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+README.md
+docs/
+
+# Python
+__pycache__/
+*.pyc
+backend/.venv/
+backend/tests/
+backend/.pytest_cache/
+backend/.coverage
+backend/*.egg-info
+backend/Dockerfile
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Misc
+*.md
+*.log
+.env
+backend_python/.env

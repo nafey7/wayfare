@@ -1,0 +1,17 @@
+{
+  "name": "31.3_external_listings_airbnb",
+  "description": "AI-CHAT-013: User asks to book on Airbnb. Voya must disclose it can't book external listings, then offer to search hotel inventory instead.",
+  "messages": [
+    {
+      "send": "Can you book me an Airbnb in Lisbon for June 15-20?",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "external listings",
+        "partner inventory",
+        "hotels"
+      ],
+      "expect_not_contains": "I'm just an AI"
+    }
+  ]
+}

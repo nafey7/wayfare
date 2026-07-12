@@ -1,0 +1,12 @@
+{
+  "name": "15.10_budget_question",
+  "description": "Budget question — provides cost information for destination",
+  "messages": [
+    {
+      "send": "Is Tokyo expensive?",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["Tokyo", "expensive", "budget", "cost", "cheap", "affordable", "price", "yen", "save", "money", "meal"]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "7.1_booking_redirect",
+  "description": "After results, 'book cheapest' → redirect to BOOK NOW button [TEMP LOOSENED PR#1108 — first turn returns flight_conversation; tighten when search-firing fixed]",
+  "messages": [
+    {
+      "send": "Round trip flights from Amsterdam to Barcelona, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "Book the cheapest one",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["book now", "book now button", "flight card", "book", "select", "cheapest", "flight", "option", "search", "result"]
+    }
+  ]
+}

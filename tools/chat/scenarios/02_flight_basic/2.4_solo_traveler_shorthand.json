@@ -1,0 +1,11 @@
+{
+  "name": "2.4_solo_traveler_shorthand",
+  "description": "'Just me' = 1 adult",
+  "messages": [
+    {
+      "send": "Just me, flying from London to Rome next Friday, one way",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 60000
+    }
+  ]
+}

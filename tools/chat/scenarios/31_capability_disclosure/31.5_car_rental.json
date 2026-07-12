@@ -1,0 +1,15 @@
+{
+  "name": "31.5_car_rental",
+  "description": "AI-CHAT-013: User asks for a car rental. Voya doesn't book cars (FlightLogic doesn't offer them) — must point to Discover Cars / Hertz and offer to plan the trip around the pickup.",
+  "messages": [
+    {
+      "send": "I need a car rental in Rome for 5 days starting June 10",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "car rentals"
+      ],
+      "expect_not_contains": "I'm just an AI"
+    }
+  ]
+}

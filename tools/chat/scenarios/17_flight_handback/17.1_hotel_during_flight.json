@@ -1,0 +1,16 @@
+{
+  "name": "17.1_hotel_during_flight",
+  "description": "User switches from flight to hotel mid-conversation",
+  "messages": [
+    {
+      "send": "Find me flights from London to Paris",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["date", "when", "passenger", "adult", "one-way", "round", "paris", "flight", "travel"]
+    },
+    {
+      "send": "Actually, I need a hotel instead",
+      "max_time_ms": 60000,
+      "expect_contains_any": ["hotel", "check-in", "checkin", "date", "guest", "adult", "stay", "city", "where", "help"]
+    }
+  ]
+}

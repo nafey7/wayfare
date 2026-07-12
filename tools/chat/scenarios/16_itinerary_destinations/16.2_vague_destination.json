@@ -1,0 +1,12 @@
+{
+  "name": "16.2_vague_destination",
+  "description": "Vague destination 'beach vacation' → asks which city",
+  "messages": [
+    {
+      "send": "Plan a beach vacation for next month",
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["which", "where", "city", "destination", "beach", "specific", "mind", "how long", "trip", "vacation", "length", "days", "week", "month", "vibe"]
+    }
+  ]
+}

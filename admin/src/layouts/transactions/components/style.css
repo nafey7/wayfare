@@ -1,0 +1,16 @@
+.paymentSuccess {
+  color: rgba(0, 0, 0, 0.5);
+  background-color: lightgreen;
+  /* pointer-events: none; */
+}
+
+.paymentFailed {
+  color: rgba(0, 0, 0, 0.5);
+  background-color: red;
+  /* pointer-events: none; */
+}
+.paymentRefunded {
+  color: rgba(0, 0, 0, 0.5);
+  background-color: #1b6be4;
+  /* pointer-events: none; */
+}

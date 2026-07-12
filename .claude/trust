@@ -1,0 +1,13 @@
+**/*.js
+**/*.jsx
+**/*.json
+**/*.md
+**/*.css
+**/*.html
+**/*.txt
+**/*.svg
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.env
+**/*.lock

@@ -1,0 +1,12 @@
+{
+  "name": "15.9_packing_tips",
+  "description": "Packing question — provides practical packing advice",
+  "messages": [
+    {
+      "send": "What should I pack for Iceland?",
+      "expect_intent": "general_query",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["layer", "warm", "waterproof", "jacket", "wool", "Iceland", "cold", "pack", "clothing", "thermal", "travel", "help", "plan", "looking", "iceland", "weather", "trip"]
+    }
+  ]
+}

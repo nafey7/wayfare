@@ -1,0 +1,12 @@
+{
+  "name": "14.2_disambiguation",
+  "description": "Ambiguous city auto-resolves to most likely country (Google Geocoding returns single result). Note: post-#1034, the LLM no longer echoes the country in its message — the resolution is on the FE artifact (search_params).",
+  "messages": [
+    {
+      "send": "Hotels in Birmingham, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 45000,
+      "expect_contains_any": ["hotel", "Found", "matching", "Birmingham", "couldn't"]
+    }
+  ]
+}

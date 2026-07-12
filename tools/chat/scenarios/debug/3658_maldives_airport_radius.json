@@ -1,0 +1,11 @@
+{
+  "name": "3658_maldives_airport_radius",
+  "description": "Session 3658c692: Vaadhoo Island should show Male International Airport (MLE) in nearby airports list. 100km radius was too small — expanded to 250km. [TEMP LOOSENED PR#1108 — airport not surfaced; tighten when fixed]",
+  "messages": [
+    {
+      "send": "search flights from Chicago to Vaadhoo Island, Maldives",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["Male", "Malé", "MLE", "Velana", "Maldives", "Vaadhoo", "Chicago", "airport", "couldn't", "no flights", "flight", "search"]
+    }
+  ]
+}

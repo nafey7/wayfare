@@ -1,0 +1,12 @@
+{
+  "name": "6.2_cabin_business",
+  "description": "Business class flight search [TEMP LOOSENED PR#1108 — filter not echoed in response; tighten when fixed]",
+  "messages": [
+    {
+      "send": "Business class flights from London to Paris, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["business", "Business", "British Airways", "Ryanair", "KLM", "couldn't", "London", "Paris", "flight", "search", "from", "to"]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "9.3_relative_dates_confirm",
+  "description": "P1: 'next weekend' → agent calls parse_dates, does NOT ask for exact dates",
+  "messages": [
+    {
+      "send": "Hotels in Tokyo next weekend, 1 adult",
+      "expect_intent": "hotel_conversation",
+      "max_time_ms": 60000,
+      "expect_not_contains": ["what are your exact dates", "please provide exact"]
+    }
+  ]
+}

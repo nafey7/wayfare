@@ -1,0 +1,415 @@
+{
+  "_metadata": {
+    "description": "Request-keyed hotel fixtures for deterministic test results",
+    "key_format": "{city_name_lowercase}",
+    "note": "Each city has unique hotels with realistic names, ratings, and pricing"
+  },
+  "cities": {
+    "amsterdam": {
+      "hotels": [
+        {
+          "hotel_id": "AMS001",
+          "name": "Hotel V Nesplein",
+          "city": "Amsterdam",
+          "address": "Nes 49, 1012 KD Amsterdam",
+          "star_rating": 4,
+          "price_per_night_eur": 185.00,
+          "facilities": ["Wi-fi", "Bar", "Restaurant", "Concierge", "Air conditioning"],
+          "review_score": 8.9,
+          "review_count": 2456
+        },
+        {
+          "hotel_id": "AMS002",
+          "name": "The Dylan Amsterdam",
+          "city": "Amsterdam",
+          "address": "Keizersgracht 384, 1016 GB Amsterdam",
+          "star_rating": 5,
+          "price_per_night_eur": 425.00,
+          "facilities": ["Wi-fi", "Spa", "Restaurant", "Bar", "Room service", "Concierge"],
+          "review_score": 9.2,
+          "review_count": 1823
+        },
+        {
+          "hotel_id": "AMS003",
+          "name": "citizenM Amsterdam City",
+          "city": "Amsterdam",
+          "address": "Prinses Irenestraat 30, 1077 WX Amsterdam",
+          "star_rating": 4,
+          "price_per_night_eur": 135.00,
+          "facilities": ["Wi-fi", "24-hour reception", "Bar", "Self check-in"],
+          "review_score": 8.5,
+          "review_count": 5621
+        }
+      ]
+    },
+    "paris": {
+      "hotels": [
+        {
+          "hotel_id": "PAR001",
+          "name": "Hôtel Plaza Athénée",
+          "city": "Paris",
+          "address": "25 Avenue Montaigne, 75008 Paris",
+          "locality": "Champs-Élysées",
+          "latitude": "48.8660",
+          "longitude": "2.3040",
+          "star_rating": 5,
+          "price_per_night_eur": 890.00,
+          "facilities": ["Wi-fi", "Spa", "Fitness Center", "Restaurant", "Bar", "Pool"],
+          "review_score": 9.4,
+          "review_count": 1256
+        },
+        {
+          "hotel_id": "PAR002",
+          "name": "Hotel Le Marais",
+          "city": "Paris",
+          "address": "12 Rue du Plâtre, 75004 Paris",
+          "locality": "Le Marais",
+          "latitude": "48.8600",
+          "longitude": "2.3530",
+          "star_rating": 3,
+          "price_per_night_eur": 145.00,
+          "facilities": ["Wi-fi", "Breakfast", "24-hour reception"],
+          "review_score": 8.2,
+          "review_count": 3421
+        },
+        {
+          "hotel_id": "PAR003",
+          "name": "Hôtel des Arts Montmartre",
+          "city": "Paris",
+          "address": "5 Rue Tholozé, 75018 Paris",
+          "locality": "Montmartre",
+          "latitude": "48.8860",
+          "longitude": "2.3370",
+          "star_rating": 3,
+          "price_per_night_eur": 98.00,
+          "facilities": ["Wi-fi", "Breakfast", "Bar"],
+          "review_score": 7.8,
+          "review_count": 2156
+        }
+      ]
+    },
+    "london": {
+      "hotels": [
+        {
+          "hotel_id": "LON001",
+          "name": "The Savoy",
+          "city": "London",
+          "address": "Strand, London WC2R 0EZ",
+          "locality": "Covent Garden",
+          "latitude": "51.5101",
+          "longitude": "-0.1185",
+          "star_rating": 5,
+          "price_per_night_eur": 650.00,
+          "facilities": ["Wi-fi", "Spa", "Fitness Center", "Restaurant", "Bar", "Pool", "Concierge"],
+          "review_score": 9.3,
+          "review_count": 4521
+        },
+        {
+          "hotel_id": "LON002",
+          "name": "Premier Inn London City",
+          "city": "London",
+          "address": "1 Wallwood Street, London E14 6EH",
+          "locality": "Canary Wharf",
+          "latitude": "51.5065",
+          "longitude": "-0.0186",
+          "star_rating": 3,
+          "price_per_night_eur": 95.00,
+          "facilities": ["Wi-fi", "Breakfast", "Restaurant", "Bar"],
+          "review_score": 8.1,
+          "review_count": 8956
+        },
+        {
+          "hotel_id": "LON003",
+          "name": "citizenM Tower of London",
+          "city": "London",
+          "address": "40 Trinity Square, London EC3N 4DJ",
+          "locality": "Tower Hill",
+          "latitude": "51.5098",
+          "longitude": "-0.0764",
+          "star_rating": 4,
+          "price_per_night_eur": 175.00,
+          "facilities": ["Wi-fi", "24-hour reception", "Bar", "Rooftop terrace"],
+          "review_score": 8.7,
+          "review_count": 6234
+        }
+      ]
+    },
+    "barcelona": {
+      "hotels": [
+        {
+          "hotel_id": "BCN001",
+          "name": "Hotel Arts Barcelona",
+          "city": "Barcelona",
+          "address": "Carrer de la Marina 19-21, 08005 Barcelona",
+          "star_rating": 5,
+          "price_per_night_eur": 385.00,
+          "facilities": ["Wi-fi", "Spa", "Pool", "Fitness Center", "Restaurant", "Bar", "Beach access"],
+          "review_score": 9.1,
+          "review_count": 3245
+        },
+        {
+          "hotel_id": "BCN002",
+          "name": "Hotel Praktik Rambla",
+          "city": "Barcelona",
+          "address": "La Rambla 27, 08002 Barcelona",
+          "star_rating": 3,
+          "price_per_night_eur": 125.00,
+          "facilities": ["Wi-fi", "Breakfast", "24-hour reception", "Terrace"],
+          "review_score": 8.4,
+          "review_count": 4567
+        },
+        {
+          "hotel_id": "BCN003",
+          "name": "Generator Barcelona",
+          "city": "Barcelona",
+          "address": "Carrer de Còrsega 373, 08037 Barcelona",
+          "star_rating": 2,
+          "price_per_night_eur": 45.00,
+          "facilities": ["Wi-fi", "Bar", "Common areas", "Laundry"],
+          "review_score": 7.6,
+          "review_count": 7823
+        }
+      ]
+    },
+    "dubai": {
+      "hotels": [
+        {
+          "hotel_id": "DXB001",
+          "name": "Burj Al Arab Jumeirah",
+          "city": "Dubai",
+          "address": "Jumeirah Beach Road, Dubai",
+          "star_rating": 5,
+          "price_per_night_eur": 1850.00,
+          "facilities": ["Wi-fi", "Spa", "Pool", "Private beach", "Restaurant", "Bar", "Helipad"],
+          "review_score": 9.5,
+          "review_count": 2156
+        },
+        {
+          "hotel_id": "DXB002",
+          "name": "Rove Downtown",
+          "city": "Dubai",
+          "address": "Financial Center Street, Dubai",
+          "star_rating": 3,
+          "price_per_night_eur": 85.00,
+          "facilities": ["Wi-fi", "Pool", "Fitness Center", "Restaurant"],
+          "review_score": 8.3,
+          "review_count": 5678
+        },
+        {
+          "hotel_id": "DXB003",
+          "name": "Atlantis The Palm",
+          "city": "Dubai",
+          "address": "Crescent Road, Palm Jumeirah, Dubai",
+          "star_rating": 5,
+          "price_per_night_eur": 520.00,
+          "facilities": ["Wi-fi", "Spa", "Pool", "Water park", "Aquarium", "Restaurant", "Bar"],
+          "review_score": 8.9,
+          "review_count": 12456
+        }
+      ]
+    },
+    "tokyo": {
+      "hotels": [
+        {
+          "hotel_id": "TYO001",
+          "name": "Park Hyatt Tokyo",
+          "city": "Tokyo",
+          "address": "3-7-1-2 Nishi-Shinjuku, Shinjuku-ku, Tokyo",
+          "locality": "Shinjuku",
+          "latitude": "35.6862",
+          "longitude": "139.6913",
+          "star_rating": 5,
+          "price_per_night_eur": 580.00,
+          "facilities": ["Wi-fi", "Spa", "Pool", "Fitness Center", "Restaurant", "Bar"],
+          "review_score": 9.2,
+          "review_count": 3421
+        },
+        {
+          "hotel_id": "TYO002",
+          "name": "Shinjuku Granbell Hotel",
+          "city": "Tokyo",
+          "address": "2-14-5 Kabukicho, Shinjuku-ku, Tokyo",
+          "locality": "Shinjuku",
+          "latitude": "35.6944",
+          "longitude": "139.7036",
+          "star_rating": 4,
+          "price_per_night_eur": 145.00,
+          "facilities": ["Wi-fi", "Restaurant", "Bar", "Concierge"],
+          "review_score": 8.4,
+          "review_count": 6789
+        },
+        {
+          "hotel_id": "TYO003",
+          "name": "9 Hours Shinjuku",
+          "city": "Tokyo",
+          "address": "1-4-15 Hyakunincho, Shinjuku-ku, Tokyo",
+          "locality": "Shinjuku",
+          "latitude": "35.6987",
+          "longitude": "139.6994",
+          "star_rating": 2,
+          "price_per_night_eur": 35.00,
+          "facilities": ["Wi-fi", "Capsule beds", "Shower facilities"],
+          "review_score": 7.9,
+          "review_count": 4521
+        }
+      ]
+    },
+    "las vegas": {
+      "hotels": [
+        {
+          "hotel_id": "LAS001",
+          "name": "Bellagio",
+          "city": "Las Vegas",
+          "address": "3600 S Las Vegas Blvd, Las Vegas, NV",
+          "star_rating": 5,
+          "price_per_night_eur": 285.00,
+          "facilities": ["Wi-fi", "Pool", "Spa", "Casino", "Restaurant", "Bar", "Shopping"],
+          "review_score": 9.0,
+          "review_count": 15678
+        },
+        {
+          "hotel_id": "LAS002",
+          "name": "The LINQ Hotel + Experience",
+          "city": "Las Vegas",
+          "address": "3535 S Las Vegas Blvd, Las Vegas, NV",
+          "star_rating": 4,
+          "price_per_night_eur": 95.00,
+          "facilities": ["Wi-fi", "Pool", "Casino", "Restaurant", "Bar"],
+          "review_score": 8.2,
+          "review_count": 23456
+        },
+        {
+          "hotel_id": "LAS003",
+          "name": "Circus Circus Hotel",
+          "city": "Las Vegas",
+          "address": "2880 S Las Vegas Blvd, Las Vegas, NV",
+          "star_rating": 3,
+          "price_per_night_eur": 45.00,
+          "facilities": ["Wi-fi", "Pool", "Casino", "Circus acts", "Arcade"],
+          "review_score": 7.1,
+          "review_count": 18234
+        }
+      ]
+    },
+    "bangkok": {
+      "hotels": [
+        {
+          "hotel_id": "BKK001",
+          "name": "Mandarin Oriental Bangkok",
+          "city": "Bangkok",
+          "address": "48 Oriental Avenue, Bangkok",
+          "locality": "Riverside",
+          "latitude": "13.7234",
+          "longitude": "100.5147",
+          "star_rating": 5,
+          "price_per_night_eur": 425.00,
+          "facilities": ["Wi-fi", "Spa", "Pool", "Fitness Center", "Restaurant", "Bar", "River views"],
+          "review_score": 9.3,
+          "review_count": 4567
+        },
+        {
+          "hotel_id": "BKK002",
+          "name": "Ibis Bangkok Siam",
+          "city": "Bangkok",
+          "address": "927 Rama 1 Road, Bangkok",
+          "locality": "Siam",
+          "latitude": "13.7466",
+          "longitude": "100.5347",
+          "star_rating": 3,
+          "price_per_night_eur": 42.00,
+          "facilities": ["Wi-fi", "Restaurant", "24-hour reception"],
+          "review_score": 8.0,
+          "review_count": 8976
+        },
+        {
+          "hotel_id": "BKK003",
+          "name": "Lub d Bangkok Silom",
+          "city": "Bangkok",
+          "address": "4 Decho Road, Silom, Bangkok",
+          "locality": "Silom",
+          "latitude": "13.7278",
+          "longitude": "100.5275",
+          "star_rating": 2,
+          "price_per_night_eur": 18.00,
+          "facilities": ["Wi-fi", "Bar", "Common areas", "Rooftop"],
+          "review_score": 8.5,
+          "review_count": 6543
+        }
+      ]
+    },
+    "portland": {
+      "hotels": [
+        {
+          "hotel_id": "PDX001",
+          "name": "The Nines Portland",
+          "city": "Portland",
+          "address": "525 SW Morrison St, Portland, OR",
+          "star_rating": 5,
+          "price_per_night_eur": 275.00,
+          "facilities": ["Wi-fi", "Spa", "Fitness Center", "Restaurant", "Bar", "Pet-friendly"],
+          "review_score": 9.0,
+          "review_count": 2345
+        },
+        {
+          "hotel_id": "PDX002",
+          "name": "Ace Hotel Portland",
+          "city": "Portland",
+          "address": "1022 SW Stark St, Portland, OR",
+          "star_rating": 4,
+          "price_per_night_eur": 165.00,
+          "facilities": ["Wi-fi", "Restaurant", "Bar", "Bike rentals"],
+          "review_score": 8.6,
+          "review_count": 3456
+        },
+        {
+          "hotel_id": "PDX003",
+          "name": "Jupiter Hotel",
+          "city": "Portland",
+          "address": "900 E Burnside St, Portland, OR",
+          "star_rating": 3,
+          "price_per_night_eur": 95.00,
+          "facilities": ["Wi-fi", "Bar", "Live music venue", "Pet-friendly"],
+          "review_score": 8.1,
+          "review_count": 4567
+        }
+      ]
+    },
+    "monaco": {
+      "hotels": [
+        {
+          "hotel_id": "MCO001",
+          "name": "Hôtel de Paris Monte-Carlo",
+          "city": "Monaco",
+          "address": "Place du Casino, 98000 Monaco",
+          "star_rating": 5,
+          "price_per_night_eur": 1250.00,
+          "facilities": ["Wi-fi", "Spa", "Pool", "Restaurant", "Bar", "Casino access"],
+          "review_score": 9.4,
+          "review_count": 1234
+        },
+        {
+          "hotel_id": "MCO002",
+          "name": "Fairmont Monte Carlo",
+          "city": "Monaco",
+          "address": "12 Avenue des Spélugues, 98000 Monaco",
+          "star_rating": 4,
+          "price_per_night_eur": 385.00,
+          "facilities": ["Wi-fi", "Pool", "Spa", "Restaurant", "Bar", "Rooftop"],
+          "review_score": 8.8,
+          "review_count": 2567
+        },
+        {
+          "hotel_id": "MCO003",
+          "name": "Novotel Monte Carlo",
+          "city": "Monaco",
+          "address": "16 Boulevard Princesse Charlotte, 98000 Monaco",
+          "star_rating": 4,
+          "price_per_night_eur": 215.00,
+          "facilities": ["Wi-fi", "Restaurant", "Bar", "Fitness Center"],
+          "review_score": 8.2,
+          "review_count": 3456
+        }
+      ]
+    }
+  }
+}

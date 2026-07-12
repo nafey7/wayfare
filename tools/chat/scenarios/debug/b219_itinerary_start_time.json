@@ -1,0 +1,24 @@
+{
+  "name": "b219_itinerary_start_time",
+  "description": "Session b219ab9d follow-up: After generating itinerary, user asks to change start time to 11 AM. Should regenerate with modification_notes, not stall.",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to London starting next week, I want to start my day at 10 am",
+      "expect_type_in": ["itinerary_results", "message"],
+      "max_time_ms": 45000,
+      "expect_contains_any": ["2026", "does that work", "sound right", "confirm", "London", "itinerary", "plan"]
+    },
+    {
+      "send": "yes",
+      "expect_type_in": ["itinerary_results", "message"],
+      "max_time_ms": 60000,
+      "expect_contains_any": ["itinerary", "London", "plan", "ready", "booking", "change", "Glad"]
+    },
+    {
+      "send": "can you help me amend my itinerary and let me start my day at 11 am instead",
+      "expect_type_in": ["itinerary_results", "message"],
+      "max_time_ms": 60000,
+      "expect_contains_any": ["11", "updated", "adjusted", "itinerary", "change", "start", "update"]
+    }
+  ]
+}

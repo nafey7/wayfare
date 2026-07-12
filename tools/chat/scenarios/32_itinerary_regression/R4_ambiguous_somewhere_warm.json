@@ -1,0 +1,12 @@
+{
+  "name": "R4_ambiguous_somewhere_warm",
+  "description": "REGRESSION (#1053 Phase 0+2): ambiguous destination ('somewhere warm'). NEVER LOOSEN — see tools/chat/scenarios/CONTRIBUTING.md regression suite policy. PHASE 2 BASELINE UPDATE 2026-05-21: Phase 2 O11 changed behavior from 'refuse + ask for a city' to 'suggest 2-3 specific cities matching the vibe + ask user to pick'. The expect_contains_any list now matches both old (refuse/ask) and new (suggest specific city names) behavior — both are graceful handling of vague input. If a future change reintroduces silent city invention (R6's old bug), this scenario must fail.",
+  "messages": [
+    {
+      "send": "I want to go somewhere warm next month for 5 days",
+      "expect_type_in": ["ai_response", "message", "itinerary_conversation"],
+      "max_time_ms": 30000,
+      "expect_contains_any": ["city", "destination", "where", "specific", "Cancún", "Lisbon", "Bali", "warm", "tropical", "Caribbean"]
+    }
+  ]
+}

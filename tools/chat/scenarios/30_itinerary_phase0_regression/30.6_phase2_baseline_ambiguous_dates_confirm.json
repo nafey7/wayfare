@@ -1,0 +1,12 @@
+{
+  "name": "30.6_phase2_baseline_ambiguous_dates_confirm",
+  "description": "P0 Phase-2 baseline (#1053): today, ambiguous-date expressions like 'next week' trigger a forced confirmation turn before the bot generates (itinerary_agent.py:85-97). Locked here so Phase 2 (O9 — skip confirmation when duration is given alongside) can be detected. The first turn should NOT be itinerary_results today.",
+  "messages": [
+    {
+      "send": "Plan a 5-day trip to Paris next week, 1 adult",
+      "max_time_ms": 30000,
+      "expect_not_contains": ["Here's your 5-day Paris itinerary", "Here is your 5-day Paris itinerary"],
+      "expect_contains_any": ["confirm", "does that work", "sound right", "2026", "May", "June"]
+    }
+  ]
+}

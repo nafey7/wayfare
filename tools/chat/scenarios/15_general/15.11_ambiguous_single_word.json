@@ -1,0 +1,12 @@
+{
+  "name": "15.11_ambiguous_single_word",
+  "description": "Ambiguous single city name — asks what user needs",
+  "messages": [
+    {
+      "send": "Paris",
+      "expect_intent": "general_query",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["Paris", "flight", "hotel", "trip", "plan", "looking for", "help", "what", "how"]
+    }
+  ]
+}

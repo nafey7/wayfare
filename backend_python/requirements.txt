@@ -1,0 +1,84 @@
+# ===== CORE WEB FRAMEWORK =====
+fastapi>=0.115.6
+uvicorn[standard]>=0.37.0
+starlette>=0.41.3
+
+# ===== DATA VALIDATION & SERIALIZATION =====
+pydantic>=2.10.3
+pydantic-settings>=2.6.1
+email-validator>=2.3.0
+
+# ===== ASYNC DATABASE & ODM =====
+motor>=3.7.0
+pymongo[srv]>=4.15.0
+dnspython>=2.8.0
+
+# ===== AUTHENTICATION & SECURITY =====
+pyjwt>=2.10.1
+cryptography>=44.0.0
+passlib[bcrypt]>=1.7.4
+bcrypt==4.0.1  # Pinned: passlib compatibility requirement
+python-multipart>=0.0.20  # Security: CVE-2024-53981 DoS fix
+
+# ===== GOOGLE APIs =====
+google-genai>=1.0.0  # Unified SDK for Gemini (replaced google-generativeai)
+google-auth>=2.40.3
+google-auth-oauthlib>=1.2.1
+google-auth-httplib2>=0.2.0
+google-api-python-client>=2.179.0
+
+# ===== EXTERNAL INTEGRATIONS =====
+stripe>=13.0.0  # Uses stripe._error (correct import for v12+)
+sendgrid>=6.11.0
+boto3>=1.26.0
+watchtower>=3.0.0
+Pillow>=10.4.0  # EXIF strip + dimension/decompression-bomb guard for profile photo uploads
+
+# ===== HTTP & NETWORKING =====
+httpx>=0.28.1
+aiohttp>=3.10.11
+requests>=2.32.5
+
+# ===== UTILITIES =====
+python-dotenv>=1.0.0
+python-dateutil>=2.9.0
+pytz>=2024.2
+pycountry>=24.6.1
+phonenumbers>=8.13.51
+python-stdnum>=1.20
+nanoid>=2.0.0
+
+# ===== DOCUMENT GENERATION =====
+jinja2>=3.1.4
+xhtml2pdf>=0.2.16
+
+# ===== LANGGRAPH AI AGENTS =====
+langgraph>=1.0.0,<2.0.0
+langgraph-checkpoint-mongodb>=0.3.0  # Latest is 0.3.1; no v1 release yet
+langchain>=1.0.0,<2.0.0  # create_agent + middleware (SummarizationMiddleware, ToolRetryMiddleware, etc.)
+langchain-google-genai>=2.0.0
+langchain-core>=0.3.0
+langchain-openai>=1.0.0  # OpenAI provider (GPT-5.4-nano, GPT-5.4-mini)
+langchain-xai>=1.0.0  # xAI provider (Grok 4.1 Fast)
+
+# ===== OBSERVABILITY =====
+langfuse>=2.0.0  # LLM observability
+sentry-sdk[fastapi]>=2.0.0  # Error tracking and APM
+
+# ===== DEVELOPMENT & TESTING =====
+pytest>=8.4.2
+pytest-asyncio>=0.24.0
+pytest-cov>=6.2.1
+pytest-mock>=3.14.1
+
+# ===== CODE QUALITY & LINTING =====
+ruff==0.13.2
+mypy>=1.18.2
+bandit[toml]>=1.8.6
+yamllint>=1.37.1
+pre-commit>=4.3.0
+
+# ===== TYPE STUBS =====
+types-python-dateutil
+types-pytz
+types-requests

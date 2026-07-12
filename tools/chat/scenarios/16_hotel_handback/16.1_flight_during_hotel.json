@@ -1,0 +1,16 @@
+{
+  "name": "16.1_flight_during_hotel",
+  "description": "User switches from hotel to flight mid-conversation",
+  "messages": [
+    {
+      "send": "Find me hotels in Paris",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["check-in", "checkin", "date", "guest", "adult", "paris", "hotel", "stay", "help", "travel", "looking for"]
+    },
+    {
+      "send": "Actually, I want to book a flight instead",
+      "max_time_ms": 60000,
+      "expect_type_in": ["flight_conversation", "hand_back", "ai_response"]
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+# Local ops: plans (/create-plan), ad-hoc scripts — not part of the codebase
+local-ops/
+
+# Database backups (never commit production data)
+prod-backup/
+*-backup/
+*.bson
+*.metadata.json
+
+# Chat scenario test results and run reports
+tools/chat/scenario_results/
+tools/chat/scenarios/*_REPORT.md
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.testing
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude.local/
+# Un-ignore Claude skills, agents, and prompts that match generic patterns (logs/, coverage/)
+!.claude/skills/**/
+!.claude/agents/**/
+!.claude/prompts/**/
+
+# Playwright CLI + MCP runtime output (snapshots, console logs, page state)
+.playwright-cli/
+.playwright-mcp/
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+.pycharm/
+.cursor/
+
+# Logs
+*.log
+logs/
+logs/pdfs/*.pdf
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+nul
+
+# Build artifacts (if any at root level)
+dist/
+build/
+
+# Package manager files at root
+node_modules/
+# Note: package-lock.json is now tracked for CI cache consistency
+yarn.lock
+pnpm-lock.yaml
+
+# Testing (if at root level)
+coverage/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Backup files and database dumps
+*.backup
+*backup/
+*-backup/
+backup-*/
+*.bson
+*.dump
+*.sql.gz
+*.sql.bz2
+*.mongodb
+mongodump/
+
+# Obsidian vault plugins (too large for git)
+dev-tools/vault/.obsidian/plugins/
+dev-tools/vault/.obsidian/workspace.json
+*.bak
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets and keys
+*.key
+*.pem
+*.crt
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+.venv*/
+*.venv*/
+.eggs/
+*.egg-info/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.ruff_cache/
+dev-tools/code_reports/
+/dev-tools/vault/Marijke/
+/dev-tools/extern/flightlogic_apis/Welcome-Pack-Flightslogic-Flights.pdf
+
+# Testing and Playwright artifacts
+test-results/
+playwright-report/
+*-report/
+*.png
+*.jpg
+# Allow committed UI assets (e.g. hotel-booker fallback images)
+!frontend-v2/src/assets/images/logo-light2.png
+!frontend-v2/src/assets/logos/*.png
+!frontend-v2/src/assets/images/landing-page/hero-voya.jpg
+!frontend-v2/src/assets/images/landing-page/intro-testimonials/*.png
+!frontend-v2/src/assets/images/landing-page/intro-testimonials/people-images/*.png
+!frontend-v2/src/assets/images/landing-page/how-it-works/*.png
+!frontend-v2/src/assets/images/landing-page/example-itineraries/*.png
+!frontend-v2/src/assets/images/landing-page/inspiration-trips/*.png
+!frontend-v2/src/assets/images/landing-page/inspiration-trips/*.jpg
+!backend_python/dev_ui/hotel-booker/assets/*.svg
+*.mp4
+*.webm
+coverage/
+.nyc_output/
+
+# Node.js in subdirectories
+tests/node_modules/
+e2e/node_modules/
+*/node_modules/
+
+# Temporary diagnostic and test scripts
+*-diagnostics.js
+test-*.js
+run-*.js
+*-authenticated-*.js
+# Exception: walkthrough runners are permanent, not temporary
+!testing/e2e/walkthroughs/run-*.js
+
+# Claude session files (keep locally, exclude from commits)
+CLAUDE.local*.md
+
+# Development debugging utilities (temporary)
+**/debug.js
+
+# Local development files and folders
+.local/
+.local
+local/
+scratch/
+_scratch/
+.scratch/
+
+# Developer-specific files
+*.local.*
+*-local.*
+dev-*
+.dev/
+
+# Personal notes and experiments
+notes/
+experiments/
+playground/
+sandbox/
+/docker-compose.yml
+# Terraform
+**/.terraform/*
+# .terraform.lock.hcl is intentionally committed (HashiCorp recommendation).
+# Committing it makes provider versions reproducible across dev machines and CI,
+# and lets terraform verify providers via the pinned hashes instead of
+# re-verifying GPG signatures at every init.
+*.tfstate*
+*.tfplan
+tfplan
+
+# Terraform variable files
+terraform.tfvars      # Local overrides (gitignored)
+**/terraform.tfvars
+*.auto.tfvars         # Auto-loaded local overrides
+*.tfvars.json         # JSON format local overrides
+# Note: Environment-specific files like staging.tfvars, production.tfvars are committed
+airports_cache.json
+
+# Trace review
+.secrets
+reports/
+tools/langfuse/review_lib/__pycache__/
+
+# Claude Code custom commands (local only)
+.claude/commands/

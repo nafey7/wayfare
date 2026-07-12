@@ -1,0 +1,121 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+*.lcov
+.nyc_output
+
+# Production
+/build
+/dist
+
+# Development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Package manager files
+package-lock.json.backup
+yarn.lock.backup
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE - IntelliJ/WebStorm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - Sublime
+*.sublime-project
+*.sublime-workspace
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Debug
+debug.log
+
+# React specific
+.cache/
+.parcel-cache/
+
+# PWA files
+**/public/precache-manifest.*
+**/public/service-worker.js
+**/public/workbox-*.js
+
+# Storybook
+storybook-static/
+.storybook/out/
+
+# Bundle analysis
+bundle-stats.json
+webpack-stats.json
+
+# Cypress
+cypress/videos
+cypress/screenshots
+cypress/downloads
+
+# Jest
+__snapshots__/
+jest-coverage/
+
+# Webpack
+.webpack/
+
+# Generated files
+*.generated.ts
+*.generated.tsx
+
+# Source maps
+*.map
+
+# Lock files (if using multiple package managers)
+pnpm-lock.yaml
+shrinkwrap.yaml

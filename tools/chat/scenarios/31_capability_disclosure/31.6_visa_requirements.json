@@ -1,0 +1,16 @@
+{
+  "name": "31.6_visa_requirements",
+  "description": "AI-CHAT-013: User asks for live visa requirements. Voya has no web search — must disclose and point at the official source (embassy / IATA Travel Centre).",
+  "messages": [
+    {
+      "send": "What's the visa requirement for a US citizen going to Japan?",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "visa",
+        "embassy"
+      ],
+      "expect_not_contains": "I'm just an AI"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "30.10_amend_make_more_relaxed_regenerates",
+  "description": "P0 baseline (#1053): pace-change amend ('make it more relaxed') is in today's MODE 2 list and regenerates. Positive baseline — Phase 2 must keep this regen path.",
+  "messages": [
+    {
+      "send": "Plan a 4-day trip to Barcelona, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["itinerary_results"],
+      "expect_intent": "create_itinerary",
+      "max_time_ms": 90000,
+      "expect_min_days": 4
+    },
+    {
+      "send": "Make it more relaxed",
+      "expect_type_in": ["itinerary_results", "itinerary_conversation", "ai_response", "message"],
+      "max_time_ms": 90000,
+      "expect_contains_any": ["relaxed", "slower", "easy", "Barcelona", "pace", "fewer", "leisurely"]
+    }
+  ]
+}

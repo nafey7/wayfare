@@ -1,0 +1,13 @@
+{
+  "name": "4.2_date_range_auto_roundtrip",
+  "description": "P0: Date range → auto round-trip, no trip type question",
+  "messages": [
+    {
+      "send": "Amsterdam to Dubai, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type": "flight_search_results",
+      "expect_has_data": true,
+      "max_time_ms": 90000,
+      "expect_not_contains": ["one-way or round"]
+    }
+  ]
+}

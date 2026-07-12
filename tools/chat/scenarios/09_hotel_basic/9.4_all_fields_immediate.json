@@ -1,0 +1,11 @@
+{
+  "name": "9.4_all_fields_immediate",
+  "description": "All hotel fields provided → immediate search",
+  "messages": [
+    {
+      "send": "Hotels in London, {{today+30:natural}} to {{today+33:natural}}, 2 adults",
+      "expect_type_in": ["hotel_search_results", "hotel_conversation"],
+      "max_time_ms": 90000
+    }
+  ]
+}

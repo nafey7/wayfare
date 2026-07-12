@@ -1,0 +1,31 @@
+{
+  "name": "voya-testing",
+  "version": "1.0.0",
+  "description": "Comprehensive testing suite for Voya application",
+  "private": true,
+  "scripts": {
+    "test": "TEST_ENV=local playwright test",
+    "test:api": "TEST_ENV=local playwright test api/",
+    "test:e2e": "TEST_ENV=local playwright test e2e/",
+    "test:all": "TEST_ENV=local playwright test",
+    "test:auth": "TEST_ENV=local playwright test e2e/tests/auth/ api/auth.spec.js",
+    "test:flights": "TEST_ENV=local playwright test e2e/tests/flights/ api/flights.spec.js",
+    "test:manual": "TEST_ENV=local playwright test manual-tests/",
+    "test:staging": "TEST_ENV=staging playwright test",
+    "test:report": "playwright show-report",
+    "test:ui": "TEST_ENV=local playwright test --ui",
+    "test:headed": "TEST_ENV=local playwright test --headed",
+    "test:debug": "TEST_ENV=local playwright test --debug",
+    "test:dev": "TEST_ENV=dev playwright test",
+    "install": "playwright install"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.59.1",
+    "dotenv": "^17.2.2",
+    "mongodb": "^6.0.0"
+  },
+  "devDependencies": {
+    "@playwright/cli": "0.1.6",
+    "playwright": "^1.59.1"
+  }
+}

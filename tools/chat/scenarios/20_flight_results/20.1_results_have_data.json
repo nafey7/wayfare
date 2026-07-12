@@ -1,0 +1,12 @@
+{
+  "name": "20.1_results_have_data",
+  "description": "Flight search returns structured data with has_data=true",
+  "messages": [
+    {
+      "send": "Flights from Amsterdam to London, {{today+30:natural}} to {{today+37:natural}}, 2 adults",
+      "expect_type_in": ["flight_search_results", "flight_conversation"],
+      "expect_has_data": true,
+      "max_time_ms": 90000
+    }
+  ]
+}

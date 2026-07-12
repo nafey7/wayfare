@@ -1,0 +1,25 @@
+{
+  "name": "31.12_midflow_flight_train",
+  "description": "AI-CHAT-013 mid-flow: flight search in progress, user asks if Voya can find Eurostar tickets instead. Voya doesn't book rail — must disclose, point at Trainline, and offer to continue the flight search.",
+  "messages": [
+    {
+      "send": "Find flights London to Paris on June 20, returning June 24, 2 adults",
+      "expect_type_in": [
+        "flight_search_results",
+        "flight_conversation",
+        "message"
+      ],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "Actually can you check Eurostar trains instead?",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "train",
+        "rail"
+      ],
+      "expect_contains": "continue your flight search"
+    }
+  ]
+}

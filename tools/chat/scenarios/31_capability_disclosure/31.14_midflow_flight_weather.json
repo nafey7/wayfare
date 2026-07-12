@@ -1,0 +1,25 @@
+{
+  "name": "31.14_midflow_flight_weather",
+  "description": "AI-CHAT-013 mid-flow: flight search in progress, user asks for weather forecast. Voya has no live weather data — must disclose, point to weather.com, and confirm the flight search is preserved.",
+  "messages": [
+    {
+      "send": "Find flights Amsterdam to Bali on July 5, returning July 15, 2 adults",
+      "expect_type_in": [
+        "flight_search_results",
+        "flight_conversation",
+        "message"
+      ],
+      "max_time_ms": 90000
+    },
+    {
+      "send": "Will it rain in Bali during my trip?",
+      "expect_type": "capability_disclosure",
+      "max_time_ms": 15000,
+      "expect_contains_any": [
+        "weather",
+        "forecast"
+      ],
+      "expect_contains": "continue your flight search"
+    }
+  ]
+}

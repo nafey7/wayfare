@@ -1,0 +1,132 @@
+name: 📋 Task
+description: General task or technical work
+title: "[TASK] "
+labels: ["task", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📋 Task
+        Describe **current behavior** (what is true now) and **expected behavior** (what should be true when done) so
+        completion is unambiguous.
+
+  - type: input
+    id: task-title
+    attributes:
+      label: Task Title
+      description: Clear, actionable task title
+      placeholder: "Update API documentation for authentication endpoints"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: |
+        What is the situation **now**? (Missing docs, failing job, wrong config, undefined process, etc.) Be concrete
+        so it contrasts with expected behavior below.
+      placeholder: |
+        Auth endpoints exist in code but OpenAPI and the developer portal only document v1. Examples for
+        `/api/v2/auth/*` 404 or are absent.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: |
+        What should be true **after** this task? List outcomes a reviewer can check (published pages, passing checks,
+        new behavior)—not only activities.
+      placeholder: |
+        OpenAPI and the portal document all v2 auth routes with request/response examples and error codes. README links
+        work; no broken anchors.
+    validations:
+      required: true
+
+  - type: textarea
+    id: task-context
+    attributes:
+      label: 📊 Context & Motivation
+      description: Why is this task needed?
+      placeholder: |
+        - Current state: API docs are outdated
+        - Problem: Developers struggling with integration
+        - Goal: Improve developer experience
+    validations:
+      required: true
+
+  - type: textarea
+    id: task-description
+    attributes:
+      label: 📝 Task Description
+      description: Concrete steps, scope, files, or owners. Expands on current vs expected above.
+      placeholder: |
+        Update the API documentation to include:
+        - New authentication endpoints
+        - Request/response examples
+        - Error code documentation
+        - Integration guide
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: ✅ Acceptance Criteria
+      description: Specific criteria that must be met
+      placeholder: |
+        - [ ] All authentication endpoints documented
+        - [ ] Code examples provided for each endpoint
+        - [ ] Error responses documented
+        - [ ] Documentation reviewed by team
+        - [ ] Links updated in developer portal
+        - [ ] Unit tests verified and updated if needed
+        - [ ] CLAUDE.md documentation updated with new features/changes
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: Task Type
+      description: What type of task is this?
+      options:
+        - Documentation
+        - Refactoring
+        - Technical Debt
+        - Research
+        - Configuration
+        - Testing
+        - Frontend
+        - Backend
+        - Integration
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Effort Estimate
+      options:
+        - XS (1-2 hours)
+        - S (Half day)
+        - M (1-2 days)
+        - L (3-5 days)
+        - XL (1+ weeks)
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧪 Testing & Documentation Requirements
+
+        **All tasks must include:**
+        - Verify existing unit tests still pass
+        - Add new unit tests for new functionality
+        - Update CLAUDE.md only if changes affect AI behavior or context (brief notes only)
+        - Update appropriate documentation files (CHANGELOG.md, docs/, README.md as needed)
+        - Include testing requirements in acceptance criteria

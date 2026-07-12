@@ -1,0 +1,13 @@
+{
+  "name": "7.2_book_without_search",
+  "description": "'Book me a flight' with no prior search → agent collects info",
+  "messages": [
+    {
+      "send": "Book me a flight",
+      "expect_intent": "flight_conversation",
+      "max_time_ms": 20000,
+      "expect_contains_any": ["flying from", "where", "passenger", "destination"],
+      "expect_not_contains": ["book now button"]
+    }
+  ]
+}

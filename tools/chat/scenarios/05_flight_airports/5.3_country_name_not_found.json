@@ -1,0 +1,12 @@
+{
+  "name": "5.3_country_name_not_found",
+  "description": "P1: Country name (Japan) → agent suggests popular airports",
+  "messages": [
+    {
+      "send": "Flights from Amsterdam to Japan, {{today+30:natural}}, one way, 1 adult",
+      "expect_intent": "flight_conversation",
+      "max_time_ms": 30000,
+      "expect_contains_any": ["tokyo", "narita", "haneda", "osaka", "which"]
+    }
+  ]
+}
