@@ -2,6 +2,18 @@
 
 Your intelligent travel agent for seamless trip planning and booking with production-ready testing infrastructure.
 
+## Screenshots
+
+<img src="docs/screenshots/home.jpg" alt="Voya home page: describe a trip and Voya AI plans it" width="100%">
+
+<p>
+  <img src="docs/screenshots/day-plan.jpg" alt="AI chat beside a day-by-day Lisbon itinerary on a map" width="49%">
+  <img src="docs/screenshots/flights.jpg" alt="Flight search results for Madrid to Lisbon with a route map" width="49%">
+</p>
+<p>
+  <img src="docs/screenshots/stays.jpg" alt="Hotel search results in Lisbon with prices on a map" width="49%">
+</p>
+
 ## 🎯 **Quick Start with Docker (Recommended)**
 
 The fastest way to get Voya running with complete environment isolation:

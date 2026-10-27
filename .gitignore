@@ -213,3 +213,6 @@ tools/langfuse/review_lib/__pycache__/
 
 # Claude Code custom commands (local only)
 .claude/commands/
+
+# README screenshots
+!docs/screenshots/*.jpg
